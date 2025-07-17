@@ -1,0 +1,5 @@
+PngImage_1 RCDATA "maxboxmandel3.png"
+PngImage_2 RCDATA "ps.png"
+Resource_1 RCDATA "examples\\astroids_res\\SOUNDS\\ENGINE.WAV"
+GutterGlyphsBitmap_1 BITMAP "Import\\GutterGlyphs.bmp"
+model RCDATA "..\\..\\ekon27\\model.jpg"
