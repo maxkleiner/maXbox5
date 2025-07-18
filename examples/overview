@@ -1,1 +1,181 @@
+Tutorial 00 Function-Coding  (Blix the Programmer)
+    Tutorial 01 Procedural-Coding
+    Tutorial 02 OO-Programming
+    Tutorial 03 Modular Coding
+    Tutorial 04 UML Use Case Coding
+    Tutorial 05 Internet Coding
+    Tutorial 06 Network Coding
+    Tutorial 07 Game Graphics Coding
+    Tutorial 08 Operating System Coding
+    Tutorial 09 Database Coding
+    Tutorial 10 Statistic Coding
+    Tutorial 10 Probability Coding
+    Tutorial 11 Forms Coding
+    Tutorial 12 SQL DB Coding
+    Tutorial 13 Crypto Coding
+    Tutorial 14 Parallel Coding
+    Tutorial 15 Serial RS232 Coding
+    Tutorial 16 Event Driven Coding
+    Tutorial 17 Web Server Coding
+    Tutorial 18 Arduino Coding and Web of Things
+    Tutorial 18_3 Arduino RGB LED Coding Breadboard and Source LED Zip
+    Tutorial 18_5 Arduino RGB LED WebSocket
+    Tutorial 19 WinCOM /Arduino Coding and Source LED COM
+    Tutorial 20 Regular Expressions RegEx 
+    Tutorial 20_1 RegEx PI Report
+    Tutorial 20_2 BASTA 2015 RegEx Slides
+    Tutorial 21 Android Coding (coming 2015)
+    Tutorial 21 Android SONAR: End of 2015 
+    Tutor 21 Android SONAR: 2015 & Basta LED Things & Code ADK SeekBar
+    Tutorial 22 Services Coding
+    Tutorial 23 Real Time Systems 
+    Tutorial 24 Clean Code 
+    Tutorial 25 maXbox Configuration
+    Tutorial 26 Socket Programming with TCP
+    Tutorial 27 XML & Tree 
+    Tutorial 28 DLL Coding (available)
+    Tutorial 29 UML Scripting (available)
+    Tutorial 30 Web of Things & Basta 2014 Arduino & maXbox
+    Tutorial 31 Closures (2014)
+    Tutorial 32 SQL Firebird (2014)
+    Tutorial 33 Oscilloscope (2014)
+    Tutorial 34 GPS Navigation (2014)
+    Tutorial 35 WebBox (2014)
+    Tutorial 36 Unit Testing (2015)
+    Tutorial 37 API Coding (2015)
+    Tutorial 38 3D Coding (2015)
+    Tutorial 39 GEO Map Coding (available)
+    Tutorial 39_1 GEO Map OpenLayers (available)
+    Tutorial 39_2 Maps2 Coding
+    Tutorial 40 REST Coding (2015)
+    Tutorial 40_1 OpenWeatherMap Coding German
+    Tutorial 41 Big Numbers Coding (2015)
+    Tutorial 41 Big Numbers Short
+    Tutorial 42 Multi Parallel Processing (2015)
+    Tutorial 43 Code Metrics: June2016
+    Tutor 43_1 Code Metrics II
+    Tutorial 44 IDE Extensions
+    Tutorial 45 Robotics: July2016
+    Tutorial 46 WineHQ: Dez2016
+    Tutor    47 RSA Crypto Jan2017
+    Tutor    48 Microservice Jan2017
+    Tutorial 49 Refactoring: March 2017
+    Tutorial 50 Big Numbers II: April 2017
+    Tutorial 51 5 Use Cases April 2017
+    Tutorial 52 Work with WMI Mai 2017
+    Tutorial 52_2 Work with WMI II June 2017
+    Tutorial 53 Real Time UML August 2017
+    Tutorial 54 MicroserviceII MS Crypto API Sept 2017
+    Tutorial 55 ASCII Talk Dez 2017
+    Tutorial 56 Artificial Neural Network 2018
+    Tutorial 57 Neural Network II
+    Tutorial 58 Data Science
+    Tutorial 59 Big Data Feb 2018
+    Tutorial 60 Machine Learning March 2018
+    Tutorial 60_1 Sentiment Analysis
+    Tutorial 60_2 Neural Network III
+    Tutorial 63 Machine Games
+    Tutorial 64 Install Routines
+    Tutorial 65 Machine Learning III
+    Tutorial 66 Machine Learning IV
+    Tutorial 67 Machine Learning V
+    Tutorial 68 Machine Learning VI
+    Tutorial 69 Machine Learning VII
+    Tutorial 70 NoGUI Shell Code
+    Tutorial 71 CGI and Web Sockets
+    Tutorial 72 Multilanguage Coding
+    Tutorial 73 EKON 24 Community Edition
+    Tutorial 74 BASTA 2020 VS Code Vision
+    Tutorial 75 Machine Learning VIII Object Detection
+    Tutorial 76 Machine Learning IX with CAI
+    Tutorial 77 Machine Learning X Confusion Matrix
+    Tutorial 78 Portable pixmap format (PPM)
+    Tutorial 79 Unit Testing with Asserts
+    Tutorial 80 My Tips & Tricks
+    Tutorial 81 RSS Feeds of BBC March 2021
+    Tutorial 82 JSON Code April 2021	
+    Tutorial 82_2 JSON Sentiment Analysis API April 2021
+    Tutorial 83 Machine Learning XI Classification April 2021	
+    Tutorial 84 Machine Learning XII Baseline Mai 2021	
+    Tutorial 85 JSON Automation JSON4Delphi Mai 2021	
+    Tutorial 86 Python4Delphi June 2021
+    Tutorial 86_1 Python4Delphi July 2021
+    Tutorial 86_2 Python4Delphi July 2021
+    Tutorial 86_3 Python4maXbox July 2021
+    Tutorial 86_4 Python4maXbox II
+    Tutor 86_5 Germany
+    Tutorial 87 CAI Image Detection in Lazarus September 2021
+    Tutorial 88 Performance Tuning Oct. 2021
+    Tutorial 89 Build a CNN Oct. 2021
+    Tutorial 89_1 Build a CNN Validation Nov. 2021
+    Tutorial 89_2 Build a CNN Prediction Nov. 2021
+    Tutorial 90 Python Pascal CheatSheet Nov. 2021
+    Tutorial 91 Faker SynDat Generator Dez. 2021
+    Tutorial 91_1 Faker SynDat II, Python_CAI CheatSheet Jan. 2022
+    Tutor 92 Big Decimals How to demystify PI	
+    Tutorial 92_1 DelphiVCL4Python Feb. 2022
+    Tutorial 92_2 Geocoding March 2022
+    Tutorial 93 Geocoding II April 2022
+    Tutorial 94 Post Service API  April 2022
+    Tutorial 95 Translator API  April 2022
+    Tutorial 96 CNN Process Pipeline July 2022	
+    Tutorial 97 Operating System Routines August 2022	
+    Tutorial 98 Integration Python Scripts August 2022	
+    Tutorial 99 DataScience API October 2022
+    Tutorial 100 Data Science Story November 2022
+    Tutorial 101 Data Science Story2 December 2022
+    Tutorial 102 Compiler and Interpreter December 2022
+    Tutorial 103 Image to Text API January 2023	
+    Tutorial 104 Restcountries API January 2023	
+    Tutorial 105 Classify CNN February 2023	
+    Tutorial 106 Air Distance and Bearing, March 2023
+    Tutorial 107 pas2js, March 2023
+    Tutorial 108 Hacking your M rklin, March 2023
+    Tutorial 109 Google Translate API, April 2023 
+    Tutorial 109_1 OpenAI ChatGPT API, April 2023
+    Tutorial 110 Code Overview Samples, April 2023
+    
+    Tutor 110 Code Overview Samples, April 2023
+    Tutor 111 Pas2JS, August 2023
+    Tutor 112 Machine Learning Package, August 2023
+    Tutor 113 Migrate to 64-bit Report, October 2023
+    Tutor 114 Cannonball Simulation, September 2023
+    Tutor 115 64-bit 2 Points in Space, November 2023
+    Tutor 116 64-bit 2 Debugging, December 2023
+    Tutor 117 Mystery of IStream, December 2023
+    Tutor 118 Code Signing, January 2024
+    Tutor 119 Multicode_Programming, February 2024
+    Tutor 119 Multicode_2, February 2024
+    Tutor 120 Unicode_Signs, March 2024
+    Tutor 121 Geocoding IV, March 2024
+    Tutor 122 Geocoding V, March 2024
+    Tutor 123 OCR NeuralNet, March 2024
+    Tutor 124 IMage API, April 2024
+    Tutor 125 Modern Regex, May 2024
+    Tutor 126 4 Machine Learning Object Detection Solutions, July 2024
+    Tutor 127 Geo Maps Directions Station2Station, October 2024
+    Tutor 128 Working with perplexity.ai, October 2024
+    Tutor 129 Using WebView2, October 2024
+    Tutor 130 MIDI magic music, November 2024
+    Tutor 131 Test Classifier App, December 2024
+    Tutor 132 Dragon Curve Sound, December 2024
+    Tutor 133 The Art of Connection, January 2025
+    Tutor 134 Beyond the Obstacle, January 2025
+    Tutor 135 Top 7 Algorithm, February 2025
+    Tutor 136 Google Gemini API, February 2025
+    Tutor 137 Lambda_expressions.pdf, February 2025
+    Tutor 138 Top 7 Statistical Methods.pdf, March 2025
+    Tutor 139 Top 5 Diagram Types, March 2025
+    Tutor 140 Data Correlation Analysis, March 2025
+    Tutor 141 Multi Pascal Solver, April 2025
+    Tutor 142 Geocode Distance Data Art, May 2025
+    Tutor 143 Go Game Board, June 2025
+    Tutor 144 Code Focus, June 2025
+    Tutor 145 Win Services, June 2025
+    Tutor 146 Script Debugging, June 2025
+    Tutor 147 Weatherstation App, June 2025
+    Tutor 148 Gemini Language Model, June 2025
+    Tutor 149 Statistic Package, July 2025
+    Tutor 150 Chess Board, July 2025
+    Tutor 151 DA Checkers & Othello Board, July 2025
 over
