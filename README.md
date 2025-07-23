@@ -19,6 +19,8 @@ Release Notes maXbox 5.2.9.190 July 2025 mX529 beta64-bit🐞
 - ChessBoard migrate 64bit https://github.com/maxkleiner/Pascal-Chess
 - Modules Count_: 3819 Units maXbox5_29beta190.xml
 
+<img width="685" height="574" alt="mX5_529190_buildInfo_Screenshot2025-07-23_184558" src="https://github.com/user-attachments/assets/fbcd6dcb-adab-4a33-8331-ba12e704d80a" />
+
 22.07.2025 09:55
 Release Notes maXbox 5.2.9.190 July 2025 
 SHA1: 5.2.9.190 maXbox5.exe c950a055083157f5f0834cf9496617ac041d333e
