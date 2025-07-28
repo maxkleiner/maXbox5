@@ -136,6 +136,15 @@
   <contains name="CDSUtil" />
   <contains name="uPSI_DBClient" />
   <contains name="uPSI_ConvUtils" />
+  <contains name="docprocMainUnit" />
+  <contains name="Vcl.WinXPickers" />
+  <contains name="Vcl.Styles" />
+  <contains name="Vcl.StyleAPI" />
+  <contains name="Vcl.StyleBitmap" />
+  <contains name="Vcl.Direct2D" />
+  <contains name="Vcl.SysStyles" />
+  <contains name="FixRecordFormat" />
+  <contains name="Utils" />
   <contains name="uPSI_U_Go3" />
   <contains name="U_Go3" />
   <contains name="uPSI_Midas" />
@@ -904,6 +913,11 @@
   <contains name="SysInfoCtrls" />
   <contains name="uPSI_Graph3D" />
   <contains name="Graph3D" />
+  <contains name="uPSI_Pas2Html" />
+  <contains name="Pas2Html" />
+  <contains name="DelphiParse" />
+  <contains name="pas2Utils" />
+  <contains name="DocStructure" />
   <contains name="imageasciiMain" />
   <contains name="ImageAscii" />
   <contains name="uPSI_ChessPrg" />
@@ -1278,6 +1292,9 @@
   <contains name="NamedPipeServer" />
   <contains name="uPSI_NamedPipes" />
   <contains name="NamedPipes" />
+  <contains name="uPSI_SimpleDOM" />
+  <contains name="SimpleDOM" />
+  <contains name="HTML_Tags" />
   <contains name="uPSI_othelloMain" />
   <contains name="othelloMain" />
   <contains name="uPSI_OthelloBoard" />
