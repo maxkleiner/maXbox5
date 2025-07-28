@@ -4,6 +4,28 @@ maXbox is a script tool engine, compiler and source lib all in one exe to design
 ![maxbox5_64logologo5](https://github.com/user-attachments/assets/f39ad1f4-3243-4104-ba45-5315b242e3e7)
 
 *****************************************************************
+Release Notes maXbox 5.2.9.195 July 2025 mX529 beta64-bit🐞
+*****************************************************************
+- ConvertPngToJpeg-ConvertJpegToPng - image.picture.loadfromstream
+- graphics32/blob/master/DocProcessor /Help/Pas2Doc Processor Demo
+- add examples on https://sourceforge.net/projects/maxbox5/files/
+- mp3 async stream collector: 1422_mp3stream_sternenhaufen2.txt
+- unit SimpleDOM; Library base uPSI_SimpleDOM
+- update compatible for Python3.13 and Python3.14 P4D export
+- ChessBoard migrate fix 64bit https://github.com/maxkleiner/Pascal-Chess
+- Modules Count_: 3836 Units maXbox5_29beta190.xml
+
+28.07.2025 20:25
+Release Notes maXbox 5.2.9.195 July 2025 
+SHA1: 5.2.9.195 maXbox5.exe 8deebcd7dca09202c38d201af0769e8bcade68be
+SHA1: ZIP maxbox52.zip 2C5613F69929105F75B0C9729D7D51056924FB0B 
+https://metadefender.com/results/file/bzI1MDcyODM4eHRSb3FMaHNaQ3l6clVabndv_mdaas
+https://www.virustotal.com/gui/file/8102f4cf17b4ae8ee0038f86502e1148c3efd2bd263bb2b39d3c01181b23710a/detection
+
+![meta_fileoverview_28-7-2025_V529195_metadefender com](https://github.com/user-attachments/assets/f0b6dc10-30b9-443f-85e7-43350ca404f1)
+
+
+*****************************************************************
 Release Notes maXbox 5.2.9.190 July 2025 mX529 beta64-bit🐞
 *****************************************************************
 - fixed bigbug in debugger/preprocessor -see tutor_146 debugging
