@@ -338,6 +338,8 @@
   <contains name="OverbyteIcsAsn1Utils" />
   <contains name="uPSI_UWANTUtils" />
   <contains name="UWANTUtils" />
+  <contains name="uPSI_IdNNTPServer" />
+  <contains name="IdNNTPServer" />
   <contains name="uPSI_HttpClasses" />
   <contains name="HttpClasses" />
   <contains name="uPSI_HttpUtils" />
@@ -2402,6 +2404,11 @@
   <contains name="cXMLFunctions" />
   <contains name="uPSI_SimpleHl" />
   <contains name="SimpleHl" />
+  <contains name="uPSI_GR32_LowLevel" />
+  <contains name="GR32_LowLevel" />
+  <contains name="GR32_Bindings" />
+  <contains name="uPSI_GR32_Math" />
+  <contains name="GR32_Math" />
   <contains name="uPSI_JclCOM" />
   <contains name="JclCOM" />
   <contains name="uPSI_JclShell" />
@@ -2419,7 +2426,7 @@
   <contains name="Tetris2" />
   <contains name="uPSI_oysUtils" />
   <contains name="oysUtils" />
-  <contains name="uPSI_dprocess" />
+  <contains name="uPSI_dprocess3" />
   <contains name="uPSI_dpipes" />
   <contains name="dprocess3" />
   <contains name="dpipes" />
@@ -2739,6 +2746,8 @@
   <contains name="StIniStm" />
   <contains name="uPSI_CPortMonitor" />
   <contains name="CPortMonitor" />
+  <contains name="uPSI_GR32_System" />
+  <contains name="GR32_System" />
   <contains name="uPSI_CmAdmCtl" />
   <contains name="Vcl.CmAdmCtl" />
   <contains name="Winapi.COMAdmin" />
