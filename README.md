@@ -14,6 +14,10 @@ Print & Export Rededesign - menu/File/Print Studio5
 maxform1.SystemInfo1Click - menu/Debug/System Info
 Modules Count_: 3860 Units maXbox5_29beta190.xml
 
+<img width="1592" height="977" alt="1440_JaroSim_Gui_mX5Screenshot2025-10-13_172253" src="https://github.com/user-attachments/assets/04ca6dd4-23fa-4db3-a8a0-3ff741f7b884" />
+
+<img width="1592" height="977" alt="1440_Jaro_mX5Screenshot2025-10-13_175026" src="https://github.com/user-attachments/assets/225307d6-8753-4f0c-9a8d-3957c45c1250" />
+
 03.09.2025 17:25
 Release Notes maXbox 5.2.9.198 September 2025 
 SHA1: 5.2.9.198 maXbox5.exe 5a51dfe26c9f57e6c51f47bc9e72625a79646b51
