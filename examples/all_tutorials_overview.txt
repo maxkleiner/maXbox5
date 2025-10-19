@@ -184,6 +184,14 @@ All maXbox Tutorials Table 2016/2017/2018/2019/2020/2021/2022/2023/2024/2025
     Tutor 149 Statistic Package, July 2025
     Tutor 150 Chess Board, July 2025
     Tutor 151 DA Checkers & Othello Board, July 2025
+    Tutor 152 MP3 Sound Engine, July 2025
+    Tutor 153 Pas2Doc Processor, August 2025
+    Tutor 154 File Operators, August 2025
+    Tutor 155 Multi-Coding, September 2025
+    Tutor 156 5 Games Collection, September 2025
+    Tutor 157 Statistic Packages EKON 29, October 2025
+    Tutor 158 Unicode Enumerator, October 2025
+    Tutor 159 Geocode Unicode, October 2025
 
 
 https://maxbox4.wordpress.com/2025/06/05/code-focus/
@@ -198,11 +206,17 @@ Tutor 134 https://maxbox5.wordpress.com/2024/07/22/beyond-the-obstacle/
 Tutor 126 4 Machine Learning Object Detection Solutions, July 2024
 Tutor 127 Geo Maps Directions Station2Station, October 2024
 Tutor 128 Working with perplexity.ai, October 2024
+https://softwareschule.code.blog/2025/09/05/multi-code/
 	
 Actual Version 32-bit: 4.7.6.50 III June 2023
 Actual Version 64-bit: 5.1.6.98 XX  August 2024 mX516 
 Actual Version 64-bit: 5.2.7.120 X  May 2025 mX527
-Actual Version 64-bit: 5.2.9.180 XIX July 2025 mX529
+Actual Version 64-bit: 5.2.9.198 XXIV September 2025 mX529
+
+03.09.2025 18:00
+Release Notes maXbox 5.2.9.198 September 2025 mX529 64-bit🐞
+SHA1: 5.2.9.198 maXbox5.exe 5a51dfe26c9f57e6c51f47bc9e72625a79646b51
+SHA1: ZIP maxbox52.zip AAA6C16CC1311A2C0DA28B212A8FBEB12FD9D1EB
 
 09.07.2025 18:03
 Release Notes maXbox 5.2.9.180 II July 2025 mX529 64-bit🐞
