@@ -1,0 +1,962 @@
+Program Statistical_Data_AnalysisScience_representation_pas_py_stuff12;     //for solution Tutor 140 finished
+
+ //http://www.rosettacode.org/wiki/Prime_decomposition#Pascal ☮ ✞ π 📌 🐞 📊  
+
+//https://rosettacode.org/wiki/Spiral_matrix#Delphi
+//https://rosettacode.org/wiki/Zeckendorf_number_representation#Delphi
+//https://rosettacode.org/wiki/Zeckendorf_number_representation#Pascal
+//https://rosettacode.org/wiki/Air_mass#Delphi   🐱‍🚀 📊 📊 📊   📈 📈 📊
+//https://medium.com/art-of-data-engineering/building-your-first-etl-pipeline-with-python-and-sql-3f4084a08ff1
+//https://medium.com/@sarowar.saurav10/20-advanced-statistical-approaches-every-data-scientist-should-know-ccc70ae4df28
+//https://blog.stackademic.com/data-analysis-with-python-pandas-and-matplotlib-advanced-a9615a3dff6f
+
+//{$I owmapikey2.inc}
+
+
+const DeFZIGZAG =                                               
+   'def zigzag(n):                                              '+LF+
+   '    ''zigzag rows''                                         '+LF+
+   '    def compare(xy):                                        '+LF+
+   '        x, y = xy                                           '+LF+
+   '        return (x + y, -y if (x + y) % 2 else y)            '+LF+
+   '    xs = range(n)                                           '+LF+
+   '    return {index: n for n, index in enumerate(sorted(      '+LF+
+   '        ((x, y) for x in xs for y in xs),                   '+LF+
+   '        key=compare                                         '+LF+
+   '    ))}                                                     '+LF+
+                                                                 
+   'def printzz(myarray):                                       '+LF+ 
+   '    ''show zigzag rows as lines''                           '+LF+ 
+   '    n = int(len(myarray) ** 0.5 + 0.5)                      '+LF+ 
+   '    xs = range(n)                                           '+LF+ 
+   '    print(''\n''.join(                                      '+LF+ 
+   '       [''''.join("%3i" % myarray[(x,y)]for x in xs)for y in xs]'+LF+ 
+   '    ))                                                       ';
+
+procedure ZigZag_Numbers_PySolution(loc: string);
+begin
+ with TPythonEngine.Create(Nil) do begin
+   //pythonhome:= PYHOME64;
+   loaddll;
+   autofinalize:= false;
+   try
+     // 9. Check the Weather Without Leaving Your Terminal 
+    // {$I owmapikey.inc}  //Const OWMKEY='' 
+     execstr('import io, sys  # Added');
+     {To get the current weather data of any city using the OpenWeatherMap 
+     API in Python, you can use the requests and json modules. Here is an example: 
+     The OpenWeatherMap API is a service that provides weather data, including current weather data, forecasts, 
+     and historical data. It offers an API with JSON, XML, and HTML endpoints, and a limited free usage tier. 
+     To use the API, you need to create an account on openweathermap.org and obtain an API key.}
+     execstr('output = io.StringIO()') 
+     execstr('sys.stdout = output');  
+     execstr(DeFZIGZAG);  
+     //execstr('for i in range(n + 1):'+
+       //      '  print(''%3i: %8s'' % (i,''''.join(str(d) for d in z(i))))');
+     Execstr('printzz(zigzag(6))');  
+     println('  '+stringreplace(evalstr('output.getvalue().strip()'),
+                                     #10,#13#10,[rfReplaceAll, rfIgnoreCase])); 
+   except
+      raiseError;
+   finally
+      UnloadDll;
+      Free;
+   end;
+ end; 
+end;
+
+ 
+procedure StatDataScience_PySolution(loc: string);
+var sg : TStringGrid; i: integer;
+    Data1, Data2 : array of Double;
+begin
+ with TPythonEngine.Create(Nil) do begin
+   //pythonhome:= PYHOME64;
+   loaddll;
+   autofinalize:= false;
+   try
+     execstr('import io, sys  # Added');
+     execstr('output = io.StringIO()') 
+     execstr('sys.stdout = output');  
+     //pip install pandas sqlalchemy psycopg2
+     //execstr('from sqlalchemy import create_engine');  
+     //execstr(DeFAIRMASS);  
+  (*
+     execstr('import pymc as pm; import numpy as np');  
+     //execstr('text_data = open(''1372_retail_sales_dataset.csv'',''r'',encoding="utf8").read()');
+     //# Load the dataset
+     execstr('data = pd.read_csv(''1372_retail_sales_dataset.csv'')');
+     execstr('print(data.info())'); 
+     execstr('print(data.head())'); 
+     
+     //Step 2: Clean and Transform the Data
+     //# Drop rows with missing values
+     execstr('data_cleaned = data.dropna()');
+
+      //# Convert sale_date to datetime
+      //execstr('data_cleaned[''sale_date''] = pd.to_datetime(data_cleaned[''sale_date''])');
+     execstr('data_cleaned[''Date''] = pd.to_datetime(data_cleaned[''Date''])');
+
+     execstr('print(data_cleaned.head())');
+      
+      //# Suppose we observed 20 coin flips with 12 heads and 8 tails
+     execstr('observ_heads = 12; observ_tails = 8');
+      
+     execstr('with pm.Model() as model:  '+                       
+          '  # Prior for the bias of the coin (theta)                '+LF+
+          '  theta = pm.Beta(''theta'', alpha=1, beta=1)             '+LF+
+          '  # Likelihood                                            '+LF+
+          '  y= pm.Binomial(''y'',n=observ_heads+observ_tails,p=theta,observed=observ_heads)'+
+          '  # Posterior sampling                                    '+LF+
+          '  trace = pm.sample(200, tune=1000, cores=1, chains=2)   ');
+          
+     execstr('pm.summary(trace)');   
+      
+     execstr('from scipy.stats import norm');
+      
+     //# Generate synthetic data
+     execstr('data = np.random.normal(loc=5, scale=2, size=1000)');
+     //# Estimate MLE for mean and standard deviation
+     execstr('mu_hat, std_hat = norm.fit(data)')
+     execstr('print(f"Estimated Mean (mu): {mu_hat:.2f}")');
+     execstr('print(f"Estimated Std (sigma): {std_hat:.2f}")');
+      
+     //3. Hypothesis Testing (t-test)
+     execstr('from scipy.stats import ttest_ind')
+     //# Synthetic data
+     execstr('group_A= np.random.normal(5,1,50); group_B= np.random.normal(5.5,1.2,50)');
+     execstr('stat, pvalue = ttest_ind(group_A, group_B)');
+      
+     execstr('print(f"T-statistic: {stat:.2f}, p-value: {pvalue:.4f}")'+LF+
+      'if pvalue < 0.05:                                                     '+LF+
+      '    print("Reject the null hypothesis (Significant difference).")     '+LF+
+      'else:                                                                 '+LF+
+      '    print("Fail to reject null hypothesis (No significant difference).")');
+      
+     execstr('from sklearn.decomposition import PCA');
+      //!pip install statsmodels
+            
+     //6. Factor Analysis
+     //!pip install factor_analyzer
+     execstr('from factor_analyzer import FactorAnalyzer');
+     //# Synthetic data (100 samples, 6 variables)
+     execstr('X = np.random.rand(100, 6)                              '+LF+ 
+             'fa = FactorAnalyzer(n_factors=2, rotation=''varimax'')  '+LF+ 
+             'fa.fit(X)                                               '+LF+ 
+             'print("Loadings:\n", fa.loadings_)                       '); 
+               
+     //7. Cluster Analysis (K-means) 
+     execstr('from sklearn.cluster import KMeans ');
+     //# Synthetic data: 200 samples, 2D
+     execstr('X = np.random.rand(200, 2)');
+     execstr('kmeans = KMeans(n_clusters=3, random_state=42)');
+     execstr('kmeans.fit(X)');
+     execstr('print("Cluster centers:", kmeans.cluster_centers_)');
+     execstr('print("Cluster labels:", kmeans.labels_[:10])');
+      
+     //9. Time Series Analysis (ARIMA)
+     execstr('from statsmodels.tsa.arima.model import ARIMA ');
+     //# Synthetic time series data
+     execstr('np.random.seed(42);  data = np.random.normal(100, 5, 50)');
+     execstr('time_series = pd.Series(data)');
+     //# Fit ARIMA model (p=1, d=1, q=1)
+     execstr('model = ARIMA(time_series, order=(1,1,1))');
+     execstr('model_fit = model.fit()');
+     //# Forecast next 5 points
+     execstr('forecast = model_fit.forecast(steps=5)');
+     execstr('print("Forecast:", forecast.values)');
+      
+     //13. Logistic Regression
+     execstr('from sklearn.linear_model import LogisticRegression');
+     execstr('from sklearn.linear_model import LinearRegression');
+     execstr('from sklearn.metrics import mean_squared_error');
+     execstr('from sklearn.model_selection import train_test_split');
+     execstr('np.random.seed(50)                                                '+LF+
+             'X = np.random.rand(100, 5)                                        '+LF+
+             'y = np.random.randint(0, 2, 100)  # Binary labels                 '+LF+
+             'X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.2) '+LF+
+             'model = LogisticRegression()                                      '+LF+
+             'model.fit(X_train, y_train)                                       '+LF+
+             //# Predicting the target values for the test set
+             //'y_pred = model.predict(X_test)                                   '+LF+
+             '# Calculating the model score (R^2 score)                         '+LF+
+             'accuracy = model.score(X_test, y_test)                            '+LF+
+             'print(y_test)                                                     '+LF+
+             'print(f"R^2 Score: {accuracy}")                                   '+LF+
+             'print("Class Accuracy:", accuracy)                                ');
+  
+     execstr('y_pred = model.predict(X_test)  '+LF+       
+            //# Calculating the Mean Squared Error
+             'mse = mean_squared_error(y_test, y_pred)' +LF+
+             'print(f"Mean Squared Error: {mse}") '+LF+
+             'print(y_test)'+LF+
+             'print(y_pred)  ');  
+     
+     //https://www.geeksforgeeks.org/difference-between-score-and-accuracy_score-methods-in-scikit-learn/
+     execstr('from sklearn.metrics import accuracy_score');       
+     execstr('# Method 3: Using accuracy_score function                 '+LF+
+             'accuracy = accuracy_score(y_test, y_pred)                 '+LF+
+             'print(f"accuracy_score function - Accuracy: {accuracy}")  ');        
+     
+     //16. Monte Carlo Simulation     
+     execstr('np.random.seed(42)                                     '+LF+
+            'n_samples = 10_000_00                                   '+LF+
+            'xs = np.random.rand(n_samples)                          '+LF+
+            'ys = np.random.rand(n_samples)                          '+LF+
+            '# Points within the unit circle                         '+LF+
+            'inside_circle = (xs**2 + ys**2) <= 1.0                  '+LF+
+            'pi_estimate = inside_circle.sum() * 4 / n_samples       ');  
+     execstr('print("Estimated π:", pi_estimate)');
+     //17. Markov Chain Monte Carlo (MCMC)   
+     
+     //# Synthetic data
+    (* execstr('np.random.seed(42)'+LF+
+          'data = np.random.normal(0, 1, 100)                                     '+LF+ 
+          'with pm.Model() as model:                                              '+LF+ 
+          '   mu = pm.Normal(''mu'', mu=0, sigma=10)                              '+LF+ 
+          '   sig = pm.HalfNormal(''sigma'', sigma=1)                             '+LF+ 
+          '                                                                       '+LF+ 
+          '   likelihood= pm.Normal(''likelihood'',mu=mu,sigma=sig,observed=data) '+LF+ 
+          '   trace = pm.sample(1000, tune=500, chains=2)                         '+LF+
+          'pm.summary(trace)                                                      ');
+     //*)
+     
+     //execstr('from pygam import LinearGAM, s'); 
+      //# Create connection to the PostgreSQL database
+      //engine = create_engine('postgresql+psycopg2://user:password@localhost:5432/mydatabase')
+
+      //# Load data into SQL
+      //execstr('data_cleaned.to_sql(''sales_data'', engine, index=False, if_exists=''replace'') ');
+     //https://blog.stackademic.com/data-analysis-with-python-pandas-and-matplotlib-advanced-a9615a3dff6f
+     //import pandas as pd
+     
+      //# Creating a Series at runtime!
+     execstr('import pandas as pd');   
+     execstr('data = [10,20,30,40]; series= pd.Series(data); print(series)');
+    //DataFrames 
+     execstr('data={''Name'':[''John'',''Jane'',''Mike''],''Age'':[23,25,30]}');
+     execstr('df = pd.DataFrame(data); print(df)'); 
+     
+     //# Create Employee Dataset
+     execstr('data = { '+LF+
+          '"Employee_ID": range(1001, 1011), '+LF+
+          '"Name":["Alice","Bob","Charlie","David","Emma","Max","Grace","Helen","Isaac","Julia"],'+LF+
+          '"Age":[25, 28, 35, 40, 22, 30, 45, 50, 29, 38], '+LF+
+          '"Department":["HR","IT","IT","Finance","HR","Finance","IT","Marketing","HR","Finance"],'+LF+
+          '"Salary":[50000,70000,85000,92000,48000,78000,110000,65000,52000,88000],'+LF+
+          '"Experience_Years":[2, 4, 10, 15, 1, 8, 20, 12, 3, 11],'+LF+
+          '"Performance_Score":[3.2,4.5,4.8,3.7,2.9,4.2,4.9,3.8,3.5,4.1]'+LF+
+          '} ');
+
+      //# Convert to DataFrame
+     execstr('df = pd.DataFrame(data)');
+      //# Display first few rows
+     execstr('print(df.head())');
+      //Data Cleaning    # Check for missing values
+     execstr('print(df.isnull().sum());  # Check data types print(df.dtypes)');
+      //# Convert categorical columns to category type
+     execstr('df[''Department''] = df[''Department''].astype(''category'')');
+
+      //# Add an Experience Level column
+     execstr('df[''Experience_Level''] = pd.cut(df[''Experience_Years''],'+LF+
+               'bins=[0,5,10,20], labels=[''Junior'',''Mid'',''Senior''])');
+      //# Show the updated DataFrame
+     execstr('print(df.head())'); 
+     
+     //Find Employees with High Salaries
+     execstr('high_salary_df = df[df[''Salary''] > 80000]');
+     execstr('print(high_salary_df)');
+     //Find Average Salary by Department
+     execstr('print(df.groupby(''Department'')[''Salary''].mean())');
+     //Find the Highest Performing Department
+     execstr('print(f"Highest Performing Department: {df.groupby("Department")["Performance_Score"].mean().idxmax()}")');     
+    
+    (* 
+     //Step 4: Data Visualization
+     //📊 1. Bar Chart — Average Salary by Department
+     execstr('import matplotlib.pyplot as plt');
+     execstr('import seaborn as sns');
+     execstr('plt.figure(figsize=(8,5))'+LF+
+      'sns.barplot(x=df[''Department''],y=df[''Salary''],estimator=np.mean,palette="coolwarm")'+LF+
+      'plt.title(''Average Salary by Department'', fontsize=14)                               '+LF+
+      'plt.xlabel(''Department'', fontsize=12)                                                '+LF+
+      'plt.ylabel(''Average Salary'', fontsize=12)                                            '+LF+
+      'plt.xticks(rotation=45)                                                                '+LF+
+      'plt.show()                                                                             '); 
+      
+    //📈 2. Scatter Plot — Salary vs Experience   
+    execstr('plt.figure(figsize=(9,5))'+LF+
+      'sns.scatterplot(x=df["Experience_Years"],y=df["Salary"],hue=df["Department"],palette="Dark2",s=100)'+LF+
+      'plt.title(''Salary vs Experience'', fontsize=14)                               '+LF+
+      'plt.xlabel(''Years of Experience'', fontsize=12)                               '+LF+
+      'plt.ylabel(''Salary'', fontsize=12)                                            '+LF+
+      'plt.legend(title="Department",bbox_to_anchor=(1, 1),fontsize=8)               '+LF+
+      'plt.show()                                                                 '); 
+      
+    //📊 3. Histogram — Salary Distribution
+    execstr('plt.figure(figsize=(8,5))                                            '+LF+
+      'plt.hist(df["Salary"], bins=5, color="blue", alpha=0.7, edgecolor="black")  '+LF+ 
+      'plt.title("Salary Distribution", fontsize=14)                               '+LF+ 
+      'plt.xlabel("Salary", fontsize=12)                                           '+LF+ 
+      'plt.ylabel("Frequency", fontsize=12)                                        '+LF+ 
+      'plt.show()                                                                  ');   
+      
+    //📊 4. Box Plot — Salary by Department
+    execstr('plt.figure(figsize=(8,5))                                    '+LF+
+      'sns.boxplot(x=df["Department"], y=df["Salary"], palette="pastel")  '+LF+
+      'plt.title("Salary Distribution by Department", fontsize=14)        '+LF+
+      'plt.xlabel("Department", fontsize=12)                              '+LF+
+      'plt.ylabel("Salary", fontsize=12)                                  '+LF+
+      'plt.xticks(rotation=45)                                            '+LF+
+      'plt.show()                                                         ');
+      
+     //📈 5. Linechart — Salary vs Experience   
+    execstr('plt.figure(figsize=(9,5))'+LF+
+      'sns.lineplot(x=df["Experience_Years"],y=df["Salary"],hue=df["Department"],palette="Dark2")'+LF+
+      'plt.title(''Salary vs Experience mX5'', fontsize=14)                               '+LF+
+      'plt.xlabel(''Years of Experience'', fontsize=12)                               '+LF+
+      'plt.ylabel(''Salary'', fontsize=12)                                            '+LF+
+      '#plt.legend(title="Department",bbox_to_anchor=(1, 1),fontsize=8)               '+LF+
+      'plt.show()                                                            ');  
+      *)
+      
+     execstr('import random; import math; import numpy as np');
+     execstr('import matplotlib.pyplot as plt');
+     execstr('from sklearn.svm import SVR');
+    // execstr('from scikitlearn.svm import SVR');
+    
+      execstr('import seaborn as sns');
+     execstr('from sklearn.metrics import mean_squared_error');
+     //execstr('from sklearn.datasets import load_boston');
+     execstr('from sklearn.datasets import fetch_california_housing');
+     execstr('housing = fetch_california_housing()');
+      //# Convert to DataFrame
+     // 'frame': None, 'target_names': ['MedHouseVal'], 'feature_names':['MedInc','HouseAge','AveRooms', 
+     // 'AveBedrms', 'Population', 'AveOccup', 'Latitude', 'Longitude'], 'DESCR': '.. 
+      //execstr('print(californ())');
+       execstr('print("Shape:",housing.data.shape, housing.target.shape)');
+      execstr('print(housing.feature_names[0:6])');
+      execstr('x, y = housing.data, housing.target');
+      //execstr('print(y[0:500]); print(x[0:500][1])');
+      execstr('print(x[0:100,1])');
+    (* execstr('x_ax=x[0:1000,0]; y=y[0:1000]                               '+LF+
+            'plt.scatter(x_ax, y, s=5,color="blue",label="original")     '+LF+
+            //'plt.plot(x_ax,pred_y, lw=1.5,color="red",label="predicted") '+LF+
+            'plt.title("california_housing mX5")              '+LF+
+            'plt.legend()                                                '+LF+
+            'plt.show()                                    '); 
+            //*)
+     execstr('df = pd.DataFrame(housing.data)');
+     //# saving the dataframe
+     execstr('df.to_csv('''+exepath+'\1382_housingdata.txt'+''')');
+     //azuLoadCSV( Filename : string; sg : TStringGrid);
+     sg:= TStringGrid.create(self);
+     sg.Rows[2].Delimiter:= ',';
+     //azuLoadCSV(exepath+'housingdata.txt',  sg);
+     //for i := 0 to Pred(sg.rowCount) do sg.Rows[i].Delimiter:= ',';
+     println('csv load lines: '+itoa(sg.rowcount)+' cols: '+itoa(sg.colcount));
+     //for i := 0 to Pred(sg.rowCount) do writeln(sg.cells[2,i]);
+     for i := 2 to 10 do writeln(sg.cells[1,i]);
+     for i := 2 to 10 do writeln(sg.cells[3,i]);
+     setlength(Data1, sg.rowcount); setlength(Data2, sg.rowcount);
+     //for i := 2 to sg.rowcount-1 do data1[i]:= stringtofloat(sg.cells[1,i]);
+     //for i := 2 to sg.rowcount-1 do data2[i]:= stringtofloat(sg.cells[3,i]);
+    (* with TStatisticClass.create do begin
+       //count:= sg.rowcount-1;
+       //Add1(data2);
+       writeln(getasString)
+       free
+     end;     *)
+     println('d-correlation mincome - avgrooms: '+flots(correlation(data1, data2))); 
+     sg.free;
+     
+      //# Display first few rows
+     execstr('print(df.head())');
+     //df['A'].corr(df['B'])
+     //Exception: ValueError: Per-column arrays must each be 1-dimensional at 846.5317
+     // execstr('print(df["MedHouseVal"].corr(df["MedInc"]))');
+     // execstr('print("corr: ",df[0].corr(df[2]))'); 
+     //https://note.nkmk.me/en/python-pandas-numpy-conversion/
+      execstr('print("corr: ",df[0].corr(pd.Series(housing.target)))'); 
+     //execstr('x, y = californ.data, californ.target');
+     //data = np.hstack([raw_df.values[::2, :], raw_df.values[1::2, :2]])
+     //target = raw_df.values[1::2, 2]
+     //https://stackabuse.com/bytes/calculate-correlation-of-dataframe-featurescolumns-with-pandas/
+      
+     //Next, we create sample data.
+     execstr('Datarange = 100; random.seed(123456789);    '+LF+
+      'def getData(N):                                    '+LF+
+      '   x,y = [],[]                                     '+LF+
+      '   for i in range(N):                              '+LF+
+      '     a = i/8+random.uniform(-1,1)                  '+LF+
+      '     yy = math.sin(a)+3+random.uniform(-1,1)       '+LF+
+      '     x.append([a])                                 '+LF+
+      '     y.append([yy])                                '+LF+ 
+      '   return np.array(x), np.array(y)                 '); 
+      
+     execstr('x,y = getData(Datarange)');
+     
+     execstr('model = SVR(gamma="auto") #=scale              '+LF+ 
+             'print(model)                                   '+LF+ 
+             'model.fit(x,y)                                 '+LF+ 
+             'pred_y = model.predict(x)                      '+LF+ 
+             '                                               '+LF+ 
+             'for yo, yp in zip(y[1:15,:], pred_y[1:15]):    '+LF+ 
+             '  print(yo,yp)                                 ');   
+      
+     execstr('x_ax=range(Datarange)                                      '+LF+
+            'plt.scatter(x_ax, y, s=5,color="blue",label="original")     '+LF+
+            'plt.plot(x_ax,pred_y, lw=1.5,color="red",label="predicted") '+LF+
+            'plt.title("high variance - be overfitted mX5")              '+LF+
+            'plt.legend()                                                '+LF+
+            'plt.show()                                                  ');  
+            
+     execstr('score=model.score(x,y)                   '+LF+
+             'print("Score:",score)                    '+LF+
+             '                                         '+LF+
+             'mse =mean_squared_error(y, pred_y)       '+LF+
+             'print("Mean Squared Error:",mse)         ');  
+      
+      //Start with Tutor 140       
+      //# Target column is under ch.target, the rest is under ch.data
+     execstr('ch = fetch_california_housing(as_frame=True)');
+     execstr('df = pd.DataFrame(data=ch.data, columns=ch.feature_names)');
+     execstr('df["MedHouseVal"] = ch.target; print(df.head())');
+         
+     execstr('fig, ax = plt.subplots(figsize=(10, 6))             '+LF+
+             'plt.title("corr. matrix - california_housing mX5")  '+LF+   
+             'sns.heatmap(df.corr(),ax=ax,annot=True); plt.show() '); 
+             
+     //Get Correlation to Target Variable
+     execstr('corr = df.corr()[["MedHouseVal"]]         '+LF+
+             'plt.title("Correlation to Target - mX5")  '+LF+  
+             'sns.heatmap(corr, annot=True);plt.show()  ');  
+     
+     println('  '+stringreplace(evalstr('output.getvalue().strip()'),
+                                     #10,#13#10,[rfReplaceAll, rfIgnoreCase])); 
+   except
+      raiseError;
+   finally
+      UnloadDll;
+      Free;
+   end;
+ end; 
+end;
+
+var d: array of int64; dc: array of TInteger;  
+ 
+begin   //@main
+//https://rosettacode.org/wiki/Happy_numbers#DWScript
+//https://python.plainenglish.io/lambda-functions-in-python-are-more-useful-than-you-think-d56ee089701d
+//https://www.kaggle.com/code/maxkleiner/notebook10dae7045a/
+//fpascal_solution(); 
+  (* 
+  writeln('program Count_the_coins_BigDecimal;');
+  d := [1, 5, 10, 25];
+  m := Length(d); n := 100;         //100
+  Writeln(itoa(Count64(d, m, n)));  //242
+  //print(changes(100000, [100, 50, 25, 10, 5, 1]));
+  d := [1, 5, 10, 25, 50, 100];
+  d:= [200, 100, 50, 20, 10, 5, 2, 1];    //eu_coins:= 10056050940818192726001
+  //d := [10, 25];
+  m:= Length(d);  n:= 100000;
+  Writeln((Count64big(d, m, n)));   *)
+  //Writeln('Python Request Weather Solutions:_____');
+  //LLM_Torch_PySolution('Lucerne');
+   //Seaborn_Lambda_PySolution('Visp');
+   //Project_Functions_Lambda_PySolution('Brig');  
+   //GetString( var Source : Ansistr; const Separator : Ansistr) : Ansistr
+   
+   Writeln('ZigZag Python Solution:_____'+CR);
+   ZigZag_Numbers_PySolution('St. Gall');
+   
+   Writeln('Statistical Data Science Python Solution:_____'+CR);
+   StatDataScience_PySolution('Wankdorf');
+   
+   {
+   Project_Functions_Weather_PySolution('Basel, CH');
+   sleep(1000);
+   Writeln('Pascal Restclient Weather Solutions:_____');
+   //println(TRestClient4_AskWeather('Basel, CH', nil));
+   println(TRestClient5_AskWeather('Basel, CH'));
+   }
+   //GetMorseTable(dots:Bool):Str;;  //whole table!
+   //println(GetMorseTable(true));  //whole table!
+   //RenderJS_factors();
+  (* RenderJS_countcoins();
+   countTheCoins_Pascal();     *)
+End.
+
+
+ref:    https://www.zeitmaschine.tv/_zm/uploads/reis/html5/1632322578743.mp4
+        https://x.com/i/status/1889295047192981796
+        https://de.slideshare.net/slideshow/maxbox_starter138_top7_statistical_methods-pdf/275863941
+        https://de.scribd.com/document/832126274/Maxbox-Starter139-Top5-Data-Diagram-Types
+        https://stackabuse.com/bytes/calculate-correlation-of-dataframe-featurescolumns-with-pandas/
+        https://colab.research.google.com/drive/1s11Z1o8RImYyzdRFCPokNeFBlVpTdlVv?usp=sharing
+        
+        This code snippet trains a linear regression model, predicts the target values for the 
+        test set, and then calculates and prints the R² score and Mean Squared Error (MSE) for the model. 
+        Feel free to adapt it to your specific dataset and model!
+        
+        Checking for correlation, and quantifying correlation is one of the key steps during 
+        exploratory data analysis and forming hypotheses.
+        “Covariance” indicates the direction of the linear relationship between variables. “Correlation” on the 
+other hand measures both the strength and direction of the linear relationship between two variables.
+        
+        One of the fundamental activities in statistics is creating models that can summarize data using 
+        a small set of numbers, thus providing a compact description of the data. In this chapter 
+        we will discuss the concept of a statistical model and how it can be used to describe data.
+        
+        In statistics, a model is meant to provide a similarly condensed description, but for 
+        data rather than for a physical structure. Like physical models, a statistical model is generally 
+        much simpler than the data being described;
+        The basic structure of a statistical model is:    data=model+error
+        
+        We load in a dataset from Scikit-Learn and pack it into a DataFrame:
+        
+ Understanding the fit() Method
+The fit() method in Scikit-Learn is used to train a machine learning model. 
+Training a model involves feeding it with data so it can learn the underlying patterns. 
+This method adjusts the parameters of the model based on the provided data.       
+        
+Scikit-learns model.score(X,y) calculation works on co-efficient of determination i.e R^2 is a 
+simple function that takes model.score= (X_test,y_test). It doesn't require y_predicted value 
+to be supplied externally to calculate the score for you, rather it calculates y_predicted internally
+ and uses it in the calculations.
+
+This is how it is done:
+
+u = ((y_test - y_predicted) ** 2).sum()
+v = ((y_test - y_test.mean()) ** 2).sum()
+
+score = 1 - (u/v)
+
+and you get the score ! Hope that helps.    
+
+https://www.bahnonline.ch/5472/tee-stiftung-in-den-niederlanden-gibt-ram-an-transportmuseum-ab/
+https://www.gofundme.com/f/aankoop-teetrein-fase-1    
+
+procedure InflateRect(var R: TRectF; const DX, DY: Single);
+begin
+//{$EXCESSPRECISION OFF}
+  R.Left := R.Left - DX;
+  R.Right := R.Right + DX;
+  R.Top := R.Top - DY;
+  R.Bottom := R.Bottom + DY;
+//{$EXCESSPRECISION ON}
+end;
+
+
+Stranded in rural Maine with a dead car and broken ankle, Tegan worries she's made a terrible mistake. 
+Then a miracle occurs: she is rescued by a couple who offers her a room in their warm cabin until the snow clears.
+
+But something isn't right. Tegan believed she was waiting out the storm, but as time ticks by, 
+she comes to realize she is in grave danger. This safe haven isn't what she thought it was, and staying here may 
+have been her most deadly mistake yet.  
+
+And now she must do whatever it takes to save herself―and her unborn child.
+
+A gut-wrenching story of motherhood, survival, and twisted expectations, #1 New York Times bestselling author Freida McFadden 
+delivers a snowbound thriller that will chill you to the bone.
+
+Python Request Weather Solutions:_____
+Exception: ConnectionError: HTTPSConnectionPool(host='api.openweathermap.org', port=443): Max retries exceeded with url:
+ /data/2.5/weather?q=Basel,%20CH&units=metric&appid=55013bf3d09cfb0619989a00ed5bed09 (Caused by 
+ NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x000002189C0DC830>: 
+ Failed to resolve 'api.openweathermap.org' ([Errno 11001] getaddrinfo failed)")) at 861.1073
+
+
+Feb 26, 2025
+12:57 PM
+Shipment Delivered
+Geneva, CH
+Feb 18, 2025
+12:04 PM
+Inbound Scan
+Case Postale, CH
+Feb 15, 2025
+9:09 AM
+Shipment Manifested Manually Attached to Outbound MAWB
+Colnbrook, UK
+Feb 15, 2025
+8:54 AM
+Shipment Manifested Manually Attached to Outbound MAWB
+Colnbrook, UK
+Feb 14, 2025
+1:11 PM
+Shipped from Global Shipping Center to Destination
+Lichfield, Staffordshire, GB
+Feb 14, 2025
+12:26 PM
+Parcel Documentation and Labeling
+Lichfield, Staffordshire, GB
+Feb 14, 2025
+12:26 PM
+Processing at Shipping Center
+Lichfield, Staffordshire, GB
+Feb 14, 2025
+12:25 PM
+In Transit
+London, UK
+Feb 10, 2025
+6:17 PM
+Tracking details uploaded
+--------------------------------------------------
+Wed, Feb 26
+12:57pm
+Shipment is Delivered in Letter Box
+GENEVA
+Tue, Feb 18
+1:17pm
+Label added to shipment, shipment now waiting to be handed to the last mile courier.
+GENEVA
+Vom Versandzentrum zu Ihnen (Schritt 2)
+PBI (Pitney Bowes): UPAAG000000072744731
+Tue, Feb 18
+1:17pm
+Label added to shipment, shipment now waiting to be handed to the last mile courier.
+GENEVA
+Tue, Feb 18
+12:56pm
+Forwarded to Delivery Office
+CASE POSTALE
+Tue, Feb 18
+12:04pm
+Under processing at operations facility
+CASE POSTALE
+Sat, Feb 15
+9:09am
+Departed Operations facility – In Transit
+COLNBROOK
+Sat, Feb 15
+8:54am
+Departed Operations facility – In Transit
+COLNBROOK
+Fri, Feb 14
+9:48pm
+Received at Origin Facility
+LONDON
+Fri, Feb 14
+9:40pm
+Received at Origin Facility
+LONDON
+Fri, Feb 14
+1:11pm
+Shipped from Global Shipping Center to Destination
+LICHFIELD, STAFFORDSHIRE WS13 8UR
+Fri, Feb 14
+12:54pm
+Container Closed
+LICHFIELD, STAFFORDSHIRE WS13 8UR
+Fri, Feb 14
+12:45pm
+Container Assignment
+LICHFIELD, STAFFORDSHIRE WS13 8UR
+Fri, Feb 14
+12:26pm
+Parcel Documentation and Labeling
+LICHFIELD, STAFFORDSHIRE WS13 8UR
+Fri, Feb 14
+12:26pm
+Second Dimension Event
+LICHFIELD, STAFFORDSHIRE WS13 8UR
+Fri, Feb 14
+12:26pm
+First Dimension Event
+LICHFIELD, STAFFORDSHIRE WS13 8UR
+Fri, Feb 14
+12:26pm
+Processing at Shipping Center
+LICHFIELD, STAFFORDSHIRE WS13 8UR
+Fri, Feb 14
+12:26pm
+Record created.
+LONDON
+Mon, Feb 10
+6:17pm
+Tracking details uploaded
+Mon, Feb 10
+11:17am
+Sendungsnummer angegeben
+Vom Verkäufer zum Versandzentrum (Schritt 1)
+Sendungsnummer wird bereitgestellt
+Tue, Feb 11
+4:43pm
+Delivered by
+Tue, Feb 11
+4:34pm
+Item Received
+Mon, Feb 10
+10:09pm
+Item Received
+Mon, Feb 10
+12:53pm
+Sender despatching item
+Mon, Feb 10
+11:17am
+Sendungsnummer angegeben
+Weniger ansehen
+    
+ // Adapted from http://www.geeksforgeeks.org/dynamic-programming-set-7-coin-change/
+    class Program
+    {
+        static long Count(int[] C, int m, int n)
+        {
+            var table = new long[n + 1];
+            table[0] = 1;
+            for (int i = 0; i < m; i++)
+                for (int j = C[i]; j <= n; j++)
+                    table[j] += table[j - C[i]];
+            return table[n];
+        }
+        static void Main(string[] args)
+        {
+            var C = new int[] { 1, 5, 10, 25 };
+            int m = C.Length;
+            int n = 100;
+            Console.WriteLine(Count(C, m, n));  //242
+            Console.ReadLine();
+        }
+    }  
+    
+    def spiral(n):
+    dx,dy = 1,0            # Starting increments
+    x,y = 0,0              # Starting location
+    myarray = [[None]* n for j in range(n)]
+    for i in xrange(n**2):
+        myarray[x][y] = i
+        nx,ny = x+dx, y+dy
+        if 0<=nx<n and 0<=ny<n and myarray[nx][ny] == None:
+            x,y = nx,ny
+        else:
+            dx,dy = -dy,dx
+            x,y = x+dx, y+dy
+    return myarray
+
+def printspiral(myarray):
+    n = range(len(myarray))
+    for y in n:
+        for x in n:
+            print "%2i" % myarray[x][y],
+        print
+
+printspiral(spiral(5)) 
+    
+
+Warning: Trying to access array offset on value of type bool in /htdocs/Spur N/minitrix/sortiment/detailseiten/Minitrix_16304.php on line 106
+
+Deprecated: mysqli::query(): Passing null to parameter #1 ($query) of type string is deprecated in /htdocs/app/classes/Category.php on line 203
+
+Fatal error: Uncaught ValueError: mysqli::query(): Argument #1 ($query) cannot be empty in /htdocs/app/classes/Category.php:203 Stack 
+trace: #0 /htdocs/app/classes/Category.php(203): 
+mysqli->query() #1 /htdocs/app/classes/Category.php(191): Category->getProductData() #2 /htdocs/Spur N/minitrix/
+sortiment/detailseiten/Minitrix_16304.php(106): Category->loadProduct() 
+#3 {main} thrown in /htdocs/app/classes/Category.php on line 203
+
+
+C:\maxbox\maxbox4\maxbox4>py -3.12 -m pip install pymc
+Collecting pymc
+  Downloading pymc-5.20.1-py3-none-any.whl.metadata (15 kB)
+Collecting arviz>=0.13.0 (from pymc)
+  Using cached arviz-0.20.0-py3-none-any.whl.metadata (8.8 kB)
+Requirement already satisfied: cachetools>=4.2.1 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from pymc) (5.5.0)
+Collecting cloudpickle (from pymc)
+  Downloading cloudpickle-3.1.1-py3-none-any.whl.metadata (7.1 kB)
+Requirement already satisfied: numpy>=1.25.0 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from pymc) (1.26.3)
+Requirement already satisfied: pandas>=0.24.0 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from pymc) (2.2.2)
+Collecting pytensor<2.28,>=2.26.1 (from pymc)
+  Downloading pytensor-2.27.1-cp312-cp312-win_amd64.whl.metadata (10 kB)
+Requirement already satisfied: rich>=13.7.1 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from pymc) (13.9.4)
+Requirement already satisfied: scipy>=1.4.1 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from pymc) (1.11.4)
+Requirement already satisfied: threadpoolctl<4.0.0,>=3.1.0 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from pymc) (3.2.0)
+Requirement already satisfied: typing-extensions>=3.7.4 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from pymc) (4.12.2)
+Requirement already satisfied: setuptools>=60.0.0 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from arviz>=0.13.0->pymc) (75.8.0)
+Requirement already satisfied: matplotlib>=3.5 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from arviz>=0.13.0->pymc) (3.9.0)
+Requirement already satisfied: packaging in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from arviz>=0.13.0->pymc) (24.1)
+Collecting xarray>=2022.6.0 (from arviz>=0.13.0->pymc)
+  Downloading xarray-2025.1.2-py3-none-any.whl.metadata (11 kB)
+Collecting h5netcdf>=1.0.2 (from arviz>=0.13.0->pymc)
+  Downloading h5netcdf-1.5.0-py3-none-any.whl.metadata (13 kB)
+Collecting xarray-einstats>=0.3 (from arviz>=0.13.0->pymc)
+  Downloading xarray_einstats-0.8.0-py3-none-any.whl.metadata (5.8 kB)
+Requirement already satisfied: python-dateutil>=2.8.2 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from pandas>=0.24.0->pymc) (2.8.2)
+Requirement already satisfied: pytz>=2020.1 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from pandas>=0.24.0->pymc) (2024.1)
+Requirement already satisfied: tzdata>=2022.7 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from pandas>=0.24.0->pymc) (2023.3)
+Requirement already satisfied: filelock>=3.15 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from pytensor<2.28,>=2.26.1->pymc) (3.15.4)
+Collecting etuples (from pytensor<2.28,>=2.26.1->pymc)
+  Downloading etuples-0.3.9.tar.gz (30 kB)
+  Preparing metadata (setup.py) ... done
+Collecting logical-unification (from pytensor<2.28,>=2.26.1->pymc)
+  Downloading logical-unification-0.4.6.tar.gz (31 kB)
+  Preparing metadata (setup.py) ... done
+Collecting miniKanren (from pytensor<2.28,>=2.26.1->pymc)
+  Downloading miniKanren-1.0.3.tar.gz (41 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 41.3/41.3 kB 1.9 MB/s eta 0:00:00
+  Preparing metadata (setup.py) ... done
+Collecting cons (from pytensor<2.28,>=2.26.1->pymc)
+  Downloading cons-0.4.6.tar.gz (26 kB)
+  Preparing metadata (setup.py) ... done
+Requirement already satisfied: markdown-it-py>=2.2.0 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from rich>=13.7.1->pymc) (3.0.0)
+Requirement already satisfied: pygments<3.0.0,>=2.13.0 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from rich>=13.7.1->pymc) (2.19.0)
+Requirement already satisfied: h5py in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from h5netcdf>=1.0.2->arviz>=0.13.0->pymc) (3.12.1)
+Requirement already satisfied: mdurl~=0.1 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from markdown-it-py>=2.2.0->rich>=13.7.1->pymc) (0.1.2)
+Requirement already satisfied: contourpy>=1.0.1 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from matplotlib>=3.5->arviz>=0.13.0->pymc) (1.2.1)
+Requirement already satisfied: cycler>=0.10 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from matplotlib>=3.5->arviz>=0.13.0->pymc) (0.12.1)
+Requirement already satisfied: fonttools>=4.22.0 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from matplotlib>=3.5->arviz>=0.13.0->pymc) (4.53.0)
+Requirement already satisfied: kiwisolver>=1.3.1 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from matplotlib>=3.5->arviz>=0.13.0->pymc) (1.4.5)
+Requirement already satisfied: pillow>=8 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from matplotlib>=3.5->arviz>=0.13.0->pymc) (10.3.0)
+Requirement already satisfied: pyparsing>=2.3.1 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from matplotlib>=3.5->arviz>=0.13.0->pymc) (3.1.2)
+Requirement already satisfied: six>=1.5 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from python-dateutil>=2.8.2->pandas>=0.24.0->pymc) (1.16.0)
+Collecting toolz (from logical-unification->pytensor<2.28,>=2.26.1->pymc)
+  Downloading toolz-1.0.0-py3-none-any.whl.metadata (5.1 kB)
+Collecting multipledispatch (from logical-unification->pytensor<2.28,>=2.26.1->pymc)
+  Downloading multipledispatch-1.0.0-py3-none-any.whl.metadata (3.8 kB)
+Downloading pymc-5.20.1-py3-none-any.whl (518 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 518.9/518.9 kB 1.9 MB/s eta 0:00:00
+Downloading arviz-0.20.0-py3-none-any.whl (1.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.7/1.7 MB 2.4 MB/s eta 0:00:00
+Downloading pytensor-2.27.1-cp312-cp312-win_amd64.whl (1.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.5/1.5 MB 3.0 MB/s eta 0:00:00
+Downloading cloudpickle-3.1.1-py3-none-any.whl (20 kB)
+Downloading h5netcdf-1.5.0-py3-none-any.whl (49 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 49.2/49.2 kB 2.4 MB/s eta 0:00:00
+Downloading xarray-2025.1.2-py3-none-any.whl (1.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 3.2 MB/s eta 0:00:00
+Downloading xarray_einstats-0.8.0-py3-none-any.whl (32 kB)
+Downloading multipledispatch-1.0.0-py3-none-any.whl (12 kB)
+Downloading toolz-1.0.0-py3-none-any.whl (56 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 56.4/56.4 kB 3.1 MB/s eta 0:00:00
+Building wheels for collected packages: cons, logical-unification, etuples, miniKanren
+  Building wheel for cons (setup.py) ... done
+  Created wheel for cons: filename=cons-0.4.6-py3-none-any.whl size=9195 sha256=f7d85559fcfb7726b95f8f6b7ff2d3ca0507e6d6b4445e325214c31c9726bd19
+  Stored in directory: c:\users\user\appdata\local\pip\cache\wheels\91\0c\f7\7ba4ffbf0db6bf272bee59789131f6ec2d26966307a3054267
+  Building wheel for logical-unification (setup.py) ... done
+  Created wheel for logical-unification: filename=logical_unification-0.4.6-py3-none-any.whl 
+  size=14016 sha256=a81c7da5232472eb8a7995fdc34aef8b0a9122370bdc6d695ff5bab0dfb087bb
+  Stored in directory: c:\users\user\appdata\local\pip\cache\wheels\4b\07\cf\3fdaedafc40d7b1861c98be0df1bf3b2b3e87e03187fa95298
+  Building wheel for etuples (setup.py) ... done
+  Created wheel for etuples: filename=etuples-0.3.9-py3-none-any.whl size=12715 sha256=e12c9e11ff8e07f03c5c48690c22e4268550e4b3cd2658c6fd56e4e011ead9dd
+  Stored in directory: c:\users\user\appdata\local\pip\cache\wheels\9e\ea\42\9562f37ce4e92913b74da9bcd504a749f0bf5d42d1d148ca76
+  Building wheel for miniKanren (setup.py) ... done
+  Created wheel for miniKanren: filename=miniKanren-1.0.3-py3-none-any.whl size=24007 sha256=9dd35bf8708feba5a4fdea38fc3b6de8256120344a9c590989a14092a3b38b72
+  Stored in directory: c:\users\user\appdata\local\pip\cache\wheels\57\48\e3\441a42666f9a4ac9ccb6897d6046d81cf970c986be39938c6e
+Successfully built cons logical-unification etuples miniKanren
+Installing collected packages: multipledispatch, toolz, cloudpickle, logical-unification, h5netcdf, xarray, cons, xarray-einstats, etuples, miniKanren, arviz, pytensor, pymc
+Successfully installed arviz-0.20.0 cloudpickle-3.1.1 cons-0.4.6 etuples-0.3.9 h5netcdf-1.5.0 logical-unification-0.4.6 miniKanren-1.0.3 multipledispatch-1.0.0 
+pymc-5.20.1 pytensor-2.27.1 toolz-1.0.0 xarray-2025.1.2 xarray-einstats-0.8.0
+
+[notice] A new release of pip is available: 24.0 -> 25.0.1
+[notice] To update, run: python.exe -m pip install --upgrade pip
+
+
+C:\maxbox\maxbox4\maxbox4>py -3.12 -m pip install statsmodels
+Collecting statsmodels
+  Downloading statsmodels-0.14.4-cp312-cp312-win_amd64.whl.metadata (9.5 kB)
+Requirement already satisfied: numpy<3,>=1.22.3 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from statsmodels) (1.26.3)
+Requirement already satisfied: scipy!=1.9.2,>=1.8 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from statsmodels) (1.11.4)
+Requirement already satisfied: pandas!=2.1.0,>=1.4 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from statsmodels) (2.2.2)
+Collecting patsy>=0.5.6 (from statsmodels)
+  Downloading patsy-1.0.1-py2.py3-none-any.whl.metadata (3.3 kB)
+Requirement already satisfied: packaging>=21.3 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from statsmodels) (24.1)
+Requirement already satisfied: python-dateutil>=2.8.2 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages 
+(from pandas!=2.1.0,>=1.4->statsmodels) (2.8.2)
+Requirement already satisfied: pytz>=2020.1 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from pandas!=2.1.0,>=1.4->statsmodels) (2024.1)
+Requirement already satisfied: tzdata>=2022.7 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from pandas!=2.1.0,>=1.4->statsmodels) (2023.3)
+Requirement already satisfied: six>=1.5 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from python-dateutil>=2.8.2->pandas!=2.1.0,
+>=1.4->statsmodels) (1.16.0)
+Downloading statsmodels-0.14.4-cp312-cp312-win_amd64.whl (9.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.8/9.8 MB 8.2 MB/s eta 0:00:00
+Downloading patsy-1.0.1-py2.py3-none-any.whl (232 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 232.9/232.9 kB 7.0 MB/s eta 0:00:00
+Installing collected packages: patsy, statsmodels
+Successfully installed patsy-1.0.1 statsmodels-0.14.4
+
+[notice] A new release of pip is available: 24.0 -> 25.0.1
+
+C:\maxbox\maxbox4\maxbox4>py -3.12 -m pip install factor_analyzer
+Collecting factor_analyzer
+  Downloading factor_analyzer-0.5.1.tar.gz (42 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 42.8/42.8 kB 260.7 kB/s eta 0:00:00
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... done
+  Preparing metadata (pyproject.toml) ... done
+Requirement already satisfied: pandas in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from factor_analyzer) (2.2.2)
+Requirement already satisfied: scipy in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from factor_analyzer) (1.11.4)
+Requirement already satisfied: numpy in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from factor_analyzer) (1.26.3)
+Requirement already satisfied: scikit-learn in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from factor_analyzer) (1.3.2)
+Requirement already satisfied: python-dateutil>=2.8.2 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from pandas->factor_analyzer) (2.8.2)
+Requirement already satisfied: pytz>=2020.1 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from pandas->factor_analyzer) (2024.1)
+Requirement already satisfied: tzdata>=2022.7 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from pandas->factor_analyzer) (2023.3)
+Requirement already satisfied: joblib>=1.1.1 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from scikit-learn->factor_analyzer) (1.3.2)
+Requirement already satisfied: threadpoolctl>=2.0.0 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from scikit-learn->factor_analyzer) (3.2.0)
+Requirement already satisfied: six>=1.5 in c:\users\user\appdata\local\programs\python\python312\lib\site-packages (from python-dateutil>=2.8.2->pandas->factor_analyzer) (1.16.0)
+Building wheels for collected packages: factor_analyzer
+  Building wheel for factor_analyzer (pyproject.toml) ... done
+  Created wheel for factor_analyzer: filename=factor_analyzer-0.5.1-py2.py3-none-any.whl size=42682 sha256=8820991dc36abae7eb955168857eb3487443e75d2af5982ec3487f2e5a2be8e3
+  Stored in directory: c:\users\user\appdata\local\pip\cache\wheels\a2\af\06\f4d4ed4d9d714fda437fb1583629417319603c2266e7b233cc
+Successfully built factor_analyzer
+Installing collected packages: factor_analyzer
+Successfully installed factor_analyzer-0.5.1
+
+[notice] A new release of pip is available: 24.0 -> 25.0.1
+[notice] To update, run: python.exe -m pip install --upgrade pip
+
+Collecting sklearn
+  Downloading sklearn-0.0.post12.tar.gz (2.6 kB)
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... error
+  error: subprocess-exited-with-error
+
+  × Getting requirements to build wheel did not run successfully.
+  │ exit code: 1
+  ╰─> [15 lines of output]
+      The 'sklearn' PyPI package is deprecated, use 'scikit-learn'
+      rather than 'sklearn' for pip commands.
+
+      Here is how to fix this error in the main use cases:
+      - use 'pip install scikit-learn' rather than 'pip install sklearn'
+      - replace 'sklearn' by 'scikit-learn' in your pip requirements files
+        (requirements.txt, setup.py, setup.cfg, Pipfile, etc ...)
+      - if the 'sklearn' package is used by one of your dependencies,
+        it would be great if you take some time to track which package uses
+        'sklearn' instead of 'scikit-learn' and report it to their issue tracker
+      - as a last resort, set the environment variable
+        SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True to avoid this error
+
+      More information is available at
+      https://github.com/scikit-learn/sklearn-pypi-package
+      [end of output]
+
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: subprocess-exited-with-error
+
+× Getting requirements to build wheel did not run successfully.
+
+
+C:\maxbox\maxbox51>py -3.14 -m pip install scikit-learn
+Collecting scikit-learn
+  Downloading scikit_learn-1.7.2-cp314-cp314-win_amd64.whl.metadata (11 kB)
+Requirement already satisfied: numpy>=1.22.0 in c:\users\user\appdata\local\programs\python\python314\lib\site-packages (from scikit-learn) (2.3.4)
+Collecting scipy>=1.8.0 (from scikit-learn)
+  Downloading scipy-1.16.2-cp314-cp314-win_amd64.whl.metadata (60 kB)
+Collecting joblib>=1.2.0 (from scikit-learn)
+  Downloading joblib-1.5.2-py3-none-any.whl.metadata (5.6 kB)
+Collecting threadpoolctl>=3.1.0 (from scikit-learn)
+  Using cached threadpoolctl-3.6.0-py3-none-any.whl.metadata (13 kB)
+Downloading scikit_learn-1.7.2-cp314-cp314-win_amd64.whl (8.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.8/8.8 MB 9.7 MB/s  0:00:00
+Downloading joblib-1.5.2-py3-none-any.whl (308 kB)
+Downloading scipy-1.16.2-cp314-cp314-win_amd64.whl (39.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 39.4/39.4 MB 10.5 MB/s  0:00:03
+Using cached threadpoolctl-3.6.0-py3-none-any.whl (18 kB)
+Installing collected packages: threadpoolctl, scipy, joblib, scikit-learn
+Successfully installed joblib-1.5.2 scikit-learn-1.7.2 scipy-1.16.2 threadpoolctl-3.6.0
+
+C:\maxbox\maxbox51>
+
+
+C:\maxbox\maxbox4\maxbox5>
+
+----app_template_loaded_code----
+----File newtemplate.txt not exists - now saved!----
