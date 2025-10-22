@@ -1,0 +1,2792 @@
+Program Demo_PictureBox2GAUSS_DataScience_64;
+
+//<head> #sign:breitsch: BREITSCH-BOX: 15/10/2025 14:29:35 
+//#tech:198perf: 0:0:3.45 threads: 10 192.168.56.1 14:29:35 5.2.9.198
+
+{Description  locs=2510
+Example of Graph of Distribution of Frequencies and Deviation Standard / Bell of Gauss in function of the obtained measures and the values of control of a normal productive process. It uses the basic components of Delphi, with the stupendous graphics of TeeChart, and it includes impression form with QuickReport. The form you can use in any project. }
+
+ 
+ Const 
+  TEXTOUT = 'Runs 5-10 random pictures on a canvas get from a web service';
+  
+  function OpenSCManagerX (lpMachineName : string;
+                       lpDatabaseName : string;
+                       dwDesiredAccess : DWORD): THANDLE;
+    //   external 'OpenSCManager@ADVAPI32.DLL.dll stdcall';
+     external 'OpenSCManagerA@advapi32.dll stdcall';
+  
+  var iserv: ISWBemServices;
+      iset:  ISWbemObjectSet;
+      ENum: IEnumVariant;
+      vObj: OleVariant;
+      aQuery, wmi_dom: string;
+      
+{ uses
+  Windows, winsvc, shellapi; uses
+  SysUtils, WinTypes, WinProcs, Messages, Classes, Graphics, Controls,
+  Forms, Dialogs, ExtCtrls, Teengine, Chart, Series, StdCtrls,
+  Buttons, Mask, Spin, ArrowCha, Grids, TeeProcs, QrTee;
+   }
+   
+   
+ type
+  TEstadistica = TForm;
+  var
+    EditMedia: TEdit;
+    Label1: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
+    BS1: TBarSeries;
+    Chart1: TChart;
+    LS2: TLineSeries;
+    Label2: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    EditIncertidumbre: TEdit;
+    EditVarianza: TEdit;
+    EditSigma: TEdit;
+    EditBajo: TEdit; //TMaskEdit;
+    EditAlto: TEdit; //TMaskEdit;
+    EditReco: TEdit;
+    Label9: TLabel;
+    Grid1: TStringGrid;
+    EditSkew: TEdit;
+    EditKurt: TEdit;
+    Label7: TLabel;
+    Label10: TLabel;
+    EditCpTol: TEdit;
+    EditCpKTol: TEdit;
+    Label11: TLabel;
+    Label12: TLabel;
+    Label13: TLabel;
+    EditCpLim: TEdit;
+    Label14: TLabel;
+    EditCpKLim: TEdit;
+    Label15: TLabel;
+    Label16: TLabel;
+    EditCpl: TEdit;
+    EditCpu: TEdit;
+    Label17: TLabel;
+    EditCr: TEdit;
+    Label18: TLabel;
+    EditLimSup: TEdit;
+    Label19: TLabel;
+    EditLimInf: Tedit; //TMaskEdit;
+    Label20: TLabel;
+    EditTolSup: Tedit; //TMaskEdit;
+    Label21: TLabel;
+    EditTolInf: TEdit; //TMaskEdit;
+    //amask: Tcustommaskedit
+    Chart2: TChart;
+    LSTolInf: TFastLineSeries;
+    LSMedida: TFastLineSeries;
+    LSTolSup: TFastLineSeries;
+    LSLimSup: TFastLineSeries;
+    LSLimInf: TFastLineSeries;
+    LSMenos3S: TFastLineSeries;
+    LSMas3S: TFastLineSeries;
+    Label22: TLabel;
+    EditMenos3: TEdit;
+    Label23: TLabel;
+    EditMas3: TEdit;
+    Label24: TLabel;
+    EditCrTol: TEdit;
+    Label8: TLabel;
+    EditMa: TEdit;
+    Label25: TLabel;
+    EditMuestras: TEdit;
+    LSMa: TFastLineSeries;
+    Label26: TLabel;
+    EditZInfLim: TEdit; //TMaskEdit;
+    EditZSupLim: TEdit;
+    Label27: TLabel;
+    LSMS: TLineSeries;
+    Label28: TLabel;
+    EditFX: TEdit;
+    LSMI: TLineSeries;
+    SECantidad: TSpinEdit;
+    Timer1: TTimer;
+    aCB1: TCheckBox;
+    Cantidad: TLabel;
+    Panel1: TPanel;
+    BCerrar: TBitBtn;
+    BB3d: TBitBtn;
+    BRecalcular: TBitBtn;
+    BBImprimir: TBitBtn;
+    Series1: TBarSeries;
+       procedure BRecalcularClick(Sender: TObject); forward;
+       procedure BCerrarClick(Sender: TObject); forward;
+       procedure BB3dClick(Sender: TObject);    forward;
+       procedure FormShow(Sender: TObject);     forward;
+       procedure SECantidadKeyDown(Sender: TObject; var Key: Word;
+         Shift: TShiftState);  forward;
+       procedure EditLimSupChange(Sender: TObject);  forward;
+       procedure EditLimInfChange(Sender: TObject);  forward;
+       procedure EditTolSupChange(Sender: TObject);  forward;
+       procedure EditTolInfChange(Sender: TObject);  forward;
+       procedure EditSigmaChange(Sender: TObject);   forward;
+       procedure FormClose(Sender: TObject; var Action: TCloseAction); forward;
+       procedure CB1Click(Sender: TObject);          forward;
+       procedure Timer1Timer(Sender: TObject);       forward;
+       procedure BBImprimirClick(Sender: TObject);   forward;
+  //private
+    { Private declarations }
+  //public
+    // Functio of librari Math.Pas of Delphi 32
+
+    //IntPower: Raise base to an integral power.  Fast.
+    function IntPower(X: Double; I: Integer): Double; forward;
+
+    // Power: Raise base to any power.
+    // For fractional exponents, or exponents > MaxInt, base must be > 0.
+    function Power(Base, Exponent: Double): Double;  forward;
+
+    // RandG produces random numbers with Gaussian distribution about the mean.
+    // Useful for simulating data with sampling errors.
+    function RandG(Mean, StdDev: Double): Double; forward;
+    
+   function {TEstadistica.}IntPower(X: Double; I: Integer): Double;
+   var
+     Y: Integer;
+   begin
+     Y := AbsInt(I);
+     Result := 1.0;
+     while Y > 0 do begin
+       while not Odd(Y) do begin
+         Y := Y shr 1;
+         X := X * X
+       end;
+       Dec(Y);
+       Result := Result * X
+     end;
+     if I < 0 then Result := 1.0 / Result
+   end;
+
+function {TEstadistica.}Power(Base, Exponent: Double): Double;
+begin
+  { Make special cases of Exponent = 0 and Exponent = integer.
+    Error if Base < 0 and Exponent not integer. }
+  if Exponent = 0.0 then
+    Result := 1.0               { By fiat, 0**0 = 1 }
+  else if (Frac(Exponent) = 0.0) and (Exponent < MaxInt) then
+    Result := IntPower(Base, Trunc(Exponent))
+  else begin
+   { if Base < 0.0 then ArgError;}
+    Result := Exp(Exponent * Ln(Base))
+  end
+end;
+
+function {TEstadistica.}RandG(Mean, StdDev: Double): Double;
+{ Marsaglia-Bray algorithm }
+var
+  U1, S2: Extended;
+begin
+  repeat
+    U1 := 2*RandomF - 1;
+    S2 := Sqr(U1) + Sqr(2*RandomF-1);
+  until S2 < 1;
+  Result := Sqrt(-2*Ln(S2)/S2) * U1 * StdDev + Mean;
+end;
+
+
+  //procedure CopySeries(DestChart: TQRDBChart; SourceChart:TChart; AOwner:TComponent);
+  //end;
+ var
+  frm: TEstadistica;
+
+  {Demo}
+  Teorico,LimSup,LimInf,TolSup,TolInf,Sigma : Double;
+
+  {Demo}
+  Datos : array [1..1001] of Double;
+
+  {The table Datos[. .] the can assign from any other unit with
+   any quantity of values between 5 and the necessary value, 1001 in this case.
+   Will will have functionality until find a value 0 in which consider it
+   ended}
+                      
+procedure BRecalcularClick(Sender: TObject);
+var
+ I,n,J : Integer;
+ Frecuencia : array[1..21] of Double;
+ NVeces : array[1..21] of Double;
+ Y,M,S,P,V,K,W,e,x,Incer,Menor,Mayor,TopGra,M2,M3,M4,Kurt,Skew,Cp,Cpk,Cpl,Cpu,aCr,
+ ZMas, ZMenos,CfAlto,CfAncho : Double;
+ TxtGra : String;
+begin
+   
+ {- Random Values for the demo.
+  - In the aplication to load the values to measure in the array Datos[] and to
+    erase the lines tagged with 'Demo'}
+
+ {Demo}
+ for I := 1 to 1000 do Datos[I] := 0;
+ if Sigma < 0.2 then Sigma := 1;
+ for I := 1 to SECantidad.Value do Datos[I] := RandG(Teorico + 0.3, Sigma);
+ {End Demo}
+
+
+{Calculation of the Middle arithmetic}
+ K := 0.0;
+ I := 1;        {Temporary utilization for the Control of the Curl of the array}
+
+ M := Datos[I]; {Temporary Utilization of M to see value minimal that it will be > 0}
+
+ W := 0.0;      {Temporary utilization of W to see maximum value}
+
+ n := 0;        {Quantity of values > 0 in the array}
+
+ {As table can be variable, alone will yield the data until see the first value 0}
+ while Datos[I] > 0 do begin
+   K := K + Datos[I]; {Values sum for the calculate of the mean arithmetic}
+   if Datos[I] < M then M := Datos[I];
+   if Datos[I] > W then W := Datos[I];
+   n := n + 1;
+   I := I + 1;
+ end;
+
+ {View the values of control of the process}
+ EditMa.Text       := FloatToStr(Teorico);{Theoretical value of adjustment of the measure}
+ EditMuestras.Text := FloatToStr(n);     {Quantity of values}
+ EditLimSup.Text   := FloatToStr(LimSup);{Upper Engineering Limit}
+ EditLimInf.Text   := FloatToStr(LimInf);{Lower Engineering Limit}
+ EditTolSup.Text   := FloatToStr(TolSup);{Upper tolerance of the process}
+ EditTolInf.Text   := FloatToStr(TolInf);{Lower tolerance of the process}
+ EditBajo.Text     := FloatToStr(M);     {Value but small found in the table Datos[]}
+ if M < TolInf then EditBajo.Font.Color := clRed else EditBajo.Font.Color := clBlack;
+
+ EditAlto.Text     := FloatToStr(W);     {Value but large found in the table Datos[]}
+ if W > TolSup then EditAlto.Font.Color := clRed else EditAlto.Font.Color := clBlack;
+
+ EditReco.Text     := FloatToStr(W-M);   {Difference between the sample but large and the but small}
+ M                 := K / n;
+ EditMedia.Text    := FloatToStr(M); {Middle arithmetic of the values > 0 of table}
+
+ {Calculation of the variance}
+ K := 0;
+ for I := 1 to n do K := K + ((Datos[I] - M)*(Datos[I] - M));
+ V  := K / (n - 1);
+ EditVarianza.Text := FloatToStr(V);
+
+ {Calculation of the normal Deviation "Sigma"}
+ S               := Sqrt(V);
+ EditSigma.Text  := FloatToStr(S);
+ EditMenos3.Text := FloatToStr(M - (S*3)); {Value of Less 3 Sigma}
+ EditMas3.Text   := FloatToStr(M + (S*3)); {Value of But 3 Sigma}
+  
+ {Demo}
+ Sigma := S; {Used in the Demo to make variable the value of Sigma}
+
+ {Measure of asymmetry of the Moment 2 of the sample}
+ M2 := K / n;
+
+ {Skeweness - Measure of asymmetry of the Moment 3 of the sample}
+ K := 0;
+ for I := 1 to n do K := K+((Datos[I]-M)*(Datos[I]-M)*(Datos[I]-M));
+ M3   := K / n;
+ Skew := M3 / Sqrt(M2*M2*M2);
+ EditSkew.Text := FloatToStr(Skew);
+
+ {Kurtosis - Measure of asymmetry of the Moment 4 of the sample}
+ K := 0;
+ for I := 1 to n do K := K+((Datos[I]-M)*(Datos[I]-M)*(Datos[I]-M)*(Datos[I]-M));
+ M4   := K / n;
+ Kurt := (M4 / (M2*M2))-3;
+ EditKurt.Text := FloatToStr(Kurt);
+
+ {Calculation of the process Capacity  Cp. It is a coefficient of as is good a
+  product with respect to what is specified, indicating the uniformity that the
+  process it is capable of obtaining in relation to the tolerance. They are
+  considered good Values for the process when they are superior to 1.33
+  The Calculation is accomplished against the Tolerance values and you Limit
+  with arrangement to the following arguments
+
+  - The Cp with respect to the tolerance is calculated with K = 2 Sigma since
+    generally it is a parameter of control of process for machinery between other.
+
+  - The Cp with respect to the you Limit of engineering is calculated with
+    K = 3 Sigma already that it tends be used for the control of the productive
+    process in the one which include but random factors}
+
+ Cp             := (TolSup-TolInf)/(4*S);
+ EditCpTol.Text := FloatToStr(Cp);
+ if Cp < 1.33 then EditCpTol.Font.Color := clRed else EditCpTol.Font.Color := clBlack;
+
+ Cp             := (LimSup-LimInf)/(6*S);
+ EditCpLim.Text := FloatToStr(Cp);
+ if Cp < 1.33 then EditCpLim.Font.Color := clRed else EditCpLim.Font.Color := clBlack;
+
+ {Calculation of the process against the lower engineering limit Cpl}
+ Cpl          := (M-LimInf)/(3*S);
+ EditCpl.Text := FloatToStr(Cpl);
+
+ {Calculation of the process against the limit upper of engineering Cpl}
+ Cpu          := (LimSup-M)/(3*S);
+ EditCpu.Text := FloatToStr(Cpu);
+ 
+ 
+
+ {Calculation of the process Capacity CpK. It is a coefficient of as is a
+  process with respect to its specifications, indicating if the process
+  produced measures within the you limit of tolerance. They are considered good
+  values to depart of 1.33 and it is the value minor of Cpu and Cpl
+  expressions The Calculation is accomplished against the Tolerance values and
+  you Limit with the same arguments that to calculate the Cp}
+
+ Cpk             := (TolSup-M)/(2*S);
+ if Cpk > ((M-TolInf)/(2*S)) then CpK := ((M-TolInf)/(2*S));
+ EditCpKTol.Text := FloatToStr(CpK);
+ if Cpk < 1.33 then EditCpKTol.Font.Color := clRed else EditCpKTol.Font.Color := clBlack;
+
+ Cpk             := (LimSup-M)/(3*S);
+ if Cpk > ((M-LimInf)/(3*S)) then CpK := ((M-LimInf)/(3*S));
+ EditCpKLim.Text := FloatToStr(CpK);
+ if Cpk < 1.33 then EditCpKLim.Font.Color := clRed else EditCpkLim.Font.Color := clBlack;
+
+ {Calculation of the Cr. It is the inverse of the Cp. It is shown with respect
+  to the limits and Tolerances}
+ aCr             := (6*S)/(LimSup-LimInf);
+ EditCr.Text    := FloatToStr(aCr);
+
+ aCr             := (4*S)/(TolSup-TolInf);
+ EditCrTol.Text := FloatToStr(aCr);
+
+ {Calculation of the Z upper for the subsequent Calculation of the % outside
+  of you Limit with arrangement to normal tables}
+
+  ZMas   := (LimSup - M)/S;
+  EditZSupLim.Text := FloatToStr(ZMas);
+
+ {Calculation of the lower Z for the subsequent Calculation of the % outside
+  of you Limit with arrangement to normal tables}
+
+  ZMenos := (M - LimInf)/S;
+  EditZInfLim.Text := FloatToStr(ZMenos);
+  
+  
+
+ {Uncertainty of the measure
+
+  The uncertainty of the measure serves to help to establish the limits of
+  control in a process, so that could be annotated with greater accuracy the
+  measures that would enter within the tolerance margins with certain reliability.
+  We could summarize it as the reasonable doubt of the measure process.
+
+  There are many you formulate for the calculation of the uncertainty, needing
+  the majority of they the knowledge of the uncertainty of the standard with the
+  one which they have been taken the measures, something that in this case
+  logically do not know.
+
+  For this case of sample can use a based on tables standar for the calculation,
+  in function of the quantity of measures that has the sample.
+
+  The formulation that we will employ and that is employed in the National Plan
+  of Quality Spanish is the following:
+
+                       S
+   Incer = 2 * W * ---------
+                    Sqrt(n)
+
+   Incer : Uncertainty of the measure
+   W     : Value of tables that we can see in the code of the program but forward
+   S     : Sigma
+   n     : Number of measures of the sample. minimal 5 measures}
+
+  if n > 4 then begin
+    if      n =  5 then W := 1.4
+    else if n =  6 then W := 1.3
+    else if n =  7 then W := 1.3
+    else if n =  8 then W := 1.2
+    else if n >= 9 then W := 1.0;
+
+    Incer := 2 * W * (S / Sqrt(n));
+    EditIncertidumbre.Text := FloatToStr(Incer);
+  end;
+  
+ {Calculation of the values but small and but large to represent in the graphic
+  counting on the measured values and the tolerances and you limit of engineering
+  for the process. we will use it to calculate the frequency ranges}
+
+ Menor := StrToFloat(EditBajo.Text);
+ if Menor > TolInf    then Menor := TolInf;
+ if Menor > LimInf    then Menor := LimInf;
+ if Menor > (M-(3*S)) then Menor := M-(3*S);
+
+ Mayor := StrToFloat(EditAlto.Text);
+ if Mayor < TolSup    then Mayor := TolSup;
+ if Mayor < LimSup    then Mayor := LimSup;
+ if Mayor < (M+(3*S)) then Mayor := M+(3*S);
+
+ {Distribution of the frequencies to count the occurrences in each range of
+  frequencies with respect to the extreme Great values and Smaller with a value
+  of 'CfAncho' for each frequency step that it will be used to escalate the
+  graphic.
+
+  Table has 21 values by that we need to know the principle and final of each
+  range, though actually alone we use 20}
+      
+ CfAncho       := (Mayor-Menor) / 20;
+ Frecuencia[1] := Menor;
+
+ for I := 2 to 21 do Frecuencia[I] := Frecuencia[I-1] + CfAncho;
+
+ {To count the occurrences of the measures occurred in each range to draw the
+  frequencies distribution}
+
+ for I := 1 to 21 do NVeces[I] := 0; {Init of table}
+ for I := 1 to 20 do
+  for J := 1 to n do begin        {Temporary utilization of J}
+   if(Datos[J] >= Frecuencia[I]) and (Datos[J] < Frecuencia[I+1]) then
+    NVeces[I] := NVeces[I] + 1;
+  end;
+
+ {To show the frequency occurrences in a grid as help of comprehension}
+ Grid1.Cells[0,0] := ' Valor';
+ Grid1.Cells[1,0] := 'Cantidad';
+ 
+ 
+
+ for I := 1 to 20 do begin
+  {To limit to 2 the decimal of the converted value}
+  TxtGra := FloatToStr(Frecuencia[I]);
+  if ansiPos(',',TxtGra) > 0 then TxtGra := Copy(TxtGra,1,ansiPos(',',TxtGra)+1);
+  Grid1.Cells[0,I] := '=> ' + TxtGra ;
+
+  TxtGra := FloatToStr(Frecuencia[I+1]);
+  if ansiPos(',',TxtGra) > 0 then TxtGra := Copy(TxtGra,1,ansiPos(',',TxtGra)+1);
+  Grid1.Cells[0,I] := Grid1.Cells[0,I] + '  <' + TxtGra;
+
+ // Grid1.Cells[1,I] := FloatToStr(NVeces[I]);
+ end;
+ Grid1.Cells[0,21] := 'Total Muestras =';
+ Grid1.Cells[1,21] := IntToStr(n);
+ 
+ 
+
+ {Calculation of the coefficient of height scale for the correspondence of the
+  Histograma and the Bell of gauss
+
+  - To superpose the bell of gauss on the frequencies histogram is accurate
+    to escalate the surface of the histogram to value = 1 since the surface of the
+    bell of gauss of the normal distribution is 1
+
+    Thereinafter the bell as well as the histogram there will be that to make
+    what is proportional to I number of samples analyzed for power to relate the
+     scales of the graphic
+
+ - First we adjust the frequency values in funtion of the I number of samples
+     and the width step of the graphic}
+
+ for I  := 1 to 20 do if NVeces[I] > 0 then NVeces[I] := (NVeces[I]/n)*CfAncho;
+
+ { - We calculate first the value of the sum of the height all the samples, with
+     something which already we have escalated the histogram}
+
+ CfAlto := 0;
+ for I  := 1 to 20 do CfAlto := CfAlto + NVeces[I];
+
+ { - We multiply all the values by the inverse of the CfAlto so that the sum
+     will be 1}
+
+ for I  := 1 to 20 do if NVeces[I] > 0 then NVeces[I] := (NVeces[I])*(1/CfAlto);
+
+ { - Now we added table NVeces we would see that it is equal to 1. For example :
+
+     CfAlto := 0;
+     for I  := 1 to 20 do CfAlto := CfAlto + NVeces[I];
+     Grid1.Cells[1,21] := FloatToStr(CfAlto);}
+
+{Bell of Gauss
+
+  - The bell as Gauss serves to verify the theoretical possibilities of the fact
+    that a value understood between - 3 and +3 Sigma occur in the reality, in
+    base to the measures taken in the analyzed sample. (Below +- 3 ++Sigma the
+    values waited are very small)
+
+    For this are calculated "J" values  (in this case the sufficient so that is
+    show the uniform way curve) from the minor range of Sigma and the range
+    greater than Sigma that we may have elected.
+
+    The distribution of the curve is always uniform reaching the greater value in
+    its central point that it is coincident with the mean arithmetic of the
+    measurement effected.
+
+    The slenderness of the bell shows us the quality or uniformity of the process
+    measured and the theoretical reliability of the real results of the process in the
+    practical. How much but slender will be the Bell, better will be the process, by the
+    opposite if the bell is flattened greater will be the dispersion in the
+    measures that we will obtain.
+
+  S : Sigma
+  x : Each one of the values understood between - 3S and + 3S with a range of
+      ((+3S) - (- 3S)) / J.  If we need but values we change the value 'J'
+      This value is sufficient to see the graph in the form of curve.
+
+  M : Middle arithmetic of the measures
+  P : 3.14159265359
+  And : F(x)
+  and : 2.7182
+
+  - Formulates it of the value of And for each value of F(x) that is designated
+    Function of probability density comes given by:
+
+                    1          - ((x - M)*(x-M))/(2*(S*S))
+  F(x) = Y = ------------- * e
+             S*(Sqrt(2*P))
+
+  - In the value superior of the curve, "and" is increased to 0  and therefore
+    is worths 1(since so much "x" as the average "M" are worths what is same)}
+
+ P := 3.14159265359;
+
+ J := 100; {Value to obtain the curve of the rounded bell. To put it a greater
+            value does not has object}
+
+ {Value of increase of the representation point of x in the line table, or what
+ is what is same, we will go representing J times the value of F(x) for each
+ point between the smaller value and the greater value}
+
+ x := (Mayor - Menor) / J;
+
+ EditFX.Text := FloatToStr(1/(S*(Sqrt(2*P)))); {Value greater than F(x)}
+
+ LS2.Clear;
+ for I := 1 to J do begin;
+  K := ((((Menor+(I*x))-M)*((Menor+(I*x))-M)))/(2*(S*S)); {K = Exponent of "e"}
+  e := Power(2.7182,-K); {To increase "e" to the value of the exponent K}
+  Y := (1/(S*(Sqrt(2*P))))* e; {Final value of F(x) for each possible value between
+                                the values of the graphic. It is the value of And
+                                in the Chart}
+
+  {For power to see directly in screen the direct relationship of the quantity of
+   samples so much found in the histogram as probable according to the bell
+   it is multiplied by 'n' the escalated value previously 'Y * CfAncho.
+   If are wished to see the values in % would suffice with converting them so
+   much into the bell as in the histogram}
+
+  LS2.AddXY((I/(J/20)),(Y*CfAncho)*n,'',clTeeColor);
+  //ls2.refresh;
+  //ls2.canvas
+ end;
+ 
+ 
+
+ {Graphic of bars of Frequencies Distribution
+
+  - A bell of Gauss by if same sometimes it is not sufficient to describe
+    the probabilities process, since is important to see where it is the
+    trend of the measures and with this its dispersion.
+
+    For this is shown in this table the quantity of times that are given the
+    values of the measure between each one of the ranges, given in this case
+    as already we have shown previously by 20 frequency ranges between the
+    smaller value and the greater value obtained by the data obtained in the sample
+    and the Tolerances and you Limit of engineering for the process. Example:
+
+    - We suppose a process in the one which we wish to measure some pieces obtained in
+      a productive process in a manufactures
+
+    - The engineering limits are the extreme theoretical values between those which
+      a piece would be given by valid.
+
+    - The Tolerances are the values of engineering limit +- the values of
+      uncertainty of the measure and that they would be the values between those
+      which consider acceptable the pieces, for example originating from a machine.
+      (To see but the explained uncertainty concept previously)
+
+    - The pieces whose values were between those of Tolerance and Limit would be
+      rejected in principle by be doubtful}
+
+{To show the frequency bars}
+
+ BS1.Clear;
+ for I := 1 to 20 do begin
+  TxtGra := FloatToStr(Frecuencia[I]);
+  if ansiPos(',',TxtGra) > 0 then TxtGra := Copy(TxtGra,1,ansiPos(',',TxtGra)+1);
+
+  {For power to see directly in screen the direct relationship of the quantity of
+   samples so much found in the histogram as probable according to the bell
+   it is multiplied by 'n' the escalated value previously to 1 in 'NVeces[I]'}
+
+  BS1.AddBar(NVeces[I]*n,TxtGra,clTeeColor)
+ end;
+
+ {To calculate the value but high of the graphic 'TopGra' to show the values of
+  control of the process with a small margin up above. Aesthetics}
+
+ TopGra := (1/(S*(Sqrt(2*P))))*CfAncho*n; {Value but high of F(x), climbed with histogram}
+ for I := 1 to 20 do if TopGra < (NVeces[I]*n) then TopGra := (NVeces[I]*n);
+
+ LSMS.Clear;
+ LSMS.AddXY(0,TopGra + (TopGra*0.05),'',clTeeColor);
+
+ {To show the limits of control of the process}
+
+ with Series1 do begin
+  Clear;
+  AddXY((((Teorico)-Menor)*20)/(Mayor-Menor),TopGra/6  ,'Ma' ,clBlue);   {Teoric}
+  AddXY(((M-Menor)*20)        /(Mayor-Menor),TopGra/3.6,'Me' ,clBlack);  {Half}
+  AddXY((((M-(3*S))-Menor)*20)/(Mayor-Menor),TopGra/2.5,'-3S',clGreen);  {-3S}
+  AddXY((((M+(3*S))-Menor)*20)/(Mayor-Menor),TopGra/2  ,'+3S',clGreen);  {+3S}
+  AddXY((((TolSup)-Menor)*20) /(Mayor-Menor),TopGra/1.4,'Ts' ,clFuchsia);{TolSup}
+  AddXY((((TolInf)-Menor)*20) /(Mayor-Menor),TopGra/1.7,'Ti' ,clFuchsia);{TolInf}
+  AddXY((((LimSup)-Menor)*20) /(Mayor-Menor),TopGra/1.1,'Ls',clRed);    {LimSup}
+  AddXY((((LimInf)-Menor)*20) /(Mayor-Menor),TopGra/1.1,'Li',clRed);    {LimInf}
+  //refresh;
+  //clear;
+ end;
+
+ {Graphic of lines to see the evolution of the sample.
+  In some instances they are made samplings to what is long of the time and it
+  is possible that exist a deviation trend of the value of sampling in one or
+  other sense that by example upon measuring drawn pieces from a machine can
+  suppose a wear or progressive breakdown of the same and to observe it is good
+  to have a graphic of lines in the one which could visualize said deviation
+  trend}
+
+ LSTolSup.Clear;
+ LSTolInf.Clear;
+ LSMedida.Clear;
+ LSLimSup.Clear;
+ LSLimInf.Clear;
+ LSMas3S.Clear;
+ LSMenos3S.Clear;
+ LSMI.Clear;
+ LSMa.Clear;
+
+ {To show the values in the lines Chart}
+ for I := 1 to n do begin
+  LSMedida.AddXY(I,Datos[I],'',clTeeColor);
+ end;
+
+ {To show the limits of control in the lines Chart}
+
+ LSTolSup.AddXY(0,TolSup,'',clTeeColor);
+ LSTolSup.AddXY(n,TolSup,'',clTeeColor);
+ LSTolInf.AddXY(0,TolInf,'',clTeeColor);
+ LSTolInf.AddXY(n,TolInf,'',clTeeColor);
+ LSLimSup.AddXY(0,LimSup,'',clTeeColor);
+ LSLimSup.AddXY(n,LimSup,'',clTeeColor);
+ LSLimInf.AddXY(0,LimInf,'',clTeeColor);
+ LSLimInf.AddXY(n,LimInf,'',clTeeColor);
+ LSMas3S.AddXY(0,(M+(3*S)),'',clTeeColor);
+ LSMas3S.AddXY(n,(M+(3*S)),'',clTeeColor);
+ LSMenos3S.AddXY(0,(M-(3*S)),'',clTeeColor);
+ LSMenos3S.AddXY(n,(M-(3*S)),'',clTeeColor);
+ LSMa.AddXY(0,(Teorico),'',clTeeColor);
+ LSMa.AddXY(n,(Teorico),'',clTeeColor);
+
+ {To show the line of limit inferior in Chart}
+ LSMI.AddXY(0,LimInf - (LimInf*0.05),'',clTeeColor);     
+ 
+ //*)
+
+end;
+
+procedure BCerrarClick(Sender: TObject);
+begin
+ frm.Close;
+end;
+
+procedure BB3dClick(Sender: TObject);
+begin
+ if Chart1.View3d then begin
+  Chart1.View3d := False;
+  Chart2.View3d := False;
+ end else begin
+  Chart1.View3d := True;
+  Chart2.View3d := True;
+ end;
+end;
+
+procedure FormShow(Sender: TObject);
+begin
+ BRecalcularClick(nil);
+end;
+
+procedure SECantidadKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+ if Key = VK_RETURN then BRecalcular.SetFocus;
+end;
+
+procedure EditLimSupChange(Sender: TObject);
+begin
+ if EditLimSup.Text = '' then Exit;
+ LimSup := StrToFloat(EditLimSup.Text);
+end;
+
+procedure EditLimInfChange(Sender: TObject);
+begin
+ if EditLimInf.Text = '' then Exit;
+ LimInf := StrToFloat(EditLimInf.Text);
+end;
+
+procedure EditTolSupChange(Sender: TObject);
+begin
+ if EditTolSup.Text = '' then Exit;
+ TolSup := StrToFloat(EditTolSup.Text);
+end;
+
+procedure EditTolInfChange(Sender: TObject);
+begin
+ if EditTolInf.Text = '' then Exit;
+ TolInf := StrToFloat(EditTolInf.Text);
+end;
+
+procedure EditSigmaChange(Sender: TObject);
+begin
+ if EditSigma.Text = '' then Exit;
+ Sigma := StrToFloat(EditSigma.Text);
+end;
+
+procedure FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+ frm.Release;
+end;
+
+{Demo}
+procedure CB1Click(Sender: TObject);
+begin
+ if aCB1.Checked then Timer1.Enabled := True else Timer1.Enabled := False;
+end;
+
+procedure Timer1Timer(Sender: TObject);
+begin
+ if aCB1.Checked then begin
+  Timer1.Enabled := False;
+  BRecalcularClick(nil);
+  Timer1.Enabled := True;
+ end;
+end;
+
+procedure BBImprimirClick(Sender: TObject);
+begin
+
+  series1.visible:= NOT series1.visible;
+
+ //Application.CreateForm(TImpresoGrafico, ImpresoGrafico);
+ (*
+ with ImpresoGrafico do begin
+
+  QRChart1.Chart.Assign(Chart1);
+  QRChart2.Chart.Assign(Chart2);
+
+  CopySeries(QRDBChart1,Chart1, self);
+  CopySeries(QRDBChart2,Chart2, self);
+
+  QRDBChart1.Gradient.Visible := False; // Color in QuickReport Chart1
+  QRDBChart2.Gradient.Visible := False; // Color in QuickReport Chart2
+
+  QMuestras.Caption    := Format('%7.0f',[StrToFloat(EditMuestras.Text)]);
+  QMedia.Caption       := Format('%10.2f',[StrToFloat(EditMedia.Text)]);
+  QBajo.Caption        := Format('%10.2f',[StrToFloat(EditBajo.Text)]);
+  QAlto.Caption        := Format('%10.2f',[StrToFloat(EditAlto.Text)]);
+  QMa.Caption          := Format('%10.2f',[StrToFloat(EditMa.Text)]);
+  QLimSup.Caption      := Format('%10.2f',[StrToFloat(EditLimSup.Text)]);
+  QLimInf.Caption      := Format('%10.2f',[StrToFloat(EditLimInf.Text)]);
+  QTolSup.Caption      := Format('%10.2f',[StrToFloat(EditTolSup.Text)]);
+  QTolInf.Caption      := Format('%10.2f',[StrToFloat(EditTolInf.Text)]);
+  QVarianza.Caption    := Format('%10.2f',[StrToFloat(EditVarianza.Text)]);
+  QSkew.Caption        := Format('%10.2f',[StrToFloat(EditSkew.Text)]);
+  QKurt.Caption        := Format('%10.2f',[StrToFloat(EditKurt.Text)]);
+  QVarianza.Caption    := Format('%10.2f',[StrToFloat(EditVarianza.Text)]);
+  QCpTol.Caption       := Format('%10.2f',[StrToFloat(EditCpTol.Text)]);
+  QCpkTol.Caption      := Format('%10.2f',[StrToFloat(EditCpkTol.Text)]);
+  QCrTol.Caption       := Format('%10.2f',[StrToFloat(EditCrTol.Text)]);
+  QCpLim.Caption       := Format('%10.2f',[StrToFloat(EditCpLim.Text)]);
+  QCpKLim.Caption      := Format('%10.2f',[StrToFloat(EditCpkLim.Text)]);
+  QCrLim.Caption       := Format('%10.2f',[StrToFloat(EditCr.Text)]);
+  QCpuLim.Caption      := Format('%10.2f',[StrToFloat(EditCpu.Text)]);
+  QCplLim.Caption      := Format('%10.2f',[StrToFloat(EditCpl.Text)]);
+  QSigma.Caption       := Format('%10.2f',[StrToFloat(EditSigma.Text)]);
+  QMas3Sigma.Caption   := Format('%10.2f',[StrToFloat(EditMas3.Text)]);
+  QMenos3Sigma.Caption := Format('%10.2f',[StrToFloat(EditMenos3.Text)]);
+  QRecorrido.Caption   := Format('%10.2f',[StrToFloat(EditReco.Text)]);
+  QZSup.Caption        := Format('%10.2f',[StrToFloat(EditZSupLim.Text)]);
+  QZInf.Caption        := Format('%10.2f',[StrToFloat(EditZInfLim.Text)]);
+  QNombre.Caption      := Estadistica.Caption;
+
+  QuickRep1.Preview; {# Attention. In some versions of QuickReport, Preview
+                        it doesn't Print}
+//  QuickRep1.Print;
+
+  QuickRep1.Destroy;
+ end;   *)
+end;
+
+(*
+procedure CopySeries(DestChart: TQRDBChart; SourceChart:TChart;
+                                  AOwner:TComponent);
+var
+ tmpSeries: TChartSeries;
+ tmpS: TChartSeriesClass;
+ t: Longint;
+begin
+  for t := 0 to SourceChart.SeriesCount-1 do
+  begin
+    tmpS := TChartSeriesClass(SourceChart.Series[t].ClassType);
+    tmpSeries := tmpS.Create(AOwner);
+    tmpSeries.Assign(SourceChart.Series[t]);
+    tmpSeries.Name := (SourceChart.Series[t].Name) + 'copy';
+    DestChart.AddSeries(tmpSeries);
+  end;
+end;  *)
+
+   
+ 
+function ServiceRunning(sMachine, sService: PChar): Boolean;
+begin
+  //Result:= SERVICE_RUNNING = ServiceGetStatus(sMachine, sService);
+end;
+
+//Picture Box --------------------------------------------------------- //
+
+Const UrlPictureLookupInfo = 'https://picsum.photos/seed/%d/%d/%d';
+
+procedure PIC_CloseClick(Sender: TObject; var action: TCloseAction);
+  begin
+    //afrm.Close;
+    action:= cafree;
+    writeln('picform close at: '+datetimetostr(now));
+  end;
+
+ function RunPictureBox(const picnr, asizew, asizeh: integer;
+                          const UrlPicture,apath: string; save:boolean): string;
+ var
+    pngStream: TMemoryStream;
+    apicfrm: TForm;
+ begin
+   pngStream:= TMemoryStream.Create;
+     try
+        HttpGet(Format(UrlPicture,[picnr, asizew, asizeh]), pngStream);
+        writeln('pic size: '+itoa(pngStream.size))
+     except
+       //if something wrong try using backup server.
+        writeln('PICexcept: '+ExceptionToString(ExceptionType, ExceptionParam));
+     end;
+  with TLinearBitmap.Create do try
+    pngStream.Position:= 0;
+    LoadFromStream2(pngStream,'JPG');    //or PNG
+    writeln('pic size2: '+itoa(pngStream.size))
+    apicfrm:= getForm2(asizew+1,asizeh+1, clblack, 
+                             'picsum.photos: '+'Id: '+inttostr(picnr));
+    apicfrm.onclose:= @Pic_CloseClick;
+    paintToCanvas(apicfrm.canvas, Rect(1,2,Width,Height),false);
+    if save then SaveToFile(apath);
+    result:= apath;
+  finally
+    Dispose;
+    Free;
+    pngStream.Free;
+  end;
+ end;    
+ 
+ 
+procedure loadformSTATfile;
+begin
+frm:= TEstadistica.create(self)
+with frm do begin
+  Left := 63
+  Top := 71
+  Width := 655
+  Height := 510
+  Caption := 
+    ' Example of Data Science Statistic and Formulation ' +
+        'il:    maxkleiner1@gmail.com'
+  Color := clBtnFace
+  Font.Charset := DEFAULT_CHARSET
+  Font.Color := clWindowText
+  Font.Height := -13
+  Font.Name := 'System'
+  Font.Style := []
+  formstyle:= fsstayontop
+  OldCreateOrder := True
+  Position := poScreenCenter
+  OnClose := @FormClose
+  OnShow := @FormShow
+  PixelsPerInch := 96
+  Icon.LoadFromResourceName(HInstance, 'NEWUNIT'); //'ZHISTOGRAM');
+  //TextHeight := 16
+  //Show;
+  Label1:= TLabel.create(frm)
+  with label1 do begin
+  parent:= frm
+    Left := 480
+    Top := 168
+    Width := 23
+    Height := 16
+    Caption := 'Half'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+    //Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  //object Label3: TLabel
+  Label3:= TLabel.create(frm)
+  with label3 do begin
+  parent:= frm
+    Left := 336
+    Top := 368
+    Width := 45
+    Height := 16
+    Caption := 'Variance'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+   // Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  //object Label4: TLabel
+  Label4:= TLabel.create(frm)
+  with label4 do begin
+  parent:= frm
+    Left := 552
+    Top := 168
+    Width := 32
+    Height := 16
+    Caption := 'Sigma'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+    //Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  //object Label2: TLabel
+  Label2:= TLabel.create(frm)
+  with label2 do begin
+  parent:= frm
+    Left := 408
+    Top := 208
+    Width := 53
+    Height := 16
+    Caption := 'Value Low'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+    //Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  //object Label5: TLabel
+  Label5:= TLabel.create(frm)
+  with label5 do begin
+  parent:= frm
+    Left := 408
+    Top := 248
+    Width := 56
+    Height := 16
+    Caption := 'Value High'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+    //Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  //object Label6: TLabel
+  Label6:= TLabel.create(frm)
+  with label6 do begin
+  parent:= frm
+    Left := 408
+    Top := 408
+    Width := 62
+    Height := 16
+    Caption := 'Uncertainty'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+    //Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  //object Label9: TLabel
+  Label9:= TLabel.create(frm)
+  with label9 do begin
+  parent:= frm
+    Left := 408
+    Top := 288
+    Width := 42
+    Height := 16
+    Caption := 'Journey'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+    //Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  //object Label7: TLabel
+  Label7:= TLabel.create(frm)
+  with label7 do begin
+  parent:= frm
+    Left := 408
+    Top := 368
+    Width := 56
+    Height := 16
+    Caption := 'Skeweness'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+    //Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  //object Label10: TLabel
+  Label10:= TLabel.create(frm)
+  with label10 do begin
+  parent:= frm
+    Left := 408
+    Top := 328
+    Width := 42
+    Height := 16
+    Caption := 'Kurtosis'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+   // Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  //object Label11: TLabel
+  Label11:= TLabel.create(frm)
+  with label11 do begin
+  parent:= frm
+    Left := 552
+    Top := 248
+    Width := 57
+    Height := 16
+    Caption := 'Cp-Tol.2S'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+    //Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  //object Label12: TLabel
+  Label12:= TLabel.create(frm)
+  with label12 do begin
+  parent:= frm
+    Left := 552
+    Top := 288
+    Width := 63
+    Height := 16
+    Caption := 'Cpk-Tol.2S'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+   // Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  //object Label13: TLabel
+  Label13:= TLabel.create(frm)
+  with label13 do begin
+  parent:= frm
+    Left := 480
+    Top := 248
+    Width := 58
+    Height := 16
+    Caption := 'Cp-Lim.3S'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+   // Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  //object Label14: TLabel
+  Label14:= TLabel.create(frm)
+  with label14 do begin
+  parent:= frm
+    Left := 480
+    Top := 288
+    Width := 64
+    Height := 16
+    Caption := 'Cpk-Lim.3S'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+    //Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  Label15:= TLabel.create(frm)
+  with label15 do begin
+  parent:= frm  Left := 483
+    Top := 408
+    Width := 54
+    Height := 16
+    Caption := 'Cpl-Limit.'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+   // Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  Label16:= TLabel.create(frm)
+  with label16 do begin
+  parent:= frm
+    Left := 480
+    Top := 368
+    Width := 57
+    Height := 16
+    Caption := 'Cpu-Limit.'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+    //Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  Label17:= TLabel.create(frm)
+  with label17 do begin
+  parent:= frm
+    Left := 480
+    Top := 328
+    Width := 60
+    Height := 16
+    Caption := 'Cr  -Limit.'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+   // Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  Label18:= TLabel.create(frm)
+  with label18 do begin
+  parent:= frm
+    Left := 336
+    Top := 328
+    Width := 45
+    Height := 16
+    Caption := 'Ls Max.'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+   // Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  Label19:= TLabel.create(frm)
+  with label19 do begin
+  parent:= frm
+    Left := 336
+    Top := 288
+    Width := 39
+    Height := 16
+    Caption := 'Li Min.'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+   // Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  Label20:= TLabel.create(frm)
+  with label20 do begin
+  parent:= frm
+    Left := 336
+    Top := 248
+    Width := 47
+    Height := 16
+    Caption := 'Tol.Sup.'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+  //  Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  Label21:= TLabel.create(frm)
+  with label21 do begin
+  parent:= frm
+    Left := 336
+    Top := 208
+    Width := 45
+    Height := 16
+    Caption := 'Tol.Inf.'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+   // Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  Label22:= TLabel.create(frm)
+  with label22 do begin
+  parent:= frm
+    Left := 480
+    Top := 208
+    Width := 56
+    Height := 16
+    Caption := '- 3 Sigma'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+   // Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  Label23:= TLabel.create(frm)
+  with label23 do begin
+  parent:= frm
+    Left := 552
+    Top := 208
+    Width := 56
+    Height := 16
+    Caption := '+ 3 Sigma'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+  //  Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  Label24:= TLabel.create(frm)
+  with label24 do begin
+  parent:= frm
+    Left := 552
+    Top := 328
+    Width := 57
+    Height := 16
+    Caption := 'Cr -Toler.'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+   // Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  Label8:= TLabel.create(frm)
+  with label8 do begin
+  parent:= frm
+    Left := 408
+    Top := 168
+    Width := 17
+    Height := 16
+    Caption := 'Ma'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+   // Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  Label25:= TLabel.create(frm)
+  with label25 do begin
+  parent:= frm
+    Left := 336
+    Top := 168
+    Width := 50
+    Height := 16
+    Caption := 'Measures'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+   // Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  Label26:= TLabel.create(frm)
+  with label26 do begin
+  parent:= frm
+    Left := 552
+    Top := 408
+    Width := 56
+    Height := 16
+    Caption := 'Z+  Limit.'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+ //   Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  Label27:= TLabel.create(frm)
+  with label27 do begin
+  parent:= frm
+    Left := 552
+    Top := 368
+    Width := 56
+    Height := 16
+    Caption := 'Z-  Limit.'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+  //  Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  Label28:= TLabel.create(frm)
+  with label28 do begin
+  parent:= frm
+    Left := 336
+    Top := 408
+    Width := 58
+    Height := 16
+    Caption := 'F(x) Upper'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+   // Font.Style := [fsBold]
+    ParentFont := False
+  end;
+  //object Cantidad: TLabel
+  cantidad:= TLabel.create(frm)
+  with cantidad do begin
+  parent:= frm
+    Left := 512
+    Top := 120
+    Width := 47
+    Height := 16
+    Caption := 'Quantity'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clMaroon
+    Font.Height := -11
+    Font.Name := 'Comic Sans MS'
+   // Font.Style := [fsBold]
+    ParentFont := False
+  end ;
+  //object EditMedia: TEdit
+  EditMedia:= TEdit.create(frm)
+  with EditMedia do begin
+  parent:= frm
+    Left := 480
+    Top := 184
+    Width := 65
+    Height := 24
+    TabStop := False
+    Color := clWhite
+    DragCursor := crDefault
+    DragMode := dmAutomatic
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+   // Font.Style := [fsBold]
+    ParentFont := False
+    ReadOnly := True
+    TabOrder := 4
+  end ;
+  //object Chart1: TChart
+  Chart1:= TChart.create(frm)
+   with chart1 do begin
+   parent:= frm 
+    Left := 7
+    Top := 8
+    Width := 322
+    Height := 281
+    BackWall.Color := clWhite
+    //BackWall.{Brush.}Style := bsClear
+    {Foot.Charset := DEFAULT_CHARSET
+    Foot.Font.Color := clRed
+    Foot.Font.Height := -11
+    Foot.Font.Name := 'Comic Sans MS'
+    Foot.Font.Style := [] }
+    Foot.Text.add('Value Measured')
+    Gradient.Visible := True
+    MarginBottom := 5
+    MarginLeft := 5
+    MarginRight := 10
+    Title.Font.Charset := DEFAULT_CHARSET
+    Title.Font.Color := clMaroon
+    Title.Font.Height := -13
+    Title.Font.Name := 'Comic Sans MS'
+   // Title.Font.Style := [fsBold] //}
+    Title.Text.add ('Statistic')
+    BottomAxis.LabelsAngle := 90
+    //LeftAxis.Axis.Color := clMaroon
+    //LeftAxis.Axis.Width := 1
+    //LeftAxis.Grid.Color := clScrollBar
+    LeftAxis.Title.Caption := 'Quantity of samples'
+    {LeftAxis.Title.Font.Charset := DEFAULT_CHARSET
+    LeftAxis.Title.Font.Color := clRed
+    LeftAxis.Title.Font.Height := -11
+    LeftAxis.Title.Font.Name := 'Comic Sans MS'  }
+    //LeftAxis.Title.Font.Style := []
+    Legend.Visible := False
+    View3D := False
+    //BevelInner := bvLowered
+    TabOrder := 5
+    end;
+    //object BS1: TBarSeries
+    BS1:= TBarSeries.create(frm)
+    with bs1 do begin
+      //parent:= chart1
+      ParentChart := Chart1;
+      //chart1.addseries(myserie);
+      Marks.ArrowLength := 20
+      {Marks.Font.Charset := DEFAULT_CHARSET
+      Marks.Font.Color := clBlack
+      Marks.Font.Height := -11
+      Marks.Font.Name := 'MS Sans Serif'
+      Marks.Font.Style := [] }
+      Marks.Visible := False
+      SeriesColor := 4227327
+      BarPen.Color := clRed
+      BarWidthPercent := 100
+      //MultiBar := mbStacked
+      OffsetPercent := 50
+      XValues.DateTime := False
+      XValues.Name := 'X'
+      XValues.Multiplier := 1.000000000000000000
+      XValues.Order := loAscending
+      YValues.DateTime := False
+      YValues.Name := 'Y'
+      YValues.Multiplier := 1.000000000000000000
+      YValues.Order := loNone
+      Left := 162
+      Top := 50
+    end;
+    //object LS2: TLineSeries
+     LS2:= TLineSeries.create(frm)
+     with ls2 do begin
+      parentchart:= chart1
+      Marks.ArrowLength := 8
+      Marks.Visible := False
+      SeriesColor := 64
+      Pointer.InflateMargins := True
+      Pointer.Style := psRectangle
+      Pointer.Visible := False
+      XValues.DateTime := False
+      XValues.Name := 'X'
+      XValues.Multiplier := 1.000000000000000000
+      XValues.Order := loAscending
+      YValues.DateTime := False
+      YValues.Name := 'Y'
+      YValues.Multiplier := 1.000000000000000000
+      YValues.Order := loNone
+      Left := 199
+      Top := 48
+    end ;
+    LSMS:= TLineSeries.create(frm)
+    with lsms do begin
+      parentchart:= chart1;
+      Marks.ArrowLength := 8
+      Marks.Visible := False
+      SeriesColor := 64
+      Pointer.InflateMargins := True
+      Pointer.Style := psRectangle
+      Pointer.Visible := False
+      XValues.DateTime := False
+      XValues.Name := 'X'
+      XValues.Multiplier := 1.000000000000000000
+      XValues.Order := loAscending
+      YValues.DateTime := False
+      YValues.Name := 'Y'
+      YValues.Multiplier := 1.000000000000000000
+      YValues.Order := loNone
+      Left := 127
+      Top := 48
+    end;
+    Series1:= TBarSeries.create(frm)
+    with series1 do begin
+    parentChart:= chart1;     //additional notes
+      Marks.ArrowLength := 0
+      Marks.BackColor := clWhite
+      Marks.Visible := True
+      SeriesColor := clRed
+      Title := 'AS1'
+      font.size:= 5;
+      BarWidthPercent := 10
+      XValues.DateTime := True
+      XValues.Name := 'X'
+      XValues.Multiplier := 1.000000000000000000
+      XValues.Order := loAscending
+      YValues.DateTime := False
+      YValues.Name := 'Bar'
+      YValues.Multiplier := 1.000000000000000000
+      YValues.Order := loNone
+    end;
+  //end TChart
+  //object EditIncertidumbre: TEdit
+   EditIncertidumbre:= TEdit.create(frm)
+   with  EditIncertidumbre do begin
+   parent:= frm
+    Left := 408
+    Top := 424
+    Width := 65
+    Height := 24
+    TabStop := False
+    Color := clWhite
+    DragCursor := crDefault
+    DragMode := dmAutomatic
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+  //  Font.Style := [fsBold]
+    ParentFont := False
+    ReadOnly := True
+    TabOrder := 6
+  end;
+  EditVarianza:= TEdit.create(frm)
+  with editvarianza do begin
+  parent:= frm
+    Left := 336
+    Top := 384
+    Width := 65
+    Height := 24
+    TabStop := False
+    Color := clWhite
+    DragCursor := crDefault
+    DragMode := dmAutomatic
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+  //  Font.Style := [fsBold]
+    ParentFont := False
+    ReadOnly := True
+    TabOrder := 7
+  end ;
+  EditSigma:= TEdit.create(frm)
+  with editsigma do begin
+  parent:= frm
+  //Exception: A control cannot have itself as its parent.
+    Left := 552
+    Top := 184
+    Width := 65
+    Height := 24
+    Color := clWhite
+    DragCursor := crDefault
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+  //  Font.Style := [fsBold]
+    ParentFont := False
+    TabOrder := 8
+    OnChange := @EditSigmaChange
+  end;
+  //object EditBajo: TMaskEdit
+  EditBajo:= TEdit.create(frm)
+  with editbajo do begin
+  parent:= frm
+    Left := 408
+    Top := 224
+    Width := 65
+    Height := 24
+    TabStop := False
+    Color := clWhite
+    DragCursor := crDefault
+    DragMode := dmAutomatic
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+   // Font.Style := [fsBold]
+    ParentFont := False
+    ReadOnly := True
+    TabOrder := 9
+  end;
+  //object EditAlto: TMaskEdit
+  Editalto:= TEdit.create(frm)
+  with editalto do begin
+  parent:= frm
+    Left := 408
+    Top := 264
+    Width := 65
+    Height := 24
+    TabStop := False
+    Color := clWhite
+    DragCursor := crDefault
+    DragMode := dmAutomatic
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+  //  Font.Style := [fsBold]
+    ParentFont := False
+    ReadOnly := True
+    TabOrder := 10
+  end;
+  //object EditReco: TEdit
+  Editreco:= TEdit.create(frm)
+  with editreco do begin
+  parent:= frm
+    Left := 408
+    Top := 304
+    Width := 65
+    Height := 24
+    TabStop := False
+    Color := clWhite
+    DragCursor := crDefault
+    DragMode := dmAutomatic
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+   // Font.Style := [fsBold]
+    ParentFont := False
+    ReadOnly := True
+    TabOrder := 11
+  end ;
+  //object Grid1: TStringGrid
+   grid1:= TStringGrid.create(frm)
+   with grid1 do begin 
+   parent:= frm;
+    Left := 336
+    Top := 8
+    Width := 156
+    Height := 153
+    TabStop := False
+    ColCount := 2
+    DefaultRowHeight := 14
+    FixedCols := 0
+    RowCount := 22
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -11
+    Font.Name := 'MS Sans Serif'
+    Font.Style := []
+    ParentFont := False
+    ScrollBars := ssVertical
+    TabOrder := 12;
+    ColWidths[0]:=85;
+    colwidths[1]:=49;
+  end;
+  //object EditSkew: TEdit
+  Editskew:= TEdit.create(frm)
+  with editskew do begin
+  parent:= frm
+    Left := 408
+    Top := 384
+    Width := 65
+    Height := 24
+    TabStop := False
+    Color := clWhite
+    DragCursor := crDefault
+    DragMode := dmAutomatic
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+  //  Font.Style := [fsBold]
+    ParentFont := False
+    ReadOnly := True
+    TabOrder := 13
+  end ;
+  //object EditKurt: TEdit
+  Editkurt:= TEdit.create(frm)
+  with editkurt do begin
+  parent:= frm
+    Left := 408
+    Top := 344
+    Width := 65
+    Height := 24
+    TabStop := False
+    Color := clWhite
+    DragCursor := crDefault
+    DragMode := dmAutomatic
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+   // Font.Style := [fsBold]
+    ParentFont := False
+    ReadOnly := True
+    TabOrder := 14
+  end;
+  //object EditCpTol: TEdit
+  Editcptol:= TEdit.create(frm)
+  with editcptol do begin
+  parent:= frm
+    Left := 552
+    Top := 263
+    Width := 65
+    Height := 24
+    TabStop := False
+    Color := clWhite
+    DragCursor := crDefault
+    DragMode := dmAutomatic
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+  //  Font.Style := [fsBold]
+    ParentFont := False
+    ReadOnly := True
+    TabOrder := 15
+  end ;
+  //object EditCpKTol: TEdit
+  Editcpktol:= TEdit.create(frm)
+  with editcpktol do begin
+  parent:= frm
+    Left := 552
+    Top := 303
+    Width := 65
+    Height := 24
+    TabStop := False
+    Color := clWhite
+    DragCursor := crDefault
+    DragMode := dmAutomatic
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+  //  Font.Style := [fsBold]
+    ParentFont := False
+    ReadOnly := True
+    TabOrder := 16
+  end;
+  //object EditCpLim: TEdit
+  Editcplim:= TEdit.create(frm)
+  with editcplim do begin
+  parent:= frm
+    Left := 480
+    Top := 263
+    Width := 65
+    Height := 24
+    TabStop := False
+    Color := clWhite
+    DragCursor := crDefault
+    DragMode := dmAutomatic
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+   // Font.Style := [fsBold]
+    ParentFont := False
+    ReadOnly := True
+    TabOrder := 17
+  end;
+  //object EditCpKLim: TEdit
+  Editcpklim:= TEdit.create(frm)
+  with editcpklim do begin
+  parent:= frm
+    Left := 480
+    Top := 303
+    Width := 65
+    Height := 24
+    TabStop := False
+    Color := clWhite
+    DragCursor := crDefault
+    DragMode := dmAutomatic
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+    //Font.Style := [fsBold]
+    ParentFont := False
+    ReadOnly := True
+    TabOrder := 18
+  end;
+  //object EditCpl: TEdit
+  Editcpl:= TEdit.create(frm)
+  with editcpl do begin
+  parent:= frm
+    Left := 480
+    Top := 423
+    Width := 65
+    Height := 24
+    TabStop := False
+    Color := clWhite
+    DragCursor := crDefault
+    DragMode := dmAutomatic
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+  //  Font.Style := [fsBold]
+    ParentFont := False
+    ReadOnly := True
+    TabOrder := 19
+  end ;
+  //object EditCpu: TEdit
+  Editcpu:= TEdit.create(frm)
+  with editcpu do begin
+  parent:= frm
+    Left := 480
+    Top := 383
+    Width := 65
+    Height := 24
+    TabStop := False
+    Color := clWhite
+    DragCursor := crDefault
+    DragMode := dmAutomatic
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+  //  Font.Style := [fsBold]
+    ParentFont := False
+    ReadOnly := True
+    TabOrder := 20
+  end ;
+  Editcr:= TEdit.create(frm)
+  with editcr do begin
+  parent:= frm
+    Left := 480
+    Top := 343
+    Width := 65
+    Height := 24
+    TabStop := False
+    Color := clWhite
+    DragCursor := crDefault
+    DragMode := dmAutomatic
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+   // Font.Style := [fsBold]
+    ParentFont := False
+    ReadOnly := True
+    TabOrder := 21
+  end;
+  //object EditLimSup: TEdit
+  Editlimsup:= TEdit.create(frm)
+  with editlimsup do begin
+  parent:= frm
+    Left := 336
+    Top := 344
+    Width := 65
+    Height := 24
+    Color := clWhite
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+   // Font.Style := [fsBold]
+    ParentFont := False
+    TabOrder := 0
+    OnChange := @EditLimSupChange
+  end;
+  EditLimInf:= TEdit.create(frm)
+  with editliminf do begin
+  parent:= frm
+    Left := 336
+    Top := 304
+    Width := 65
+    Height := 24
+    Color := clWhite
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+   // Font.Style := [fsBold]
+    ParentFont := False
+    TabOrder := 1
+    OnChange := @EditLimInfChange
+  end;
+  //object EditTolSup: TMaskEdit
+  Edittolsup:= TEdit.create(frm)
+  with edittolsup do begin
+  parent:= frm
+    Left := 336
+    Top := 264
+    Width := 65
+    Height := 24
+    Color := clWhite
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+   // Font.Style := [fsBold]
+    ParentFont := False
+    TabOrder := 2
+    OnChange := @EditTolSupChange
+  end;
+  //object EditTolInf: TMaskEdit
+  Edittolinf:= TEdit.create(frm)
+  with edittolinf do begin
+  parent:= frm
+    Left := 336
+    Top := 224
+    Width := 65
+    Height := 24
+    Color := clWhite
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+    //Font.Style := [fsBold]
+    ParentFont := False
+    TabOrder := 3
+    OnChange := @EditTolInfChange
+  end ;
+  //object Chart2: TChart
+   chart2 := TChart.create(frm)
+   with chart2 do begin
+   parent:= frm
+    Left := 8
+    Top := 296
+    Width := 321
+    Height := 153
+    //BackWall.Brush.Color := clWhite
+    //BackWall.Brush.Style := bsClear
+    {Foot.Font.Charset := DEFAULT_CHARSET
+    Foot.Font.Color := clRed
+    Foot.Font.Height := -12
+    Foot.Font.Name := 'Arial'
+    Foot.Font.Style := [fsItalic] }
+    Foot.Visible := False
+    //Gradient.EndColor := 16777088
+    //Gradient.StartColor := 8454143
+    //Gradient.Visible := True
+    MarginLeft := 2
+    MarginRight := 5
+    MarginTop := 10
+    Title.Text.add ('')
+    Title.Visible := False
+    BottomAxis.AxisValuesFormat := '#,##0.#'
+    BottomAxis.LabelsAngle := 90
+    View3D := False
+    //BevelInner := bvLowered
+    TabOrder := 22
+    //object LSTolInf: TFastLineSeries
+    end;
+    LSTolInf:=TFastLineSeries.create(frm)
+    with lstolinf do begin
+    parentchart:= chart2;
+      Marks.ArrowLength := 8
+      Marks.Visible := False
+      SeriesColor := clFuchsia
+      Title := 'Tol.Inf.'
+      LinePen.Color := clFuchsia
+      LinePen.Style := psDot
+      XValues.DateTime := False
+      XValues.Name := 'X'
+      XValues.Multiplier := 1.000000000000000000
+      XValues.Order := loAscending
+      YValues.DateTime := False
+      YValues.Name := 'Y'
+      YValues.Multiplier := 1.000000000000000000
+      YValues.Order := loNone
+      Left := 106
+      Top := 355
+    end;
+    //object LSMedida: TFastLineSeries
+    LSmedida:=TFastLineSeries.create(frm)
+    with lsmedida do begin
+    parentChart:= chart2;
+    //LSTolInf: TFastLineSeries
+      Marks.ArrowLength := 8
+      Marks.Visible := False
+      SeriesColor := clBlack
+      Title := 'Measure'
+      XValues.DateTime := False
+      XValues.Name := 'X'
+      XValues.Multiplier := 1.000000000000000000
+      XValues.Order := loAscending
+      YValues.DateTime := False
+      YValues.Name := 'Y'
+      YValues.Multiplier := 1.000000000000000000
+      YValues.Order := loNone
+      Left := 138
+      Top := 315
+    end ;
+    //object LSTolSup: TFastLineSeries
+    LSTolsup:=TFastLineSeries.create(frm)
+    with lstolsup do begin
+    parentchart:= chart2;
+      Marks.ArrowLength := 8
+      Marks.Visible := False
+      SeriesColor := clFuchsia
+      Title := 'Tol.Sup.'
+      XLabelsSource := 'Max'
+      LinePen.Color := clFuchsia
+      LinePen.Style := psDot
+      XValues.DateTime := False
+      XValues.Name := 'X'
+      XValues.Multiplier := 1.000000000000000000
+      XValues.Order := loAscending
+      YValues.DateTime := False
+      YValues.Name := 'Y'
+      YValues.Multiplier := 1.000000000000000000
+      YValues.Order := loNone
+      Left := 74
+      Top := 355
+    end;
+    //object LSLimSup: TFastLineSeries
+    LSlimsup:=TFastLineSeries.create(frm)
+    with lslimsup do begin
+    //parentchart:= chart2;
+      Marks.ArrowLength := 8
+      Marks.Visible := False
+      SeriesColor := clRed
+      Title := 'Lim.Sup.'
+      LinePen.Color := clRed
+      LinePen.Style := psDash
+      XValues.DateTime := False
+      XValues.Name := 'X'
+      XValues.Multiplier := 1.000000000000000000
+      XValues.Order := loAscending
+      YValues.DateTime := False
+      YValues.Name := 'Y'
+      YValues.Multiplier := 1.000000000000000000
+      YValues.Order := loNone
+      Left := 138
+      Top := 355
+    end ;
+    //object LSLimInf: TFastLineSeries
+    LSlimInf:=TFastLineSeries.create(frm)
+    with lsliminf do begin
+    parentchart:= chart2;
+      Marks.ArrowLength := 8
+      Marks.Visible := False
+      SeriesColor := clRed
+      Title := 'Lim.Inf.'
+      LinePen.Color := clRed
+      LinePen.Style := psDash
+      XValues.DateTime := False
+      XValues.Name := 'X'
+      XValues.Multiplier := 1.000000000000000000
+      XValues.Order := loAscending
+      YValues.DateTime := False
+      YValues.Name := 'Y'
+      YValues.Multiplier := 1.000000000000000000
+      YValues.Order := loNone
+      Left := 170
+      Top := 355
+    end;
+   // object LSMenos3S: TFastLineSeries
+    LSmenos3s:=TFastLineSeries.create(frm)
+    with lsmenos3s do begin
+    parentChart:= chart2;
+      Marks.ArrowLength := 8
+      Marks.Visible := False
+      SeriesColor := clGreen
+      Title := '-3Sigma'
+      XLabelsSource := 'Max'
+      LinePen.Color := clGreen
+      LinePen.Style := psDashDot
+      XValues.DateTime := False
+      XValues.Name := 'X'
+      XValues.Multiplier := 1.000000000000000000
+      XValues.Order := loAscending
+      YValues.DateTime := False
+      YValues.Name := 'Y'
+      YValues.Multiplier := 1.000000000000000000
+      YValues.Order := loNone
+      Left := 74
+      Top := 315
+    end ;
+    //object LSMas3S: TFastLineSeries
+    LSmas3s:=TFastLineSeries.create(frm)
+    with lsmas3s do begin
+    //parentchart:= chart2;
+      Marks.ArrowLength := 8
+      Marks.Visible := False
+      SeriesColor := clGreen
+      Title := '+3Sigma'
+      XLabelsSource := 'Max'
+      LinePen.Color := clGreen
+      LinePen.Style := psDashDot
+      XValues.DateTime := False
+      XValues.Name := 'X'
+      XValues.Multiplier := 1.000000000000000000
+      XValues.Order := loAscending
+      YValues.DateTime := False
+      YValues.Name := 'Y'
+      YValues.Multiplier := 1.000000000000000000
+      YValues.Order := loNone
+      Left := 106
+      Top := 315
+    end ;
+    //object LSMa: TFastLineSeries
+    LSma:=TFastLineSeries.create(frm)
+    with lsma do begin
+    //parentChart:= chart2;
+      Marks.ArrowLength := 8
+      Marks.Visible := False
+      SeriesColor := clBlue
+      Title := 'Ma'
+      LinePen.Color := clBlue
+      LinePen.Style := psDashDotDot
+      XValues.DateTime := False
+      XValues.Name := 'X'
+      XValues.Multiplier := 1.000000000000000000
+      XValues.Order := loAscending
+      YValues.DateTime := False
+      YValues.Name := 'Y'
+      YValues.Multiplier := 1.000000000000000000
+      YValues.Order := loNone
+      Left := 170
+      Top := 315
+    end;
+    //object LSMI: TLineSeries
+    LSmi:=TLineSeries.create(frm)
+    with lsmi do begin
+    //parent:= chart2;
+      Marks.ArrowLength := 8
+      Marks.Visible := False
+      SeriesColor := clYellow
+      Pointer.InflateMargins := True
+      Pointer.Style := psRectangle
+      Pointer.Visible := False
+      XValues.DateTime := True
+      XValues.Name := 'X'
+      XValues.Multiplier := 1.000000000000000000
+      XValues.Order := loAscending
+      YValues.DateTime := False
+      YValues.Name := 'Y'
+      YValues.Multiplier := 1.000000000000000000
+      YValues.Order := loNone
+      Left := 208
+      Top := 312
+    end ;
+  end;
+  //object EditMenos3: TEdit
+  Editmenos3:= TEdit.create(frm)
+  with editmenos3 do begin
+  parent:= frm
+    Left := 480
+    Top := 224
+    Width := 65
+    Height := 24
+    TabStop := False
+    Color := clWhite
+    DragCursor := crDefault
+    DragMode := dmAutomatic
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+    //Font.Style := [fsBold]
+    ParentFont := False
+    ReadOnly := True
+    TabOrder := 23
+    OnChange := @EditSigmaChange
+  end;
+  //object EditMas3: TEdit
+  Editmas3:= TEdit.create(frm)
+  with editmas3 do begin
+  parent:= frm
+    Left := 552
+    Top := 224
+    Width := 65
+    Height := 24
+    TabStop := False
+    Color := clWhite
+    DragCursor := crDefault
+    DragMode := dmAutomatic
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+   // Font.Style := [fsBold]
+    ParentFont := False
+    ReadOnly := True
+    TabOrder := 24
+  end ;
+  //object EditCrTol: TEdit
+  Editcrtol:= TEdit.create(frm)
+  with editcrtol do begin
+  parent:= frm
+    Left := 552
+    Top := 343
+    Width := 65
+    Height := 24
+    TabStop := False
+    Color := clWhite
+    DragCursor := crDefault
+    DragMode := dmAutomatic
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+   // Font.Style := [fsBold]
+    ParentFont := False
+    ReadOnly := True
+    TabOrder := 25
+  end;
+  //object EditMa: TEdit
+  Editma:= TEdit.create(frm)
+  with editma do begin
+  parent:= frm
+    Left := 408
+    Top := 184
+    Width := 65
+    Height := 24
+    TabStop := False
+    Color := clWhite
+    DragMode := dmAutomatic
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+   // Font.Style := [fsBold]
+    ParentFont := False
+    ReadOnly := True
+    TabOrder := 26
+    OnChange := @EditLimSupChange
+  end ;
+  //object EditMuestras: TEdit
+  Editmuestras:= TEdit.create(frm)
+  with editmuestras do begin
+  parent:= frm
+    Left := 336
+    Top := 183
+    Width := 65
+    Height := 24
+    TabStop := False
+    Color := clWhite
+    DragCursor := crDefault
+    DragMode := dmAutomatic
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+  //  Font.Style := [fsBold]
+    ParentFont := False
+    ReadOnly := True
+    TabOrder := 27
+  end ;
+  //object EditZInfLim: TMaskEdit
+  Editzinflim:= TEdit.create(frm)
+  with editzinflim do begin
+  parent:= frm
+    Left := 552
+    Top := 383
+    Width := 65
+    Height := 24
+    TabStop := False
+    Color := clWhite
+    DragMode := dmAutomatic
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+   // Font.Style := [fsBold]
+    ParentFont := False
+    ReadOnly := True
+    TabOrder := 28
+    OnChange := @EditLimInfChange
+  end ;
+  //object EditZSupLim: TEdit
+  Editzsuplim:= TEdit.create(frm)
+  with editzsuplim do begin
+  parent:= frm
+    Left := 552
+    Top := 423
+    Width := 65
+    Height := 24
+    TabStop := False
+    Color := clWhite
+    DragCursor := crDefault
+    DragMode := dmAutomatic
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+    //Font.Style := [fsBold]
+    ParentFont := False
+    ReadOnly := True
+    TabOrder := 29
+  end ;
+  //object EditFX: TEdit
+  Editfx:= TEdit.create(frm)
+  with editfx do begin
+  parent:= frm
+    Left := 336
+    Top := 424
+    Width := 65
+    Height := 24
+    TabStop := False
+    Color := clWhite
+    DragCursor := crDefault
+    DragMode := dmAutomatic
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'System'
+   // Font.Style := [fsBold]
+    ParentFont := False
+    ReadOnly := True
+    TabOrder := 30
+    OnChange := @EditSigmaChange
+  end ;
+  SECantidad:= TSpinEdit.create(frm)
+  with secantidad do begin
+  parent:= frm
+    Left := 512
+    Top := 136
+    Width := 65
+    Height := 26
+    Increment := 50
+    MaxValue := 1000
+    MinValue := 5
+    TabOrder := 31
+    Value := 250
+  end ;
+  aCB1:= TCheckBox.create(frm)
+  with acb1 do begin
+  parent:= frm
+    Left := 512
+    Top := 92
+    Width := 81
+    Height := 17
+    Caption := 'Animate'
+    Font.Charset := DEFAULT_CHARSET
+    Font.Color := clBlack
+    Font.Height := -13
+    Font.Name := 'Comic Sans MS'
+    //Font.Style := [fsBold]
+    ParentFont := False
+    TabOrder := 32
+    OnClick := @CB1Click
+  end;
+   Panel1:= TPanel.create(frm)
+   with panel1 do begin
+   parent:= frm
+    Left := 496
+    Top := 8
+    Width := 145
+    Height := 42
+    BevelInner := bvLowered
+    BevelWidth := 2
+    BorderWidth := 1
+    BorderStyle := bsSingle
+    TabOrder := 33
+    BCerrar:= TBitBtn.create(frm)
+    with bcerrar do begin
+    parent:= panel1
+      Left := 103
+      Top := 5
+      Width := 33
+      Height := 28
+      Cancel := True
+      Font.Charset := DEFAULT_CHARSET
+      Font.Color := clBlack
+      Font.Height := -13
+      Font.Name := 'Comic Sans MS'
+    //  Font.Style := [fsBold]
+      ParentFont := False
+      TabOrder := 0
+      OnClick := @BCerrarClick
+      glyph.LoadFromResourceName(getHINSTANCE,'CL_MPSTOP'); // CL_MPSTOP'); 
+      NumGlyphs := 2
+    end;
+    BB3d:= TBitBtn.create(frm)
+    with bb3d do begin
+    parent:= panel1
+      Left := 39
+      Top := 5
+      Width := 33
+      Height := 28
+      Font.Charset := DEFAULT_CHARSET
+      Font.Color := clBlack
+      Font.Height := -13
+      Font.Name := 'Comic Sans MS'
+    //  Font.Style := [fsBold]
+      ParentFont := False
+      TabOrder := 1
+      OnClick := @BB3dClick
+      glyph.LoadFromResourceName(getHINSTANCE,'TCHART'); // CL_MPSTOP'); 
+      //Glyph.Data := {
+       NumGlyphs := 2
+    end ;
+    //object BRecalcular: TBitBtn
+    Brecalcular:= TBitBtn.create(frm)
+    with brecalcular do begin
+    parent:= panel1
+      Left := 6
+      Top := 5
+      Width := 33
+      Height := 28
+      Default := True
+      Font.Charset := DEFAULT_CHARSET
+      Font.Color := clBlack
+      Font.Height := -13
+      Font.Name := 'Comic Sans MS'
+      //Font.Style := [fsBold]
+      ParentFont := False
+      TabOrder := 2
+      OnClick := @BRecalcularClick
+      glyph.LoadFromResourceName(getHINSTANCE,'TCHARTGRID'); //CL_MPPREV');
+      //Glyph.Data := {
+       end ;
+    //object BBImprimir: TBitBtn
+    BBimprimir:= TBitBtn.create(frm)
+    with bbimprimir do begin
+    parent:= panel1
+      Left := 72
+      Top := 5
+      Width := 32
+      Height := 28
+      Default := True
+      Font.Charset := DEFAULT_CHARSET
+      Font.Color := clBlack
+      Font.Height := -13
+      Font.Name := 'Comic Sans MS'
+     // Font.Style := [fsBold]
+      ParentFont := False
+      TabOrder := 3
+      OnClick := @BBImprimirClick
+      ShowHint := True;
+      hint:= 'Export to Printer';
+      //Glyph.Data := {
+      glyph.LoadFromResourceName(getHINSTANCE,'TCHARTPAGENAVIGATOR'); 
+      NumGlyphs := 2
+    end ;
+  end;
+  //object Timer1: TTimer
+  timer1:= TTimer.create(frm)
+  with timer1 do begin
+    Interval := 500
+    enabled:= false;
+    OnTimer := @Timer1Timer
+    //enabled:= false;
+    //Left := 600
+    //Top := 124
+  end ;     //}
+  //FormShow(self);
+  frm.Show;
+ //end;
+end;
+
+
+procedure TMyGridOnGridMouseMove(Sender: TObject; Shift: TShiftState;
+  X, Y: Integer);
+var
+  aPoint: TPoint;
+  Grid: TStringGrid;
+begin
+  //inherited;
+  //Application.Hint := 'Hint Text';
+  Grid.Hint := 'Hint Text Test';
+  Grid.ShowHint := True;
+  aPoint.X := X;
+  aPoint.Y := Y;
+  aPoint := frm.ClientToScreen(aPoint);
+  Application.ActivateHint(aPoint);
+end;
+
+procedure TForm1AutoSizeCol(Grid: TStringGrid; Column: integer);
+var
+  i, W, WMax: integer;
+begin
+  WMax := 0; 
+  for i := 0 to (Grid.RowCount - 1) do begin
+    W := Grid.Canvas.TextWidth(Grid.Cells[Column, i]);
+    if W > WMax then 
+      WMax := W;
+  end;
+  Grid.ColWidths[Column] := WMax + 5;
+end;
+
+procedure TForm1SizeColsToHeaders(Grid: TStringGrid);
+var
+  Col: integer;
+begin
+  for Col := 0 to (Grid.ColCount - 1) do
+    Grid.ColWidths[Col] := 
+      Grid.Canvas.TextWidth(Grid.Cells[Col, 0]) + 5;
+end;
+
+var rndpic: integer;  var abt: boolean;
+
+Begin  //@main
+
+   {Demo}
+//initialization
+
+ Teorico := 23;
+ LimSup  := 29;
+ LimInf  := 18;
+ TolSup  := 26;
+ TolInf  := 20;
+ Sigma   := 1;
+
+//<Executable statements>
+    Println(TEXTOUT);
+    maXcalcF('Sqrt(PI/e^2)') 
+    
+    writeln('3. Get Task Process Priority Info:') 
+    
+  // iserv:= WMIConnect(isloc,'localhost\root\SecurityCenter2','',''); 
+  // Get-WmiObject Win32_process -filter 'name = "ProcessName"' | foreach-object 
+                                     { $_.SetPriority(PriorityLevelID) }
+  
+    iserv:= WMIConnect(WMIStart,'localhost','',''); 
+    wmi_dom:= 'Win32_process';
+    iset:= WMIExecQuery(iserv,'Select * from '+wmi_dom+' WHERE Name = "maXbox4.exe"')
+    if WMIRowFindFirst(iset, ENum, vObj) then 
+      repeat 
+        PrintF('PriorityLevelID of maXbox: %s ',[vObj.Priority]);
+        //vObj.setPriority('128')
+      until not WMIRowFindNext(ENum, vObj);
+    vObj:= unassigned;
+    
+    writeln(GetLastErrorMessage) 
+    
+    //enigma test
+    {writeln((uppercase(AllTrimSpaces('this is ä  UrsprÃ¼nglich  Strng : string'))));
+    writeln(StripSpaces('this is    Strng : string'));
+    writeln(uppercase(DelSpace('this is  a  hidden  Strng : string')));  }
+    //sr:= loadfromfile((exepath+'mytexte.txt'))
+    //sr:= alltrimspaces (sr)
+    //writeln(uppercase(utf8decode(delspace(sr))))
+    
+ (*
+  if isInternet then   
+   for it:= 1 to 5 do begin
+     rndpic:= random(30000)
+     sleep(2000)
+     RunPictureBox(rndpic,400,400,UrlPictureLookupInfo,  {false=store pic} 
+                        Exepath+'\images\'+itoa(rndpic)+'.jpg', true);
+   end; //*)   
+   
+   loadformSTATfile;
+   
+   writ(flots(pi));
+   
+   //Function MaskGetCurrentDirectives( const EditMask : string; MaskOffset : Int) : TMaskDirectives
+    // MaskGetCurrentDirectives( const EditMask : string; MaskOffset : Int) : TMaskDirectives
+   //Convert a dfm to string:
+
+{srlist:= TStringlist.create;
+if LoadDFMFile2Strings('C:\maXbox\EKON_BASTA\EKON23\gaussen\gauss_6en.dfm',srlist, abt)= 0 then writeln(srlist.text);
+    srlist.Free;  }
+   
+  
+End. 
+
+ref: http://swissdelphicenter.ch/en/showcode.php?id=1275
+
+https://github.com/FMXExpress/Cross-Platform-Samples/blob/master/89-HTTPImage/Unit1.pas
+http://www.festra.com/eng/mtut09.htm
+
+Doc:  16235; is train test
+
+{ Gauss6  Original
+
+ Author
+
+    (c) Jose Maria Gias
+    email : sigekom@arrakis.es
+            http://ww.arrakis.es/~sigecom
+
+ 04/19/1999
+
+ Delphi 4 Proffesional or Client Server
+ # with Delphi 4 Destokp versión, you need plus TeeChart Pro
+
+ Freeware  - This is an example, reason why reclamations are not admitted
+             neither they offer guarantees neither support of any class
+
+ Functions used Mathematics
+    - Delphi4\source\rtl\sys\math.pas
+    - Statistics Introduction     - National education University to distance
+    - Estadistica basica practica - Wonnacott and Wonnacott
+    ** Have been incorporated to the Unit the necessary functions **
+
+ Example of Table of Frequencies and Estandar Deviation Distribution -
+ Bell of Gauss in function of the obtained samples and the values of control
+ of a normal productive process.
+
+ They are considered the values of you Limit of control of Ingeniery for the
+ process productive and Tolerances of Schemes as you Limit of control
+
+ To use in a Project to withdraw the code preceded from 'Demo' and to happen to
+ him the data
+
+ To experience with it values, it is possible to change the Sigma and the
+ tolerances
+
+ The value of Sigma for the generation random of measures is updated in each
+ data apprehension, generating the following series of measures from I finish
+ value
+
+}
+Do not use the service display name (as displayed in the services
+  control panel applet.) You must use the real service name, as
+  referenced in the registry under
+  HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services
+  
+  //https://www.heise.de/hintergrund/25-Jahre-Delphi-war-ein-Kind-seiner-Zeit-4660219.html?seite=3
+  
+  https://www.heise.de/forum/heise-online/Kommentare/25-Jahre-Delphi-war-ein-Kind-seiner-Zeit/Ein-Teil-der-Code-Zukunft-ist-mehrsprachig/posting-36135387/show/
+  
+  procedure TForm1.Button1Click(Sender: TObject);
+begin
+  if NetHTTPClient1.Tag=NOT_BUSY then
+    begin
+      GaussianBlurEffect1.Enabled := True;
+      ProgressBar1.Visible := True;
+      Timer1.Enabled := True;
+      TTask.Run(procedure var LResponse: TMemoryStream; begin
+        LResponse := TMemoryStream.Create;
+        try
+          NetHTTPClient1.Get('https://picsum.photos/seed/'+Random.ToString+'/'+Image1.Width.ToString+'/'+Image1.Height.ToString,LResponse);
+          TThread.Synchronize(nil,procedure begin
+            Image1.Bitmap.LoadFromStream(LResponse);
+          end);
+        finally
+          LResponse.Free;
+          NetHTTPClient1.Tag := NOT_BUSY;
+
+          GaussianBlurEffect1.Enabled := False;
+          ProgressBar1.Visible := False;
+          Timer1.Enabled := False;
+          ProgressBar1.Value := 0;
+        end;
+      end);
+    end;
+end;
+  
+  
+  Combining three rotors from a set of five, each of the 3 rotor settings with 26 positions, and the plugboard with ten pairs of letters connected, the military Enigma has 158,962,555,217,826,360,000 different settings (nearly 159 quintillion or about 67 bits).[19]
+
+Note that (5x4x3) x (26^3) x [26! / (6! x 10! x 2^10)] = 158,962,555,217,826,360,000 ˜ 2^67.1 
+
+    “Imagine a counterfactual history in which the British had not been able to decipher Enigma messages during the Battle of Britain, the naval war in the Mediterranean, the early years of the Battle of the Atlantic, or in the campaign in the Western Desert. Such a scenario is frightening, as it would be a history that depicts not just a longer, drawn-out war but potentially one with a quite different outcome.”
+
+    „Stellen Sie sich eine kontrafaktische Geschichte vor, in der die Briten die Enigma-Sprüche während der [Luft-]Schlacht um England, des Seekriegs im Mittelmeer, der frühen Jahre der Atlantik-Schlacht oder im [Afrika-]Feldzug in der [Libyschen] Westlichen Wüste nicht hätten entziffern können. Ein solches Szenario ist beängstigend, denn es wäre eine Geschichte, die nicht nur einen längeren, langwierigen Krieg darstellt, sondern möglicherweise einen Krieg mit einem ganz anderen Ergebnis.“
+
+– Sir Dermot Turing[140]
+  
+  There is a way to start a process with the desired priority. This can be done with a console command "start", available in the classic command prompt (cmd.exe). Here is how.
+  Finally, using the console tool wmic, you can change an already running app's process priority level. This can be useful in various automation scripts.
+How to change the app priority level using wmic
+
+    Open a new command prompt instance.
+    Type or copy-paste the following command:
+    
+    https://winaero.com/blog/change-process-priority-windows-10/
+    
+    what it says, you're trying to cram a sequence of numbers into a single number slot. It can be thrown under various circumstances. 
+    
+    INFORMACIÓN  URGENTE  E  IMPORTANTE.
+    
+    
+Vergessen Sie diese Abzüge nicht
+
+    Zinsgutschriften ab CHF 200.–, Zinserträge von Obligationen und Dividendenauszahlungen sind verrechnungssteuerpflichtig. Die 35% Verrechnungssteuer werden Ihnen zurückerstattet, wenn Sie Ihre Konten und Wertschriften angeben.
+    Auslagen wie Berufskosten für den Arbeitsweg, die Verpflegung und die Anschaffung von Notwendigem wie Berufskleidern (Quittungen und Kontoauszüge für alle Abzüge sammeln, für die es keine Pauschale gibt)
+    Ausgaben für Weiterbildung
+    Einzahlungen in die gebundene Vorsorge (Säule 3a)
+    Spenden?an gemeinnützige Organisationen (Quittungen und Kontoauszüge für alle Abzüge sammeln, für die es keine Pauschale gibt)
+
+
+    https://giphy.com/gifs/die-5sfN51bhaxoVq
+    
+    https://ch.mathworks.com/help/signal/ug/residual-analysis-with-autocorrelation.html
+    
+    The autocorrelation function is the correlation of the residuals (as a time series) with its own lags.
+    Edit: Here's a plot to illustrate the difference between an uncorrelated and a highly correlated series (in fact, a nonstationary one)
+    The upper plot is white noise (independent). The lower one is a random walk (whose differences are the original series) - it has very strong autocorrelation.
+    
+    
+What is the most impressive thing you have seen a software engineer do in an interview?
+Chip Frank
+Chip Frank, works at Computer Programming
+Answered Dec 18 · Upvoted by Meet Vajaria, Master of Software Engineering and Daniel Sobrado, M.S, Master Software Engineering, University of Deusto (2002)
+
+    Q: “What is the most impressive thing you have seen a software engineer do in an interview?”
+
+A guy wrote some code on a whiteboard and then sat down. Reviewing the code, something didn’t make sense. So, I asked a question about a variable.
+
+Dude says: “Oh, sorry about that.”
+
+Un-caps the whiteboard pen he has in his hand, throws it at the board (like a dart), making a dot between two words. Catches the whiteboard pen as it bounces back, caps it, turns around saying: “That better?”
+
+I looked at it, and I was like: “Yeah.”
+
+Ref:  
+
+>>> with open("C:\maXbox\maxbox3\maxbox3\maXbox3\mytexte.txt") as f:
+...     lines = f.readlines()
+To remove all whitespace characters (space, tab, newline) you can use split then join:
+... lines = ''.join(str(lines).split())
+
+strip does a rstrip and lstrip (removes leading and trailing spaces, tabs, returns and form feeds, but it does not remove them in the middle of the string).
+
+>>> with open("C:\maXbox\maxbox3\maxbox4\mytext.txt",encoding='utf-8') as f:
+...     lines = ''.join(str(f.readlines()).split())
+
+https://kb.paessler.com/en/topic/1073-what-are-the-most-common-errors-when-monitoring-wmi
+https://msdn.microsoft.com/en-us/library/aa394217(v=vs.85).aspx
+
+EventType  -   //"BUILTIN\\Administrators"';
+'1 Error
+'2 Warning()
+'3 Information()
+'4 Security audit success
+'5 Security audit failure
+
+Crypto-Check
+The vendor company is requested to establish a secure connection (https/SSL) 
+Data and Code-Check
+Webshop also reads and parses the information in the confirmation returned by the payment service.
+Website-Check
+URL, Identity-Spoofing and possible Web Form Hooks
+Process-Check 
+List of Admin Accounts and Debit Information (cannot view the entered data. Card and account numbers cannot be saved by the merchant)
+Contract-Check
+Erfüllen der  contract with a payment service provider 
+
+Schlussbericht mit 5 Punkten:
+
+'1 Error
+'2 Warning()
+'3 Information()
+'4 Security audit success
+'5 Security audit failure
+
+Basierend auf diesen Daten hier die Grobofferte für max. 4 Tage inklusive Meetings:
+
+1. Crypto-Check
+- The vendor company is requested to establish a secure connection (https/SSL)
+2. Data and Code-Check (PaymentController.php)
+- Webshop also reads and parses the information in the confirmation returned by the payment service.
+3. Server Website-Check
+- URL, Identity-Spoofing and possible Web Form Hooks
+4. Process-Check
+- List of Admin Accounts and Debit Information (cannot view the entered data. Card and account numbers cannot be saved by the merchant)
+5. Contract-Check
+- Meet the requirements of the contract with the payment service provider
+
+6. Schlussbericht mit 5 Punkten:
+
+'1 Error
+'2 Warning()
+'3 Information()
+'4 Security audit success
+'5 Security audit failure
+
+https://www.udemy.com/share/101yBE/
+
+
+<QueryList>
+  <Query Id="0" Path="System">
+    <Select Path="System">*[System[(Level=2)]]</Select>
+  </Query>
+</QueryList>
+
+Exception: Could not convert variant of type (OleStr) into type (Date).
+  //NullStrictConvert := false;
+
+https://www.scribd.com/document/348528006/Work-with-WMI-System-Management-Second-Part
+
+"Hello Siri, open a shell!" Siri: "I don't see an app called "a shell". You could try searching the App Store."
+
+public class MainClassWMI
+{
+    public static void MainWMI()
+    {
+        ManagementObjectSearcher query = new ManagementObjectSearcher("SELECT * FROM Win32_NetworkAdapterConfiguration WHERE IPEnabled = 'TRUE'");
+        ManagementObjectCollection queryCollection = query.Get();
+        foreach (ManagementObject mo in queryCollection)
+        {
+            string[] addresses = (string[])mo["IPAddress"];
+
+            foreach (string ipaddress in addresses)
+            {
+                Console.WriteLine("IP Address: {0}", ipaddress);
+            }
+        }
+    }
+}

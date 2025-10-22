@@ -1,0 +1,935 @@
+PROGRAM WeatherBox5_2_main_cities;
+
+///////////////////////////////////////////////////////////////////////////
+//  #sign: User: DESKTOP-BTLKHKF: 29/09/2025 09:33:12 
+//  Purpose: how to call a weather map function with modern regex & webview2
+//  #path>C:\maxbox\maxbox51\examples\
+//  Lines of Code #locs:264
+///////////////////////////////////////////////////////////////////////////
+
+Const TEXTOUT = 'hi world of weather reports geo opcode mode';
+
+{$DEFINE MSWINDOWS}
+
+//############################################################################
+// www.openweathermap.com REx Tutor Tour
+//############################################################################
+//TODO: Button with stop event, change color and save bitmap as png
+  //TODO: http://www.timeanddate.com/worldclock/australia/perth
+
+{$I .\OWMAPIKEY.INC}
+
+CONST 
+  UrlMapQuestAPICode2='http://open.mapquestapi.com/nominatim/v1/search.php?format=%s&json_callback=renderBasicSearchNarrative&q=%s';  
+
+  URLWeatherReport25=
+     'https://api.openweathermap.org/data/2.5/weather?q=%s&units=metric&APPID'+ OWMKEY;
+
+ {@To get access to weather API you need an API key whatever account you chose!!}
+                                          
+  WeatherREX = 
+    //test: '.*Дата\s*Ку?с\s*Ку?с пок.\s*Ку?с п?од.\s*Курс на?[^<\d]*' 
+    //'"temp":([\d\.]+).*"pressure":([0-9]+).*"humidity":([0-9]+).*"name":"([\w]+)"';  
+    '"temp":([\d\.-]+).*"pressure":([0-9]+).*"humidity":([0-9]+).*"country":"([\w\s]+).*'+
+                       '"sunrise":([0-9]+).*"sunset":([0-9]+).*"name":"([\w\s]+)"';  
+
+   WeatherREX3 = 
+    //test: '.*Дата\s*Ку?с\s*Ку?с пок.\s*Ку?с п?од.\s*Курс на?[^<\d]*' 
+    '"lon":([\d\.-]+).*"lat":([\d\.-]+).*'+  
+    '"temp":([\d\.-]+).*"pressure":([0-9]+).*"humidity":([0-9]+).*"country":"([\w\s]+).*'+
+                       '"sunrise":([0-9]+).*"sunset":([0-9]+).*"name":"([\w\s]+)"';  
+
+type TTlatlong = record
+       lat, long: double;
+       descript: string;
+     end; 
+     
+ var latlong: TTlatlong;    
+                          
+function GetGeoWeather(const location: string;
+                             const UrlRestAPI: string): string;
+var lStream: TStringStream;  asyn:TSynwInfo;
+begin
+  lStream:= TStringStream.Create('');
+  try
+     //lHTTP.Get1(Format(UrlRestAPI,[location]),lStream);
+    http_getStream(Format(UrlRestAPI,[location]),lStream);
+    lStream.Seek(0,0);
+    result:= 'GEO_Weather_Report: '+lStream.ReadString(lStream.Size);    
+  except
+     //if something went wrong try using a backup server.
+     //writeln('html back: '+GetURLAsString('http://api.openweathermap.org'));
+     writeln(ExceptionToString(ExceptionType, ExceptionParam));
+  finally
+    lStream.Free;
+  end;
+end;
+
+ procedure letMultipleWeather(apistr: string);
+ var mc: TMatch;
+ begin
+   with TRegEx.Create1(weatherREX) do try 
+     //Expression:= weatherREX; 
+     if ismatch(apistr) then begin
+       mc:= Match(apistr); 
+       PrintF('WeatherREX1: '+
+          '%sє in %s by %s of %s hPa, %s hum -- %s sunrise,  sunset: %s',
+                [mc.groups[1].value,mc.Groups[7].value,mc.Groups[4].value,
+                 mc.Groups[2].value,mc.Groups[3].value+'%',
+                 datetimetostr(UnixToDateTime(strtoint(mc.Groups[5].value))),
+                 timetostr(UnixToDateTime(strtoint(mc.Groups[6].value)))]); 
+      end; finally Free; 
+    end;
+ end;   
+
+ procedure letMultipleWeather2(apistr: string);
+ var mc: TGroupCollection;
+ begin
+   with TRegEx.Create1(weatherREX) do try 
+     if ismatch(apistr) then begin
+       mc:= Match(apistr).groups; 
+       PrintF('WeatherREX2: '+
+          '%sє in %s by %s of %s hPa, %s hum -- %s sunrise,  sunset: %s',
+              [mc[1].value,mc[7].value,mc[4].value,
+               mc[2].value,mc[3].value+'%',
+               datetimetostr(UnixToDateTime(strtoint(mc[5].value))),
+               timetostr(UnixToDateTime(strtoint(mc[6].value)))]); 
+      end; finally Free; 
+    end;
+ end;   
+
+ procedure letMultipleWeather3(apistr: string; var latlong: TTlatlong);
+ var mc: TGroupCollection;
+ begin                                                 
+   with TRegEx.Create1(weatherREX3) do try 
+     if ismatch(apistr) then begin
+       mc:= Match(apistr).groups; 
+       latlong.lat:= strtofloat(mc[2].value);
+       latlong.long:= strtofloat(mc[1].value);
+       PrintF('WeatherREX3: '+
+          'lat:%s lon:%s %sє in %s by %s of %s hPa, %s hum -- %s sunrise, sunset: %s',
+              [mc[2].value,mc[1].value, mc[3].value,mc[9].value,mc[6].value,
+               mc[4].value,mc[5].value+'%',
+               datetimetostr(UnixToDateTime(strtoint(mc[7].value))),
+               timetostr(UnixToDateTime(strtoint(mc[8].value)))]); 
+      end; finally Free; 
+    end;
+ end;   
+
+   procedure TForm1Button6ClickRegExTest(Sender: TObject);
+   var
+      vtext, regex: String;
+      match: TMatch;
+      matches: TMatchCollection;
+      groups: TGroupCollection;
+      group: TGroup; reg: TRegEx;
+    begin
+      vtext:= 'ion":657,"durationLabel":"11 Min.","geoblocking":{"code":"';
+      regex:= '.*"durationLabel":"(.*)","geoblocking".*';
+      //regex:= '("durationLabel":")(.*)("."geoblocking")';
+      reg:= TRegEx.Create1(regex);
+      matches:= reg.Matches(vtext);
+      if matches.Count > 0 then begin
+        match:= matches[0];
+        groups:= match.Groups;
+         if groups.Count > 0 then begin
+           group:= groups[1];
+           writeln(group.value);
+         end;
+      end;
+     reg.Free; 
+   end;
+
+var  verInfo: TOSVersionInfo;
+     aProcessHandle : THandle;
+     filestr, vtext, regex: string;
+     afrm: TForm;  mch: TMatch;  //Args: TNewWindowRequestedEventArgs
+     //apgs: TGPS;  Args: TNewWindowRequestedEventArgs
+     //mydom: TDOMDocument //TRefClass;  //TDOMNode;
+     //ahd: TIpAddrRec, TIpBaseAccess; //TIpMD5Digest; //TIpHandle;
+
+Begin  //@Main
+//<Executable statements> //TOutlookExport_Spy;
+  Writeln('');
+ //Writeln('Start Command of DLL: '+CheckIEStartCommand);  
+//<Definitions>  
+   //ares:= TResolver.create;
+ { with TResolver.create do begin
+   //writeln(inttostr(GetHostByName(gethostname)));
+    Free;   end;  }
+    {repeat 
+     TApplication_PaintView(aform.canvas);
+     switch:= NOT switch;
+     Sleep(20);
+   until isKeyPressed or FWait;}
+    {with TledForm.create(self) do begin
+    showmodal; free; end;} 
+ //  GetMacAddresses(const Machine: string; const Addresses: TStrings):Integer;
+  maxform1.console1click(self)
+  TForm1Button6ClickRegExTest(self);
+  
+  writeln(sha1(exepath+'maxbox5.exe'));
+    writeln(floattostr(power(310,25)));  
+     writ(format('%.18f',[power(310,25)]));
+     writ(format('%.18f',[jclpower(310,25)]));
+     writ(format('%.18f',[pow(310,25)]));
+    writeln(regexReplace('["some regex text"]','\["(.+?)"\]','$1',[])); 
+    writeln(regexReplace('A90B3C','A((\d+)B)(\d+)C','$1',[]));  
+    //function regexFindall(const aInput, Pattern: string): string; 
+    writ(regexFindall('A90B3CA80B6CA280B17C', 'A(\d+)B(\d+)C'));  
+    writ(regexFindall('A90B3CA80B6CA280B17C', 'A(?:\d+)B(\d+)C')); 
+    
+     sr:= GetGeoWeather('Bern', UrlWeatherReport25);
+     writeln('debug '+sr)
+     letMultipleWeather(sr)   
+     sr:= GetGeoWeather('Athen', UrlWeatherReport25);
+     letMultipleWeather(sr)  
+      sr:= GetGeoWeather('Budapest', UrlWeatherReport25);
+     letMultipleWeather(sr)       
+     sr:= GetGeoWeather('Rom', UrlWeatherReport25);
+     letMultipleWeather(sr)    
+     sr:= GetGeoWeather('Paris', UrlWeatherReport25);
+     letMultipleWeather(sr)   
+     sr:= GetGeoWeather('Madrid', UrlWeatherReport25);
+     letMultipleWeather(sr)   
+     sr:= GetGeoWeather('Koeln', UrlWeatherReport25);
+     letMultipleWeather(sr) 
+     sr:= GetGeoWeather('Berlin', UrlWeatherReport25);
+     letMultipleWeather(sr) 
+     sr:= GetGeoWeather('Kopenhagen', UrlWeatherReport25);
+     letMultipleWeather(sr) 
+     sr:= GetGeoWeather('Reykjavik', UrlWeatherReport25);
+     letMultipleWeather(sr) 
+     sr:= GetGeoWeather('Vienna', UrlWeatherReport25);
+     letMultipleWeather(sr) 
+     sr:= GetGeoWeather('Melbourne,Australia', UrlWeatherReport25);
+     letMultipleWeather2(sr) 
+     sr:= GetGeoWeather('Oslo', UrlWeatherReport25);
+     letMultipleWeather(sr) 
+     sr:= GetGeoWeather('Stockholm,se', UrlWeatherReport25);
+     sr:= StrDelete('GEO_Weather_Report: ',sr);
+     //writ(formatjson(sr));
+     letMultipleWeather2(sr)  
+     sr:= GetGeoWeather('Helsinki', UrlWeatherReport25);
+     letMultipleWeather(sr) 
+     sr:= GetGeoWeather('Tokyo', UrlWeatherReport25);
+     letMultipleWeather(sr) 
+     
+     sr:= GetGeoWeather('flensburg,germany', UrlWeatherReport25);
+     sr:= StrDelete('GEO_Weather_Report: ',sr);
+     //GPS coordinates: 54° 46' 59.8800'' N 9° 25' 59.8800'' E
+     //Extended2DMS( const X : Extended; var Degs, Mins, Secs: Extended)
+     //writ(DegToDmsStr(DegTograd(latlong.lat), 4));
+     //writ(formatjson(sr));
+     letMultipleWeather3(sr, latlong) 
+     writ(DegToDmsStr((latlong.lat), 4));
+     writ(DegToDmsStr((latlong.long), 4));
+     //OpenWeb('https://www.latlong.net/c/?lat='+flots(latlong.lat)+'&long='+flots(latlong.long)); 
+     
+     with TEdgeViewForm.create(self) do begin
+        width:= 1500;
+        pagecontrol1.height:= 40;
+        icon.loadfromresourcename(hinstance,'XJICON');
+        Caption:= 'maXbox5 EdgeView2BrowserFeed_GEOReport' ;
+        panel1.parentcolor:= false;
+        panel1.ParentBackground:= false;
+        panel1.color:= clnavy;
+        //memoJavaScript.height:= 180;
+        //btngoclick(self); //OnNewWindowRequested
+        edit1.text:= 'https://www.latlong.net/c/?lat='+flots(latlong.lat)+'&long='+flots(latlong.long);
+        sleep(500);
+        navigate('https://wttr.in/Paris'); 
+        //btnExecuteScriptClick(self);  //}
+        //memoHTML.Text:= JS_InitFunc;
+        //btnSetSourceClick(self); 
+        //memoJavaScript.text:= JS_InitFunc;
+         {sleep(1500);
+         btnGeoCodeClick(self);  }
+         showmodal;
+         free;
+     end;
+     
+   {  writ(regexFindall('A90B3CA80B6CA280B8C', 'A(\d+)B(\d+)C'));  
+     vtext := 'ion":657,"durationLabel":"11 Min.","geoblocking":{"code":"';
+     regex := '.*"durationLabel":"(.*)","geoblocking".*';
+     writ(regexFindall(vtext, regex)); 
+     writeln(regexReplace(vtext,regex,'$1',[]));  } 
+     (*
+     with TRegEx.Create1(regex) do begin
+       mch:= Match(vtext);
+       if ismatch(vtext) then
+         writeln(mch.groups[1].value); 
+       free;
+     end; *)          
+End. 
+
+//DOC
+ref: WeatherREX3: 18.04є in Bern by CH of 1022 hPa, 70% hum -- 26/08/2024 06:42:23 sunrise,  sunset: 20:21:56
+WeatherREX3: 24.82є in Klagenfurt by AT of 1018 hPa, 58% hum -- 26/08/2024 06:15:28 sunrise,  sunset: 19:54:00
+WeatherREX3: 20.88є in Cologne by DE of 1023 hPa, 57% hum -- 26/08/2024 06:37:03 sunrise,  sunset: 20:31:15
+WeatherREX3: 44.36є in Kuwait City by KW of 1000 hPa, 33% hum -- 26/08/2024 04:22:40 sunrise,  sunset: 17:17:28
+WeatherREX3: 25.87є in Melbourne by US of 1018 hPa, 89% hum -- 26/08/2024 12:58:28 sunrise,  sunset: 01:50:10
+ mX5?? executed: 26/08/2024 11:53:32  Runtime: 0:0:3.897  Memload: 44% use
+ref: https://stackoverflow.com/questions/5982824/what-does-1-2-etc-mean-in-regular-expressions
+Small set for arduino and android unit testing 
+
+https://github.com/EtheaDev/DelphiGoogleMap/blob/main/Source/Vcl.GoogleMap.pas
+
+infile: Const OWMKEY= '=55013bf3d09cfb0619989a00ed5.....';
+
+http://glscene.sourceforge.net/wikka/HomePage
+
+Positioned in the foothills of Mount Parnassos, historic Delphi was traditionally believed to be the geographical  
+centre of the world – the meeting point of two eagles dispatched by Zeus. For many centuries it was also the religious and spiritual 
+centre of the ancient Greek world and the Delphic oracle was consulted by visitors from across a wide region. 
+unit Unit1;
+
+interface
+
+pascal delphi 
+
+uses Windows,
+     Messages,
+     SysUtils,
+     Variants,
+     Classes,
+     Graphics,
+     Controls,
+     Forms,
+     Dialogs,
+     Contnrs,
+     StdCtrls,
+     xmldom,
+     XMLIntf,
+     msxmldom,
+     XMLDoc,
+     AlFcnString,
+     AlXmlDoc,
+     ExtCtrls,
+     OleCtrls,
+     SHDocVw,
+     ComObj,
+     ALFcnFile,
+     ALStringList;
+
+{------------------------------------}
+Const WM_XmlFullyLoaded = WM_user + 1;
+
+type
+  PPROCESS_MEMORY_COUNTERS = ^PROCESS_MEMORY_COUNTERS;
+  PROCESS_MEMORY_COUNTERS = record
+    cb : DWORD;
+    PageFaultCount : DWORD;
+    PeakWorkingSetSize : DWORD;
+    WorkingSetSize : DWORD; //Task managers MemUsage number
+    QuotaPeakPagedPoolUsage : DWORD;
+    QuotaPagedPoolUsage : DWORD;
+    QuotaPeakNonPagedPoolUsage : DWORD;
+    QuotaNonPagedPoolUsage : DWORD;
+    PagefileUsage : DWORD; //TaskMan's VM Size number
+    PeakPagefileUsage : DWORD;
+  end;
+  TProcessMemoryCounters = PROCESS_MEMORY_COUNTERS;
+
+ 
+function GetProcessMemoryInfo(Process : THandle; var MemoryCounters : TProcessMemoryCounters; cb : DWORD) : BOOL; stdcall;
+function ProcessMemoryUsage(ProcessID : DWORD): DWORD;
+
+var
+  Form1: TForm1;
+
+implementation
+
+//{$R *.dfm}
+
+{**************************************************}
+function GetProcessMemoryInfo; external 'psapi.dll';
+
+{****************************************************}
+function ProcessMemoryUsage(ProcessID : DWORD): DWORD;
+var ProcessHandle : THandle;
+    MemCounters   : TProcessMemoryCounters;
+begin
+  Result := 0;
+  ProcessHandle := OpenProcess(PROCESS_QUERY_INFORMATION or PROCESS_VM_READ,
+                               false,
+                               ProcessID);
+  try
+    if GetProcessMemoryInfo(ProcessHandle,
+                            MemCounters,
+                            sizeof(MemCounters))
+    then Result := MemCounters.WorkingSetSize;
+  finally
+    CloseHandle(ProcessHandle);
+  end;
+end;
+
+{****************************************************************}
+Function CreateEmptyXMLDocument(Rootname:AnsiString):IXMLDocument;
+Var aXmlDoc: TXMLDocument;
+begin
+  aXmlDoc := TXMLDocument.Create(nil);
+  Result := aXmlDoc;
+  with result do begin
+    Options := [];
+    ParseOptions := [];
+    FileName := '';
+  end;
+End;
+
+{******************************************************}
+function TForm1.scrollAllNode(aNode: iXmlNode): Integer;
+Var aStack: Tstack;
+    i: integer;
+begin
+  Result := 0;
+  aStack := Tstack.Create;
+  try
+      For i := 0 to aNode.ChildNodes.Count - 1 do
+        aStack.Push(pointer(ANode.ChildNodes[i]));
+      While astack.Count > 0 do begin
+        inc(result);
+        aNode := ixmlNode(astack.Pop);
+        If assigned(ANode.ChildNodes) then
+          For i := 0 to ANode.ChildNodes.Count - 1 do
+            aStack.Push(pointer(ANode.ChildNodes[i]));
+
+        If assigned(ANode.AttributeNodes) then
+          For i := 0 to ANode.AttributeNodes.Count - 1 do
+            aStack.Push(pointer(ANode.AttributeNodes[i]));
+      end;
+  finally
+    aStack.Free;
+  end;
+
+end;
+
+//############################################################################
+// Archimedes Spiral App
+//############################################################################
+
+procedure SIRegister_TOvcIntlSup(CL: TPSPascalCompiler);
+begin
+  //with RegClassS(CL,'TObject', 'TOvcIntlSup') do
+  with CL.AddClassN(CL.FindClass('TObject'),'TOvcIntlSup') do begin
+    RegisterMethod('Constructor Create');
+    Procedure Free');
+    Function CurrentDateString( const Picture : string; Pack : Boolean) : string');
+    Function CurrentDatePChar( Dest : PChar; Picture : PChar; Pack : Boolean) : PChar');
+    Function CurrentTimeString( const Picture : string; Pack : Boolean) : string');
+    Function CurrentTimePChar( Dest : PChar; Picture : PChar; Pack : Boolean) : PChar');
+    Function DateToDateString(const Picture:string; Julian:TStDate;Pack : Boolean) : string');
+  Function DateToDatePChar(Dest:PChar;Picture:PChar;Julian:TStDate;Pack:Boolean):PChar');
+  Function DateTimeToDatePChar(Dest:PChar;Picture:PChar;DT:TDateTime;Pack:Bool): PChar');
+    Function DateStringToDMY( const Picture, S : string; var Day, Month, Year : Integer; Epoch : Integer) : Boolean');
+    Function DatePCharToDMY(Picture,S:PChar;var Day,Month,Year:Integer;Epoch:Integer):Bool');
+    Function DateStringIsBlank( const Picture, S : string) : Boolean');
+    Function DatePCharIsBlank( Picture, S : PChar) : Boolean');
+    Function DateStringToDate( const Picture, S : string; Epoch : Integer) : TStDate');
+    Function DatePCharToDate( Picture, S : PChar; Epoch : Integer) : TStDate');
+    Function DayOfWeekToString( WeekDay : TDayType) : string');
+    Function DayOfWeekToPChar( Dest : PChar; WeekDay : TDayType) : PChar');
+    Function DMYtoDateString( const Picture : string; Day, Month, Year : Integer; Pack : Boolean; Epoch : Integer) : string');
+    Function DMYtoDatePChar( Dest : PChar; Picture : PChar; Day, Month, Year : Integer; Pack : Boolean; Epoch : Integer) : PChar');
+    Function InternationalCurrency( FormChar : Char; MaxDigits : Byte; Float, AddCommas, IsNumeric : Boolean) : string');
+    Function InternationalCurrencyPChar( Dest : PChar; FormChar : Char; MaxDigits : Byte; Float, AddCommas, IsNumeric : Boolean) : PChar');
+    Function InternationalDate( ForceCentury : Boolean) : string');
+    Function InternationalDatePChar( Dest : PChar; ForceCentury : Boolean) : PChar');
+  Function InternationalLongDate( ShortNames : Boolean; ExcludeDOW : Boolean) : string');
+  Function InternationalLongDatePChar(Dest:PChar;ShortNames:Boolean; ExcludeDOW:Boolean):PChar');
+    Function InternationalTime( ShowSeconds : Boolean) : string');
+    Function InternationalTimePChar( Dest : PChar; ShowSeconds : Boolean) : PChar');
+    Function MonthStringToMonth( const S : string; Width : Byte) : Byte');
+    Function MonthPCharToMonth( S : PChar; Width : Byte) : Byte');
+    Function MonthToString( Month : Integer) : string');
+    Function MonthToPChar( Dest : PChar; Month : Integer) : PChar');
+    Procedure ResetInternationalInfo');
+    Function TimeStringToHMS(const Picture,S:string;var Hour,Minute,Second: Integer):Boolean');
+    Function TimePCharToHMS( Picture, S : PChar; var Hour, Minute, Second : Integer):Boolean');
+    Function TimeStringToTime( const Picture, S : string) : TStTime');
+    Function TimePCharToTime( Picture, S : PChar) : TStTime');
+    Function TimeToTimeString( const Picture : string; T : TStTime; Pack : Boolean) : string');
+    Function TimeToTimePChar(Dest:PChar;Picture: PChar; T : TStTime; Pack : Boolean) : PChar');
+    Function TimeToAmPmString( const Picture : string; T : TStTime; Pack : Boolean) : string');
+    Function TimeToAmPmPChar(Dest: PChar; Picture:PChar; T: TStTime; Pack : Boolean) : PChar');
+    RegisterProperty('AutoUpdate', 'Boolean', iptrw);
+    RegisterProperty('CurrencyLtStr', 'string', iptrw);
+    RegisterProperty('CurrencyRtStr', 'string', iptrw);
+    RegisterProperty('DecimalChar', 'Char', iptrw);
+    RegisterProperty('CommaChar', 'Char', iptrw);
+    RegisterProperty('Country', 'string', iptr);
+    RegisterProperty('CurrencyDigits', 'Byte', iptrw);
+    RegisterProperty('ListChar', 'Char', iptrw);
+    RegisterProperty('SlashChar', 'Char', iptrw);
+    RegisterProperty('TrueChar', 'Char', iptrw);
+    RegisterProperty('FalseChar', 'Char', iptrw);
+    RegisterProperty('YesChar', 'Char', iptrw);
+    RegisterProperty('NoChar', 'Char', iptrw);
+    RegisterProperty('OnWinIniChange', 'TNotifyEvent', iptrw);
+  end;
+end;
+
+initialization 
+  MyIntObject:= TMyObject.Create; 
+finalization 
+  MyIntObject.Free; 
+
+But how about the DLL is written in C++?
+
+At the very end we call a C++ DLL from maXbox:
+First of all, you have to translate the header-file (should be delivered 
+with the DLL), which is like an interface-section in OP. Headers in c usually 
+contain all sorts of definitions which are relevant outside the module. In our c++ example it looks like: 
+
+/*FILE: income.h */ 
+class CIncome 
+{ 
+  public: 
+    virtual double __stdcall GetIncome( double aNetto ) = 0 ; 
+    virtual void   __stdcall SetRate( int aPercent, int  aYear ) = 0 ; 
+    virtual void   __stdcall FreeObject() = 0 ; 
+} ;
+
+Then you translate it to an Abstract Class in a unit of her own: 
+
+//FILE: income.pas 
+interface 
+type 
+CIncome = class 
+   public 
+   function GetIncome(const aNetto: double): double; 
+                               virtual; stdcall; abstract; 
+   procedure SetRate(const aPercent: Integer; aYear: integer); 
+                               virtual; stdcall; abstract; 
+   procedure FreeObject; virtual; stdcall; abstract; 
+end;
+
+
+Short for Dynamic Link Library, a library of executable functions or data that can be 
+used by a Windows application. Typically, a DLL provides one or more particular functions 
+and a program accesses the functions by creating either a 
+static or dynamic link to the DLL. A static link remains constant during program execution 
+while a dynamic link is created by the program as needed. 
+DLLs can also contain just data. DLL files usually end with the extension .dll,.exe., drv, or .fon.
+
+A DLL can be used by several applications at the same time. Some DLLs are provided 
+with the Windows operating system and available for any Windows application. Other 
+DLLs are written for a particular application and are loaded with the application.
+
+Disclaimer: The foregoing release may contain forward-looking statements that
+can be identified by terminology such as 'seek', 'not pursue', 'not approvable',
+'continue', 'believes', 'believe', 'will', 'remained open to exploring',
+'would', 'could', or similar expressions, or by express or implied discussions
+regarding Addex Therapeutics, formerly known as, Addex Pharmaceuticals, its
+business, the potential approval of its products by regulatory authorities, or
+regarding potential future revenues from such products. Such forward-looking
+statements reflect the current views of Addex Therapeutics regarding future
+
+events, future economic performance or prospects, and, by their very nature. 
+
+ 
+--------------ADK ----------------Delphi--------------------
+Java Native Interface (JNI)
+
+    Java Native Interface (JNI) is one of the intersting interface by java By using Java Native Interface (JNI) you can operate with other applications and libraries.
+
+JNI is the native programming interface for java that is part of JDK. Using JNI you can operate with other applications and libraries written in other 
+language such as C,C++. But the basic question arises when should I use the JNI ?
+
+    You want some platform specific information and the standard Java class library may not support the platform-dependent features needed by your application.
+    You have some library application written in other language and you want to use it in your java application.
+    You want Java should interact with some low level programming language.
+
+Below is given Simple Example; See that methods have 'native' KeyWord:
+
+public native void displayHelloWorld();
+public native void displayOther();
+private native String getLine(String prompt);
+
+The DLL we are going to use is firstJNI.DLL This DLL can be generated by VC++ or borland. Which we will discuss later.
+
+//firstJNI.java
+
+class firstJNI
+{
+    public native void displayHelloWorld();
+    public native void displayOther();
+    private native String getLine(String prompt);
+
+    static {
+     System.loadLibrary("firstJNI");//This is firstJNI.DLL
+     /*if generated by borland
+     System.loadLibrary("firstjni");//This is firstjni.dll
+     */
+    }
+
+     public static void main(String[] args) 
+     {
+        firstJNI JN=new firstJNI();
+        JN.displayHelloWorld();
+        JN.displayOther();
+        
+        String input = JN.getLine("Enter Some Thing "); 
+        System.out.println("You Entered " + input); 
+     }
+}
+
+Compile the above code using (What does this mean ?)
+
+prompt>javac firstJNI.java
+
+Then create header File using (What does this mean ?)
+
+prompt>javah javah -jni HelloWorld
+
+This will create firstJNI.h file. In the header File you will see
+
+-------------------------------------
+JNIEXPORT void JNICALL Java_firstJNI_displayHelloWorld
+(JNIEnv *, jobject);
+
+/*
+ * Class:     firstJNI
+ * Method:    displayOther
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_firstJNI_displayOther
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     firstJNI
+ * Method:    getLine
+ * Signature: (Ljava/lang/String;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_firstJNI_getLine
+  (JNIEnv *, jobject, jstring);
+----------------------------------------------
+
+Don't edit header File
+Now let see how to generate DLL using VC++, Click: File->New->Win32Dynamic-Link Library Give name and Select A simple DLL 
+project You will have firstJNI.CPP file Below is given the firstJNI.cpp file
+
+// MYVCDLL.cpp : Defines the entry point for the DLL application.
+//
+
+#include "stdafx.h"
+#include "D:\Kanad\Study\codeToad Articles\firstJNI.h"
+#include "jni.h" //can copy or give full path
+#include <math.h>
+
+BOOL APIENTRY DllMain( HANDLE hModule, 
+                       DWORD  ul_reason_for_call, 
+                       LPVOID lpReserved
+                     )
+{
+    return TRUE;
+}
+
+extern "C" __declspec(dllexport) int getMemorySize();
+//And your function definition should look like this: 
+extern "C" __declspec(dllexport) int getMemorySize()
+{     //do something 
+
+MEMORYSTATUS memoryStatus;  
+int MB=1024*1024 ;
+double memSize;  
+memoryStatus.dwLength=sizeof(MEMORYSTATUS);  
+
+GlobalMemoryStatus(&memoryStatus);  
+
+__int64 size= memoryStatus.dwTotalPhys;  
+
+memSize=(double)size/MB;  
+
+printf("\nTotal Memory %.0lf MB",ceil(memSize));
+
+ return 0;
+}
+
+JNIEXPORT void JNICALL 
+Java_firstJNI_displayHelloWorld(JNIEnv *env, jobject obj) 
+{
+    printf("Hello world! This is using VC++ DLL\n");
+
+}
+
+JNIEXPORT void JNICALL 
+Java_firstJNI_displayOther(JNIEnv *env, jobject obj) 
+{
+    printf("Hello world! This is using VC++ DLL Other Function \n");
+    getMemorySize();
+    
+}
+
+JNIEXPORT jstring JNICALL
+Java_firstJNI_getLine(JNIEnv *env, jobject obj, jstring enter)
+{
+
+    char buf[128];
+    const char *str = env->GetStringUTFChars(enter, 0);
+    printf("\n%s", str);
+    env->ReleaseStringUTFChars(enter, str);
+    scanf("%s", buf);
+    return env->NewStringUTF(buf);
+
+}
+
+Now I have questions about how can I use .dll file written in C++/C in my java application. I am developing application for android using 
+Eclipse and I have some dll files and I haven't their source ... How can I use them in my project ???
+
+First a disclaimer - I'm a bit sketchy on this, it's been a while since I've used JNI.
+
+Many JNI examples assume you own the code for the library you want to call, which in my experience is rarely the case. In the example you 
+sight the javah util has been used to generate a header file, against which cpp implementation has been 
+written - this is why you can see 
+the jni header file and various Java keywords in the cpp file.
+
+
+http://stackoverflow.com/questions/5908660/how-to-import-dll-to-android-java-project-working-with-eclipse
+
+http://stackoverflow.com/questions/5908660/how-to-import-dll-to-android-java-project-working-with-eclipse                                                                                    
+The Android SDK is the default software when dealing with Android on a computer. The vast majority of rooted users have run into the SDK, 
+whether they know it or not, when they use the ever-popular Android Debug Bridge, or ADB for short. While the SDK does 
+very well for its intended purposes 
+and works perfectly, anything created to augment or help out is always exciting and fun.
+
+The Android SDK is the default software when dealing with Android on a computer. The vast majority of rooted users have 
+run into the SDK, whether they know it or not, when they use the ever-popular Android Debug Bridge, or ADB for short. While the SDK 
+does very well for its intended purposes
+ and works perfectly, anything created to augment or help out is always exciting and fun.
+
+
+    public native void displayHelloWorld();
+    public native void displayOther();
+    private native String getLine(String prompt);
+           
+    //firstJNI.java
+     
+    class firstJNI
+    {
+        public native void displayHelloWorld();
+        public native void displayOther();
+        private native String getLine(String prompt);
+     
+        static {
+         System.loadLibrary("firstJNI");//This is firstJNI.DLL
+         /*if generated by borland
+         System.loadLibrary("firstjni");//This is firstjni.dll
+         */
+        }
+     
+         public static void main(String[] args)
+         {
+            firstJNI JN=new firstJNI();
+            JN.displayHelloWorld();
+            JN.displayOther();
+            
+            String input = JN.getLine("Enter Some Thing ");
+            System.out.println("You Entered " + input);
+         }
+    }
+           
+    prompt>javac firstJNI.java
+           
+    prompt>javah javah -jni HelloWorld
+           
+    -------------------------------------
+    JNIEXPORT void JNICALL Java_firstJNI_displayHelloWorld
+    (JNIEnv *, jobject);
+     
+    /*
+     * Class:     firstJNI
+     * Method:    displayOther
+     * Signature: ()V
+     */
+    JNIEXPORT void JNICALL Java_firstJNI_displayOther
+      (JNIEnv *, jobject);
+     
+    /*
+     * Class:     firstJNI
+     * Method:    getLine
+     * Signature: (Ljava/lang/String;)Ljava/lang/String;
+     */
+    JNIEXPORT jstring JNICALL Java_firstJNI_getLine
+      (JNIEnv *, jobject, jstring);
+    ----------------------------------------------
+           
+    // MYVCDLL.cpp : Defines the entry point for the DLL application.
+    //
+     
+    #include "stdafx.h"
+    #include "D:KanadStudycodeToad ArticlesfirstJNI.h"
+    #include "jni.h" //can copy or give full path
+    #include <math.h>
+     
+    BOOL APIENTRY DllMain( HANDLE hModule,
+                           DWORD  ul_reason_for_call,
+                           LPVOID lpReserved
+                         )
+    {
+        return TRUE;
+    }
+     
+    extern "C" __declspec(dllexport) int getMemorySize();
+    //And your function definition should look like this:
+    extern "C" __declspec(dllexport) int getMemorySize()
+    {     //do something
+     
+    MEMORYSTATUS memoryStatus;  
+    int MB=1024*1024 ;
+    double memSize;  
+    memoryStatus.dwLength=sizeof(MEMORYSTATUS);  
+     
+    GlobalMemoryStatus(&memoryStatus);  
+    __int64 size= memoryStatus.dwTotalPhys;  
+    memSize=(double)size/MB;  
+     
+    printf("nTotal Memory %.0lf MB",ceil(memSize));
+     
+     return 0;
+    }
+     
+    JNIEXPORT void JNICALL
+    Java_firstJNI_displayHelloWorld(JNIEnv *env, jobject obj)
+    {
+        printf("Hello world! This is using VC++ DLLn");
+     
+    }
+     
+    JNIEXPORT void JNICALL
+    Java_firstJNI_displayOther(JNIEnv *env, jobject obj)
+    {
+        printf("Hello world! This is using VC++ DLL Other Function n");
+        getMemorySize();
+    }
+     
+    JNIEXPORT jstring JNICALL
+    Java_firstJNI_getLine(JNIEnv *env, jobject obj, jstring enter)
+    {
+     
+        char buf[128];
+        const char *str = env->GetStringUTFChars(enter, 0);
+        printf("n%s", str);
+        env->ReleaseStringUTFChars(enter, str);
+        scanf("%s", buf);
+        return env->NewStringUTF(buf);
+     
+    }
+
+public native void displayHelloWorld();
+public native void displayOther();
+private native String getLine(String prompt);
+	
+//firstJNI.java
+
+class firstJNI
+{
+    public native void displayHelloWorld();
+    public native void displayOther();
+    private native String getLine(String prompt);   }
+    
+   program learn;
+    uses crt;
+    var a,b,c,e,f,right: integer; d:real;
+    label 1,2,3,4,5;
+    begin
+    textbackground(green);
+    textcolor(white);
+    clrscr;
+    repeat
+    inc(f);
+    until f=100000;
+    randomize;
+    1:
+    e:=random(3)+1;
+    b:=random(200)+1;
+    c:=random(200)+1;
+    if e=1 then d:=b+c;
+    if e=2 then d:=b-c;
+    if e=3 then d:=b*c;
+    writeln(' ',b:3);
+    if e=1 then write('+ ');
+    if e=2 then write('- ');
+    if e=3 then write('x ');
+    writeln(c:3);
+    writeln('______');
+    readln(a);
+    if a=d then
+    begin
+    inc(right);
+    writeln('HORRAY! YOU GOT IT RIGHT! you have ',right,' points!');
+    end
+    else
+    begin
+    right:=right-1;
+    writeln('WRONG! you have ',right,' points');
+    end;
+    goto 1;
+    end.
+    
+    program veryweird;
+uses crt;
+type aaa=array[1..40,1..12] of char;
+var a,b,c,d,e,pa,pd:integer; f:aaa; g:char;
+label 1,2,3,4;
+begin
+pa:=1;
+pd:=1;
+writeln('hello');
+writeln('press the arrow keys to move');
+2:
+IF KeyPressed THEN
+BEGIN
+g:=readkey;
+CASE g OF
+'H' :
+begin
+if pd=1 then goto 2;
+f[pa,pd]:='_';
+pd:=pd-1;
+f[pa,pd]:='@';
+end;
+'K' :
+begin
+if pa=1 then goto 2;
+f[pa,pd]:='_';
+pa:=pa-1;
+f[pa,pd]:='@';
+end;
+'M' :
+begin
+if pa=40 then goto 2;
+f[pa,pd]:='_';
+pa:=pa+1;
+f[pa,pd]:='@';
+end;
+'P' :
+begin
+if pd=12 then goto 2;
+f[pa,pd]:='_';
+pd:=pd+1;
+f[pa,pd]:='@';
+end;
+end;
+clrscr;
+for a:=1 to 12 do writeln(f[1,a],f[2,a],f[3,a],f[4,a],f[5,a],f[6,a],f[7,a],
+f[8,a],f[9,a],f[10,a],f[11,a],f[12,a],f[13,a],f[14,a],f[15,a],f[16,a],f[17,a],
+f[18,a],f[19,a],f[20,a],f[21,a],f[22,a],f[23,a],f[24,a],f[25,a],f[26,a],f[27,a],
+f[28,a],f[29,a],f[30,a],f[31,a],
+f[32,a],f[33,a],f[34,a],f[35,a],f[36,a],f[37,a],f[38,a],f[39,a],f[40,a]);
+goto 2;
+end
+
+REM Java compiler
+call javac -verbose -classpath %APK_SDK_PLATFORM%\android.jar -d bin\classes src\com\pascal\lcltest\LCLActivity.java
+
+http://useruploadedfiles.programmersheaven.com/index.php?dir=48584%2F
+
+----Simple Browser started----
+
+"There is a theory which states that if ever anybody discovers
+exactly what the Universe is for and why it is here, it will
+instantly disappear and be replaced by something even more
+bizarre and inexplicable. There is another theory which states
+that this has already happened."
+-- Douglas Adams

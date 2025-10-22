@@ -1,0 +1,1365 @@
+//****************Stat Fraction Tester**************************
+program ContFrac_console_mX5_64_Py3_debuggingtests_DStatisticPavkage_EKON;
+
+//{$APPTYPE CONSOLE}
+//https://rosettacode.org/wiki/Continued_fraction#Pascal
+//https://entwickler-konferenz.de/delphi-innovations-fundamentals/statistic-packages-fuer-delphi-oder-python/
+
+{From the log file I can see that the numbers are slightly (1e-14 relative error) different. 
+Extended is equal to Double in X64. X32 mode is using the FPU floating point unit,while X64 
+is using the SSE registers for floating point execution.}   //☘️ 🐞 📊
+
+{uses
+  SysUtils;   }
+  
+  Const PYHOME64 = 'C:\Users\user\AppData\Local\Programs\Python\Python312\'; 
+      PYDLL64  = 'C:\Users\user\AppData\Local\Programs\Python\Python312\python312.dll';  
+
+type TCoeffFunction = function( n : integer) : extended;
+
+// Calculate continued fraction as a sum, working forwards.
+// Stop on reaching a term with absolute value less than epsilon,
+//   or on reaching the maximum number of terms.
+procedure CalcContFrac( a, b : TCoeffFunction;
+                        epsilon : extended;
+                        maxNrTerms : integer {= 1000}); // optional, with default
+var
+  n : integer;
+  sum, term, u, v : extended;
+  whyStopped : string;
+begin
+  sum:= a(0);
+  term:= b(1)/a(1);
+  v:= a(1);
+  n:= 1;
+  repeat
+    sum:= sum + term;
+    inc(n);
+    u:= v;
+    v:= a(n) + b(n)/u;
+    term:= -term * b(n)/(u*v);
+  until (Abs(term) < epsilon) or (n >= maxNrTerms);
+  if n >= maxNrTerms then whyStopped:= 'too many terms'
+                     else whyStopped:= 'converged';
+  WriteLn({SysUtils.}Format( '%21.17f after %d terms (%s)',
+                                          [sum, n, whyStopped]));
+end;
+
+//---------------- a and b for sqrt(2) ----------------
+function a_sqrt2( n : integer) : extended;
+begin
+  if n = 0 then result := 1
+           else result := 2;
+end;
+function b_sqrt2( n : integer) : extended;
+begin
+  result := 1;
+end;
+
+//---------------- a snd b for e  ----------------
+function a_e( n : integer) : extended;
+begin
+  if n = 0 then result := 2
+           else result := n;
+end;
+function b_e( n : integer) : extended;
+begin
+  if n = 1 then result := 1
+           else result := n - 1;
+end;
+
+//-------- Rosetta Code a and b for pi --------
+function a_pi( n : integer) : extended;
+begin
+  if n = 0 then result := 3
+           else result := 6;
+end;
+function b_pi( n : integer) : extended;
+var
+  temp : extended;
+begin
+  temp := 2*n - 1;
+  result := temp*temp;
+end;
+
+//-------- More efficient a and b for pi --------
+function a_pi_alt( n : integer) : extended;
+begin
+  if n = 0 then result := 0
+           else result := 2*n - 1;
+end;
+function b_pi_alt( n : integer) : extended;
+var temp : extended;
+begin
+  if n = 1 then
+    result := 4
+  else begin
+    temp := n - 1;
+    result := temp*temp;
+  end;
+end;
+
+Const REXDEF= 'def striphtml(data):      '+LF+
+               '  p = re.compile(r"<.*?>")'+LF+
+               '  return p.sub("", data)  ';  
+               
+Const ACALC=  'def calc(fun, n):                '+LF+
+              '     temp = Decimal("0.0")       '+LF+
+
+              '     for ni in range(n+1, 0, -1):      '+LF+
+              '         (a, b) = fun(ni)               '+LF+
+              '         temp = Decimal(b) / (a + temp) '+LF+
+
+              '     return fun(0)[0] + temp            ';
+              
+Const fsqrt2=  'def fsqrt2(n):                         '+LF+
+               ' return (2 if n > 0 else 1, 1)         ';
+
+Const fnapier= 'def fnapier(n):                                           '+LF+
+               '    return (n if n > 0 else 2, (n - 1) if n > 1 else 1)   ';
+
+Const fpi=     'def fpi(n):                                              '+LF+
+               '    return (6 if n > 0 else 3, (2 * n - 1) ** 2)         ';
+
+              
+procedure pyfractDemo;
+var eng: TPythonEngine;
+begin
+eng:= TPythonEngine.Create(Nil);
+  //eng.pythonhome:= PYHOME64;
+  //eng.initialize2;
+  //eng.opendll(PYDLL64)
+  //eng.IO:= pyMemo;
+  eng.loadDLL;
+  eng.autofinalize:= false;
+  try
+    eng.Execstring('import base64'+LF+'import urllib.parse');
+    eng.Execstring('import urllib.request, os, sys, textwrap, json');
+    eng.Execstring('from decimal import Decimal, getcontext');
+    //eng.Execstring('from decimal import getcontext');
+    eng.Execstring(ACALC);
+    eng.Execstring(fsqrt2);
+    eng.Execstring(fnapier);
+    eng.Execstring(fpi);
+    
+    eng.Execstring('getcontext().prec = 50');
+    println('py dec64> '+eng.evalStr('calc(fsqrt2, 200)'));  
+    
+    //DLL := LoadLibrary('c:\windows\desktop\shell\project1.dll');
+    
+    eng.ExecString('from sklearn.linear_model import LinearRegression'); 
+    eng.ExecString('import numpy as np');
+    eng.ExecString('import matplotlib as mpl'); 
+    eng.ExecString('import matplotlib.pyplot as plt');   
+    //eng.ExecString('plt.plot([-1, -4.5, 16, 23, 15, 59])');
+    
+    eng.ExecStr('days = list(range(0, 22, 3))');
+    eng.ExecStr('celsius_values=[25.6,24.1,26.7,28.3,27.5,30.5,32.8,33.1]');
+    eng.ExecStr('plt.plot(days, celsius_values)');
+    eng.ExecStr('plt.xlabel("Day", style="italic", loc="right")');
+    eng.ExecStr('plt.ylabel("Degrees Celsius")');
+    eng.ExecStr('plt.show()');  
+       //*)
+    
+    eng.ExecStr('X = np.linspace(-2 * np.pi, 2 * np.pi, 50, endpoint=True)');
+    eng.ExecStr('F1 = 3 * np.sin(X)');
+    eng.ExecStr('F2 = np.sin(2*X)');
+    eng.ExecStr('F3 = 0.3 * np.sin(X)');
+
+    eng.ExecStr('startx, endx = -2 * np.pi - 0.1, 2*np.pi + 0.1');
+    eng.ExecStr('starty, endy = -3.1, 3.1');
+    eng.ExecStr('plt.axis([startx, endx, starty, endy])');
+    eng.ExecStr('plt.plot(X,F1)');
+    eng.ExecStr('plt.plot(X,F2)');
+    eng.ExecStr('plt.plot(X,F3)');
+    eng.ExecStr('plt.title("maXbox5 PyPlot slot")');
+    eng.ExecStr('plt.show()');  //*)
+    
+   println(eng.evalStr('base64.b64decode("2e8WuEr0+5nc14VBxQrOl4ob6guOTySr")'));
+    
+   //https://python.plainenglish.io/5-more-useful-scripts-in-python-4-ad141646a7ca
+   //eng.Execstring('from Crypto.Cipher import AES');
+   //eng.Execstring('from Crypto import Random');
+   eng.Execstring('from binascii import b2a_hex');
+   eng.Execstr('import sys');
+   //eng.Execstr('import commands');
+   
+   eng.Execstring('a=343');
+   eng.Execstring('b=a');
+   eng.Execstring('c=a');
+   println('py reference> '+eng.evalStr('sys.getrefcount(a)'));
+   println('py version> '+eng.evalStr('sys.version')); 
+   println('matplotlib version: '+eng.evalstr('mpl.__version__')); 
+   //println('pyplot version: '+eng.evalstr('plt.__version__')); 
+      
+    //writeln(GETDOSOutput('pip install pendulum','C:\'));
+   eng.Execstring('import pendulum');
+    //# Create a date
+    println(eng.evalStr('pendulum.datetime(2022, 1, 5)'));
+    //print(dt)  # Output: 2022-01-01T00:00:00+00:00
+  
+  except
+    eng.raiseError;
+  finally
+    eng.unloadDll;
+    eng.Free;
+    //_multiarray_umath.cp37-win32.pyd
+    //aPythonVersion.Free;
+  end;  
+ end; 
+  
+procedure pyStatsmodelsDemo;
+var eng: TPythonEngine;
+begin
+eng:= TPythonEngine.Create(Nil);
+with eng do begin
+  //eng.pythonhome:= PYHOME64;
+  //eng.initialize2;
+  //eng.opendll(PYDLL64)
+  //eng.IO:= pyMemo;
+  loadDLL;
+  autofinalize:= false;
+  try
+    Execstring('import base64'+LF+'import urllib.parse');
+    Execstring('import urllib.request, os, sys, io, textwrap, json, pandas');
+    Execstring('import statsmodels.api as sm; import numpy as np');
+    Execstring('import statsmodels.formula.api as smf');
+    ExecString('import matplotlib.pyplot as plt');
+    ExecString('import seaborn as sn');
+    execstr('output = io.StringIO(); sys.stdout = output'); 
+    //https://vincentarelbundock.github.io/Rdatasets/doc/HistData/Guerry.html
+    //https://www.statsmodels.org/v0.10.2/gettingstarted.html#:~:text='+
+    //We%20download%20the%20Guerry%20dataset%2C%20a%20collection%20of,comma-separated%20values%20format%20%28CSV%29%20by%20the%20Rdatasets%20repository.
+    //writeln(GETDOSOutput('pip install pendulum','C:\'));
+    Execstring('import pendulum');
+    //# Create a date
+    println(eng.evalStr('pendulum.datetime(2022, 1, 5)'));
+    //# Load sample dataset
+    //debug: 64-URLError: <urlopen error [Errno 11001] getaddrinfo failed> 865 err:20
+    if isinternetconnected then
+      Execstring('df = sm.datasets.get_rdataset("Guerry", "HistData").data')
+    else
+      eng.execstr('df=pandas.read_csv(r"'+exepath+'\examples\1417_export_dataframe.csv")');
+   ////eng.execstr('df.from_csv(r"'./export/dftocsv.csv', sep='\t', encoding='utf-8', header='true')
+   
+    //execstr('df.to_csv (r"'+exepath+'\examples\1417_export_dataframe.txt", header=True)'); 
+    execstr('df_columns = df.iloc[:, 5:9]');
+    //println(evalstr('df_columns.describe()'));
+    execstr('print(df_columns.describe())');
+    println(evalstr('df.info()'));
+    //println(evalstr('df.head()'));
+    execstr('print(df.head())');
+    //println(eng.evalstr('df.corr(["Wealth","Literacy"])'));
+    println(evalstr('"single correlation:",df["Wealth"].corr(df["Suicides"])'));
+    println(evalstr('"single correlation:",df["Lottery"].corr(df["Suicides"])'));
+    println(evalstr('"single correlation:",df["Lottery"].corr(df["Literacy"])'));
+    println(evalstr('"single correlation:",df["Donations"].corr(df["Literacy"])'));
+    //# Compute the correlation matrix
+    execstr('numeric_df = df.select_dtypes(include=["number"])');
+     //execstr('numeric_df = numeric_df.iloc[:, 4:10]');
+     execstr('correlation_matrix = numeric_df.corr()');
+     execstr('print(correlation_matrix)');
+    
+    //# Visualize the correlation matrix using a heatmap
+      execstr('ax = plt.figure(figsize=(12, 8))');
+      execstr('sn.heatmap(correlation_matrix, annot=True, cmap="coolwarm", fmt=".2f")');
+      execstr('plt.title("mX5 Correlation Matrix of Guerry Data")');
+      ExecStr('plt.show()'); 
+     
+    //# Fit an OLS regression model
+    //eng.Execstring('model = smf.ols("Lottery ~ Literacy + np.log(Pop1831)", data=data).fit()');
+     Execstr('model = smf.ols("Lottery ~ Wealth + Literacy + np.log(Pop1831)", data=df).fit()');
+    //# Display the summary of results
+     execstr('print(model.summary())');
+    {Notice that there is one missing observation in the Region column. 
+                    We eliminate it using a DataFrame method provided by pandas:}
+     execstr('df = df.dropna()');
+     //execstr('fig, ax = plt.subplots(figsize=(12,8))');
+     execstr('sm.graphics.plot_partregress("Lottery","Wealth", ["Department","Distance"],'+
+                                                              'data=df, obs_labels=True)');
+     execstr('sm.graphics.plot_partregress_grid(model)');
+     //https://github.com/statsmodels/statsmodels/blob/main/examples/python/regression_plots.py  
+     //https://www.statsmodels.org/0.9.0/examples/notebooks/generated/regression_plots.html 
+     //execstr('sm.graphics.plot_regression(model)');                                             
+     ExecStr('plt.show()');                                                      
+     //println(eng.evalstr('(output.getvalue().strip())')); 
+     println(StringReplace(evalstr('(output.getvalue().strip())'),
+                                                   LF,CRLF,[rfReplaceAll])); 
+     //https://www.datarobot.com/blog/multiple-regression-using-statsmodels/
+  except
+    raiseError;
+  finally
+    println(eng.evalstr('"version:", sys.version')); 
+    unloadDll;
+    Free;
+  end; 
+    //_multiarray_umath.cp37-win32.pyd
+    //aPythonVersion.Free;
+ end;  
+end; 
+ 
+ 
+ //uses
+  //SysUtils, Classes;
+  
+ Type TMatrx = array of array of string; 
+      DMatrix = array of array of double;
+
+procedure TStringListToMatrix(strList: TStringList; var matrix: TMatrx);
+var i, j: Integer;
+  RowData: TStringList;
+begin
+  if strList.Count = 0 then Exit;
+  // Create a temporary TStringList to parse each row
+  RowData:= TStringList.Create;
+  try
+    RowData.Delimiter:= ','; // Assuming comma-separated values
+    RowData.StrictDelimiter:= True;
+    
+    // Resize matrix to match the TStringList dimensions
+    SetLength(matrix, strList.Count);
+    for i := 0 to strList.Count - 1 do begin
+      RowData.DelimitedText:= strList[i];
+      //writ('debug '+itoa(rowdata.count));
+      SetLength(Matrix[i], RowData.Count);
+      for j:= 0 to RowData.Count - 1 do
+        Matrix[i][j]:= RowData[j];
+    end;
+  finally
+    RowData.Free;
+  end;
+end;
+
+procedure CalculateCorrelationMatrix(data: DMatrix; var matrix: DMatrix);
+var i, j, n: Integer;
+begin
+  n:= Length(data);
+  for i:= 0 to n - 1 do begin
+    for j:= 0 to n - 1 do 
+      matrix[i][j]:= {Pearson}Correlation(data[i], data[j]);
+  end;
+end;
+
+(*
+// Example usage
+procedure Test;
+var
+  StringList: TStringList;
+  Matrix: array of array of string;
+  i, j: Integer;
+begin
+  StringList := TStringList.Create;
+  try
+    // Add some sample data
+    StringList.Add('1,2,3');
+    StringList.Add('4,5,6');
+    StringList.Add('7,8,9');
+
+    // Convert to matrix
+    TStringListToMatrix(StringList, Matrix);
+
+    // Output the matrix
+    for i := 0 to High(Matrix) do begin
+      for j := 0 to High(Matrix[i]) do
+        Write(Matrix[i][j] + ' ');
+      Writeln;
+    end;
+  finally
+    StringList.Free;
+  end;
+end;   *)
+
+ 
+ procedure GetDATAfromCSV;
+var
+  I,j: Integer;
+  aKey: string;
+  S,S1: TStringList;
+  amatx: TMatrx; //array of array of string;
+  datacol: array of mfloat;
+  dataser1, dataser2: array of double;
+begin
+  S := TStringList.Create;
+  S1:= TStringList.Create;
+  try
+    //GetEnvironmentVars(S,false);
+    //S.StrictDelimiter := True;
+    //S.Delimiter := #10;
+    S.LineBreak := #10;
+    S1.Delimiter := ',';
+    //S.NameValueSeparator:= ',';   
+    s.loadfromfile(exepath+'\examples\1417_export_dataframe.csv');
+    //S.DelimitedText:= s.text;
+    //!! convert
+     TStringListToMatrix(s, amatx);  
+     for i:= 0 to High(amatx)-80 do begin
+      for j:= 0 to High(amatx[i]) do
+        Write(amatx[i][j] + ' ');
+      Writeln('');
+    end;
+    setlength(datacol,87);
+    setlength(dataser1,86);
+    setlength(dataser2,86);
+    //writ(itoa(high(amatx)));
+     for i := 1 to High(amatx)-1 do begin
+       write(amatx[i][4]+' ');      //Crime_pers
+       datacol[i]:= strtofloat(amatx[i][6])  //literacy
+       dataser1[i]:= strtofloat(amatx[i][6])
+       dataser2[i]:= strtofloat(amatx[i][16])   //lottery
+       
+     end;  
+     with TStatisticClass.create do begin
+       add1(datacol)
+       writeln(getasstring)
+       free
+     end; 
+     writ('single correlation literacy-lottery '+floattostr(Correlation(dataser2, dataser1))); 
+    
+     //SL.QuoteChar := '"';
+     //S.StrictDelimiter := True;
+    //GetEnvironmentVars(S,true);
+    writeln('list size '+itoa(s.count));
+    writeln('');
+    //writeln(s.text)
+    for I := 1 to S.Count - 82 do begin
+      //aKey := utf8tostr(S.Names[I]);
+       //writeln(aline)
+       S1.DelimitedText:= S[I];;
+       //writeln(S.DelimitedText)
+       for j:= 1 to S1.count-1 do 
+                   write(S1[j]+' ');
+        writeln(' ');          
+      {with EnvironmentView.Items.Add do begin
+        Caption := itoa(i)+' '+aKey;
+        SubItems.Add(S.Values[aKey]);
+      end;}
+    end; //}
+  finally
+    S1.Free; 
+    S.Free;
+  end;
+end;
+
+//---------------- #Main routine ----------------
+// Unlike Free Pascal, Delphi does not require
+//   an @ sign before the function names.
+begin
+  setdebugcheck(true);
+  maxform1.console1click(self);
+  WriteLn( 'sqrt(2)');
+  CalcContFrac( @a_sqrt2, @b_sqrt2, 1E-20, 1000);
+  WriteLn( 'e');
+  CalcContFrac( @a_e, @b_e, 1E-20, 1000);
+  WriteLn( 'pi');
+  CalcContFrac( @a_pi, @b_pi, 1E-20, 1000);
+  WriteLn( 'pi (alternative formula)');
+  CalcContFrac( @a_pi_alt, @b_pi_alt, 1E-20, 1000);
+  //tprocesspriorities
+  
+  //pyfractDemo;
+  TestMathClass;
+  TestStatisticClass;
+  TestMatrixClass;
+  
+  memo2.font.name:= 'Courier';
+  memo2.font.size:= 12;
+  
+  pyStatsmodelsDemo;
+  
+  GetDATAfromCSV();
+  
+  //adjustimage
+  //dirpurge
+  //ndBeginning nrOK
+ end.
+end.
+
+Ref:  --------------------------------------------------------
+1 E Ain 28870 15890 37 5098 33120 35039 2:Med 73 58 11 71 60 69 41 55 46 13 218.372 5762 346.03 
+ 2 N Aisne 26226 5521 51 8901 14572 12831 2:Med 22 10 82 4 82 36 38 82 24 327 65.945 7369 513.0 
+ 3 C Allier 26747 7925 13 10973 17044 114121 2:Med 61 66 68 46 42 76 66 16 85 34 161.927 7340 298.26 
+ 4 E Basses-Alpes 12935 7289 46 2733 23018 14238 1:Sm 76 49 5 70 12 37 80 32 29 2 351.399 6925 155.9 
+ 5 E Hautes-Alpes 17488 8174 69 6962 23076 16171 1:Sm 83 65 10 22 23 64 79 35 7 1 320.28 5549 129.1 
+ 
+ mX5🐞 executed: 29/09/2025 20:26:27  Runtime: 0:0:14.67  Memload: 77% use
+RemObjects Pascal Script. Copyright (c) 2004-2026 by RemObjects Software & maXbox5
+On Intel 64-bit Windows systems, however, the System.Extended type is an alias for System.Double, 
+which is only 8 bytes. This difference can adversely affect numeric precision in floating-point 
+operations. For more information, see Delphi Considerations for Multi-Device Applications.
+
+To fit most of the models covered by statsmodels, you will need to create two design matrices. The first is a matrix of endogenous 
+variable(s) (i.e. dependent, response, regressand, etc.). The second is a matrix of exogenous variable(s) (i.e. independent, 
+predictor, regressor, etc.). The OLS coefficient estimates are calculated as usual:
+
+In this tutorial, you learned how to use Matplotlib to add titles, subtitles, and axis labels 
+to your plots. You also learned how to control the style, size, and position of these titles. 
+You also learned how to control these titles globally and how to reset values back to their default values.
+
+Es ist eben so dass die Toleranz gegenüber Kindern, sowie der Egoismus keine Kinder haben
+ zu wollen zugenommen hat. Mal ehrlich, in einer Welt voller Sorgen und Schaden nimmt auch 
+ die Zuversicht ab. Zudem geht der Mensch zu sich auf Distanz, Kinder sind da nur noch ein Fremdkörper.
+ 
+             dept    Crime_pers  ...          Area     Pop1831
+count   86.000000     86.000000  ...     86.000000   86.000000
+mean    46.883721  19754.406977  ...   6146.988372  378.628721
+std     30.426157   7504.703073  ...   1398.246620  148.777230
+min      1.000000   2199.000000  ...    762.000000  129.100000
+25%     24.250000  14156.250000  ...   5400.750000  283.005000
+50%     45.500000  18748.500000  ...   6070.500000  346.165000
+75%     66.750000  25937.500000  ...   6816.500000  444.407500
+max    200.000000  37014.000000  ...  10000.000000  989.940000
+
+[8 rows x 20 columns]
+ 
+  3.14159265358979260 after 29 terms (converged)
+py dec64> 1.4142135623730950488016887242096980785696718753770
+debug: 31-TclError: Can't find a usable init.tcl in the following directories: 
+    {C:\Users\User\AppData\Local\Programs\Python\Python313\\tcl\tcl8.6}
+
+C:/Users/User/AppData/Local/Programs/Python/Python313/tcl/tcl8.6/init.tcl: version conflict for package "Tcl": have 8.6.13, need exactly 8.6.15
+version conflict for package "Tcl": have 8.6.13, need exactly 8.6.15
+    while executing
+"package require -exact Tcl 8.6.15"
+    (file "C:/Users/User/AppData/Local/Programs/Python/Python313/tcl/tcl8.6/init.tcl" line 21)
+    invoked from within
+"source C:/Users/User/AppData/Local/Programs/Python/Python313/tcl/tcl8.6/init.tcl"
+    ("uplevel" body line 1)
+    invoked from within
+"uplevel #0 [list source $tclfile]"
+
+
+This probably means that Tcl wasn't installed properly.
+ 851 err:20
+debug: 32-TclError: Can't find a usable init.tcl in the following directories: 
+    {C:\Users\User\AppData\Local\Programs\Python\Python313\\tcl\tcl8.6}
+
+C:/Users/User/AppData/Local/Programs/Python/Python313/tcl/tcl8.6/init.tcl: version conflict for package "Tcl": have 8.6.13, need exactly 8.6.15
+version conflict for package "Tcl": have 8.6.13, need exactly 8.6.15
+    while executing
+"package require -exact Tcl 8.6.15"
+    (file "C:/Users/User/AppData/Local/Programs/Python/Python313/tcl/tcl8.6/init.tcl" line 21)
+    invoked from within
+"source C:/Users/User/AppData/Local/Programs/Python/Python313/tcl/tcl8.6/init.tcl"
+    ("uplevel" body line 1)
+    invoked from within
+"uplevel #0 [list source $tclfile]"
+
+
+This probably means that Tcl wasn't installed properly.
+ 851 err:20
+debug: 33-TclError: Can't find a usable init.tcl in the following directories: 
+    {C:\Users\User\AppData\Local\Programs\Python\Python313\\tcl\tcl8.6}
+
+C:/Users/User/AppData/Local/Programs/Python/Python313/tcl/tcl8.6/init.tcl: version conflict for package "Tcl": have 8.6.13, need exactly 8.6.15
+version conflict for package "Tcl": have 8.6.13, need exactly 8.6.15
+    while executing
+"package require -exact Tcl 8.6.15"
+    (file "C:/Users/User/AppData/Local/Programs/Python/Python313/tcl/tcl8.6/init.tcl" line 21)
+    invoked from within
+"source C:/Users/User/AppData/Local/Programs/Python/Python313/tcl/tcl8.6/init.tcl"
+    ("uplevel" body line 1)
+    invoked from within
+"uplevel #0 [list source $tclfile]"
+
+This probably means that Tcl wasn't installed properly.
+ 851 err:20
+Exception: TclError: Can't find a usable init.tcl in the following directories: 
+    {C:\Users\User\AppData\Local\Programs\Python\Python313\\tcl\tcl8.6}
+
+C:/Users/User/AppData/Local/Programs/Python/Python313/tcl/tcl8.6/init.tcl: version conflict for package "Tcl": have 8.6.13, need exactly 8.6.15
+version conflict for package "Tcl": have 8.6.13, need exactly 8.6.15
+    while executing
+"package require -exact Tcl 8.6.15"
+    (file "C:/Users/User/AppData/Local/Programs/Python/Python313/tcl/tcl8.6/init.tcl" line 21)
+    invoked from within
+"source C:/Users/User/AppData/Local/Programs/Python/Python313/tcl/tcl8.6/init.tcl"
+    ("uplevel" body line 1)
+    invoked from within
+"uplevel #0 [list source $tclfile]"
+
+
+This probably means that Tcl wasn't installed properly.
+ at 851.3866
+ 
+ Collecting pillow>=8 (from matplotlib)
+  Downloading pillow-11.2.1-cp313-cp313-win_amd64.whl.metadata (9.1 kB)
+Collecting pyparsing>=2.3.1 (from matplotlib)
+  Downloading pyparsing-3.2.3-py3-none-any.whl.metadata (5.0 kB)
+Collecting python-dateutil>=2.7 (from matplotlib)
+  Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+Collecting six>=1.5 (from python-dateutil>=2.7->matplotlib)
+  Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+Downloading matplotlib-3.10.3-cp313-cp313-win_amd64.whl (8.1 MB)
+   ???????????????????????????????????????? 8.1/8.1 MB 4.0 MB/s eta 0:00:00
+Downloading contourpy-1.3.2-cp313-cp313-win_amd64.whl (223 kB)
+Downloading cycler-0.12.1-py3-none-any.whl (8.3 kB)
+Downloading fonttools-4.58.0-cp313-cp313-win_amd64.whl (2.2 MB)
+   ???????????????????????????????????????? 2.2/2.2 MB 4.8 MB/s eta 0:00:00
+Downloading kiwisolver-1.4.8-cp313-cp313-win_amd64.whl (71 kB)
+Downloading packaging-25.0-py3-none-any.whl (66 kB)
+Downloading pillow-11.2.1-cp313-cp313-win_amd64.whl (2.7 MB)
+   ???????????????????????????????????????? 2.7/2.7 MB 4.9 MB/s eta 0:00:00
+Downloading pyparsing-3.2.3-py3-none-any.whl (111 kB)
+Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+Installing collected packages: six, pyparsing, pillow, packaging, kiwisolver, fonttools, cycler, contourpy, python-dateutil, matplotlib
+Successfully installed contourpy-1.3.2 cycler-0.12.1 fonttools-4.58.0 kiwisolver-1.4.8 matplotlib-3.10.3 packaging-25.0 pillow-11.2.1 
+pyparsing-3.2.3 python-dateutil-2.9.0.post0 six-1.17.0
+
+[notice] A new release of pip is available: 25.0.1 -> 25.1.1
+[notice] To update, run: python.exe -m pip install --upgrade pip
+
+sqrt(2)
+  1.41421356237309470 after 27 terms (converged)
+e
+  2.71828182845904510 after 20 terms (converged)
+pi
+  3.14159265383979520 after 1000 terms (too many terms)
+pi (alternative formula)
+  3.14159265358979260 after 29 terms (converged)
+ mX5 executed: 14/12/2023 12:13:56  Runtime: 0:0:2.104  Memload: 73% use
+RemObjects Pascal Script. Copyright (c) 2004-2024 by RemObjects Software & maXbox5
+sqrt(2)
+  1.41421356237309505 after 27 terms (converged)
+e
+  2.71828182845904524 after 20 terms (converged)
+pi
+  3.14159265383979293 after 1000 terms (too many terms)
+pi (alternative formula)
+  3.14159265358979324 after 29 terms (converged)
+ mX4 executed: 14/12/2023 11:30:32  Runtime: 0:0:1.978  Memload: 30% use
+
+
+sqrt(2)
+  1.41421356237309505 after 27 terms (converged)
+e
+  2.71828182845904524 after 20 terms (converged)
+pi
+  3.14159265383979293 after 1000 terms (too many terms)
+pi (alternative formula)
+  3.14159265358979324 after 29 terms (converged)
+ mX4 executed: 23/02/2023 17:48:58  Runtime: 0:0:1.689  Memload: 40% use
+
+sqrt(2)
+  1.41421356237309505 after 27 terms (converged)
+e
+  2.71828182845904524 after 20 terms (converged)
+pi
+  3.14159265383979293 after 1000 terms (too many terms)
+pi (alternative formula)
+  3.14159265358979324 after 29 terms (converged)
+  
+  debug: 118-NameError: name 'np' is not defined 848 err:20
+Exception: NameError: name 'np' is not defined at 848.3477
+
+{ compile-time registration functions }
+procedure SIRegister_TDataSetUtils(CL: TPSPascalCompiler);
+procedure SIRegister_DataSetUtils(CL: TPSPascalCompiler);
+
+{ run-time registration functions }
+procedure RIRegister_TDataSetUtils(CL: TPSRuntimeClassImporter);
+procedure RIRegister_DataSetUtils(CL: TPSRuntimeClassImporter);
+https://archive.org/details/02-master-of-puppets_202111
+
+
+Doc:  we download a script-file in powershell with wget Invoke-WebRequest open the file to check
+      the content, then execute the script and get the result back to maXbox-console as memo2.
+      Hint: needs a \examples dir otherwise 
+      
+      HttpRESTConnectionIndy
+
+   https://rapidapi.com/collection/list-of-free-apis               
+
+   https://wiki.delphi-jedi.org/wiki/JCL_Help:Execute@string@string@Boolean@PBoolean
+   https://docs.microsoft.com/en-us/windows/win32/debug/system-error-codes--0-499-
+
+    writeln(GETDOSOutput('cmd.exe /c wmic cpu get architecture','C:\'));
+    writeln(GETDOSOutput('cmd.exe /c wmic cpu get name','C:\'));
+    //to monitor tcp spyware over PID - process ID
+    memo2.setFocus;
+    repeat
+      writeln(GETDOSOutput('cmd.exe /c netstat -o','C:\'));
+      memo2.color:= clsilver;
+      sleep(2000)
+      memo2.color:= clyellow;    
+    until isKeyPressed;  
+    memo2.color:= clwhite;    
+    writeln(SysErrorMessage(GetLastError))
+
+Passwort checker? https://haveibeenpwned.com
+https://dnslytics.com/spf-lookup  
+
+procedure RunDosInMemo(DosApp: string; AMemo:TMemo);
+const
+    READ_BUFFER_SIZE = 2400;
+var
+    Security: TSecurityAttributes;
+    readableEndOfPipe, writeableEndOfPipe: THandle;
+    start: TStartUpInfo;
+    ProcessInfo: TProcessInformation;
+    Buffer: PAnsiChar;
+    BytesRead, AppRunning: DWORD;
+begin
+    Security.nLength := SizeOf(TSecurityAttributes);
+    Security.bInheritHandle := True;
+    Security.lpSecurityDescriptor := nil;
+
+    if CreatePipe({var}readableEndOfPipe, {var}writeableEndOfPipe, @Security, 0) then begin
+        Buffer := AllocMem(READ_BUFFER_SIZE+1);
+        FillChar(Start, Sizeof(Start), #0);
+        start.cb := SizeOf(start);
+
+        // Set up members of the STARTUPINFO structure.
+        // This structure specifies the STDIN and STDOUT handles for redirection.
+        // - Redirect the output and error to the writeable end of our pipe.
+        // - We must still supply a valid StdInput handle (because we used STARTF_USESTDHANDLES to swear that all three handles will be valid)
+        start.dwFlags := start.dwFlags or STARTF_USESTDHANDLES;
+        start.hStdInput := GetStdHandle(STD_INPUT_HANDLE); //we're not redirecting stdInput; but we still have to give it a valid handle
+        start.hStdOutput := writeableEndOfPipe; //we give the writeable end of the pipe to the child process; we read from the readable end
+        start.hStdError := writeableEndOfPipe;
+
+        //We can also choose to say that the wShowWindow member contains a value.
+        //In our case we want to force the console window to be hidden.
+        start.dwFlags := start.dwFlags + STARTF_USESHOWWINDOW;
+        start.wShowWindow := SW_HIDE;
+
+        // Don't forget to set up members of the PROCESS_INFORMATION structure.
+        ProcessInfo := Default(TProcessInformation);
+
+        //WARNING: The unicode version of CreateProcess (CreateProcessW) can modify the command-line "DosApp" string. 
+        //Therefore "DosApp" cannot be a pointer to read-only memory, or an ACCESS_VIOLATION will occur.
+        //We can ensure it's not read-only with the RTL function: UniqueString
+        UniqueString({var}DosApp);
+
+        if CreateProcess(nil, PChar(DosApp), nil, nil, True, NORMAL_PRIORITY_CLASS, nil, nil, start, {var}ProcessInfo) then begin
+            //Wait for the application to terminate, as it writes it's output to the pipe.
+            //WARNING: If the console app outputs more than 2400 bytes (ReadBuffer),
+            //it will block on writing to the pipe and *never* close.
+            repeat
+                Apprunning := WaitForSingleObject(ProcessInfo.hProcess, 100);
+                Application.ProcessMessages;
+            until (Apprunning <> WAIT_TIMEOUT);
+
+            //Read the contents of the pipe out of the readable end
+            //WARNING: if the console app never writes anything to the StdOutput, then ReadFile will block and never return
+            repeat
+                BytesRead := 0;
+                ReadFile(readableEndOfPipe, Buffer[0], READ_BUFFER_SIZE, {var}BytesRead, nil);
+                Buffer[BytesRead]:= #0;
+                OemToAnsi(Buffer,Buffer);
+                AMemo.Text := AMemo.text + String(Buffer);
+            until (BytesRead < READ_BUFFER_SIZE);
+        end;
+        FreeMem(Buffer);
+        CloseHandle(ProcessInfo.hProcess);
+        CloseHandle(ProcessInfo.hThread);
+        CloseHandle(readableEndOfPipe);
+        CloseHandle(writeableEndOfPipe);
+    end;
+end;
+
+procedure TForm1.Button1Click(Sender: TObject);
+begin {button 1 code}
+   RunDosInMemo('chkdsk.exe c:\',Memo1);
+end;
+
+CL.AddDelphiFunction('procedure RunDosInMemo(DosApp: string; AMemo:TMemo);');
+
+ShellExecute(0, 'open', Pchar('DocumentName.pdf'), '', '', SW_SHOWNORMAL);
+
+work under Windows 7 and 8, which would start the Acrobat Reader and open the file but under Windows 
+10 this no longer is the case. So the next step 
+was to update the call to use ShellExecuteEX instead.
+ShellInfo := Default(TShellExecuteInfo);
+ShellInfo.cbSize := SizeOf(TShellExecuteInfo);
+ShellInfo.lpFile := PChar(Current_Client_Documents + FileName +'.pdf');
+ShellInfo.nShow := SW_SHOWNORMAL;
+
+try
+ShellExecuteEx(@ShellInfo);
+
+The actual code will prepare the Object ShellInfo to contain all of the necessary data to start up the 
+Acrobat Reader and display the generated PDF.
+
+ mX4 executed: 30/08/2022 16:07:02  Runtime: 0:0:2.369  Memload: 45% use
+ mX4 executed: 07/09/2022 09:07:56  Runtime: 0:0:9.906  Memload: 45% use
+ mX4 executed: 07/09/2022 10:23:00  Runtime: 0:0:9.134  Memload: 45% use
+ 
+   
+Software & Support Media GmbH
+Schwedlerstr. 8
+60314 Frankfurt
+
+https://my6.code.blog/2022/09/02/webpostdata/
+https://my6.code.blog/2023/02/23/distance-and-bearing/
+
+Das Tool bietet eine umfassende Schichtplanung an und kann einfach bedient werden. F
+
+Abbildung 3 Use Case Diagram
+
+Tabelle 15 Use Case Personalbedarf erfasse
+
+https://mobadaten.net/MoBaDatenInfo/index.php?title=Trix_H0_3-Leiter_-_Deutsche_Bundesbahn_
+(DB,_DSG,_DBP)&DPL_arg1=IV&DPL_arg2=DB&DPL_arg3=EL&DPL_arg4=17#DBEPIV
+
+  3.1415926535894 after 29 terms (converged)
+ mX4 executed: 08/06/2023 12:11:46  Runtime: 0:0:1.700  Memload: 46% use
+ mX4 executed: 10/06/2023 23:24:13  Runtime: 0:0:1.705  Memload: 44% use
+ mX4 executed: 12/06/2023 23:09:00  Runtime: 0:0:1.744  Memload: 44% use
+ mX4 executed: 14/06/2023 20:58:58  Runtime: 0:0:1.774  Memload: 35% use
+ mX4 executed: 14/06/2023 22:35:00  Runtime: 0:0:1.736  Memload: 36% use                                                                                     
+ mX4 executed: 15/06/2023 08:57:25  Runtime: 0:0:1.762  Memload: 41% use
+ mX4 executed: 15/06/2023 14:13:30  Runtime: 0:0:1.755  Memload: 46% use
+ mX5 executed: 05/01/2024 16:02:12  Runtime: 0:0:2.167  Memload: 76% use
+  mX5?? executed: 15/05/2024 18:33:42  Runtime: 0:0:2.664  Memload: 72% use
+  mX5?? executed: 24/05/2024 17:59:05  Runtime: 0:0:2.672  Memload: 64% use
+ mX5?? executed: 08/06/2024 18:09:03  Runtime: 0:0:2.384  Memload: 51% use
+  mX5?? executed: 23/06/2024 15:47:09  Runtime: 0:0:2.289  Memload: 65% use 
+     
+                             OLS Regression Results                            
+==============================================================================
+Dep. Variable:                Lottery   R-squared:                       0.414
+Model:                            OLS   Adj. R-squared:                  0.392
+Method:                 Least Squares   F-statistic:                     19.30
+Date:                Thu, 26 Jun 2025   Prob (F-statistic):           1.47e-09
+Time:                        17:35:22   Log-Likelihood:                -375.28
+No. Observations:                  86   AIC:                             758.6
+Df Residuals:                      82   BIC:                             768.4
+Df Model:                           3                                         
+Covariance Type:            nonrobust                                         
+================================================================================
+                      coef    std err          t      P>|t|   [0.025      0.975]
+--------------------------------------------------------------------------------
+Intercept         194.3951     37.768      5.147      0.000  119.263     269.527
+Wealth              0.2820      0.093      3.024      0.003    0.097       0.468
+Literacy           -0.3840      0.127     -3.033      0.003   -0.636      -0.132
+np.log(Pop1831)   -25.2363      6.047     -4.174      0.000  -37.265     -13.207
+==============================================================================
+Omnibus:                        7.602   Durbin-Watson:                   1.890
+Prob(Omnibus):                  0.022   Jarque-Bera (JB):                7.051
+Skew:                          -0.651   Prob(JB):                       0.0294
+Kurtosis:                       3.524   Cond. No.                     1.13e+03
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+[2] The condition number is large, 1.13e+03. This might indicate that there are
+strong multicollinearity or other numerical problems.
+ mX5?? executed: 26/06/2025 17:35:23  Runtime: 0:0:47.680  Memload: 58% use      
+     
+  
+  Sentiment Analysis & perplexity-gemini queries / prompts   
+     ## Ten Best Delphi Projects Over 30 Years
+
+Delphi has fostered a vibrant ecosystem of open-source projects and commercial applications since its debut in 1995. The following list 
+highlights ten of the most impactful and popular Delphi projects, reflecting both technical innovation and community adoption over the past 
+three decades.
+
+**1. Awesome Delphi**  
+A comprehensive, curated collection of Delphi frameworks, libraries, and resources. It serves as a central hub for discovering high-quality 
+Delphi tools and components, making it invaluable for developers seeking to expand their toolkit[1].
+
+**2. Delphi IDE Theme Editor**  
+This tool allows developers to customize the color schemes and visual themes of the Delphi IDE, enhancing productivity and 
+comfort for long development sessions[1].
+
+**3. DelphiMVCFramework (DMVCFramework)**  
+A powerful and widely used web framework for Delphi, enabling developers to build robust RESTful web applications and APIs with modern architectural 
+patterns[1].
+
+**4. Delphi REST Client API**  
+A flexible and easy-to-use library for consuming RESTful web services from Delphi applications, supporting integration with modern web APIs[1].
+
+**5. Virtual-TreeView**  
+An advanced and highly flexible tree view control for Delphi, used in numerous commercial and open-source applications due to its performance and 
+versatility[1].
+
+**6. Delphi-OpenCV**  
+A Delphi translation of the popular OpenCV computer vision library headers, enabling Delphi developers to harness advanced image 
+processing and computer vision capabilities[1].
+
+**7. DUnitX**  
+A modern unit testing framework inspired by DUnit and NUnit, designed for Delphi 2010 and later. DUnitX brings advanced testing features and 
+is widely adopted for test-driven development in Delphi projects[1].
+
+**8. Delphi IDE Colorizer**  
+A plugin for theming and skinning the look and feel of the Delphi IDE workspace, allowing for a personalized and modern development environment[1].
+
+**9. CEF4Delphi**  
+A project for embedding Chromium-based browsers into Delphi applications, making it possible to integrate modern web content 
+and technologies directly within native apps[1].
+
+**10. OmniThreadLibrary**  
+A robust and easy-to-use threading library for Delphi, simplifying the development of multi-threaded applications and enabling efficient use 
+of modern multi-core processors[1].
+
+---
+
+These projects have been selected based on their popularity, technical significance, 
+and impact on the Delphi development community. They represent a mix of developer tools, frameworks, 
+and components that have shaped the way Delphi applications are built and maintained from the early days 
+of Windows 3.1 to modern multi-platform environments[1][2][3].
+
+[1] https://blogs.embarcadero.com/top-10-most-popular-open-source-delphi-projects-on-github-by-star-rating/
+[2] https://delphi.embarcadero.com
+[3] https://delphi.embarcadero.com/history-of-delphi-innovations/
+[4] https://www.softacom.com/wiki/development/delphi-versions-a-complete-history-evolution/
+[5] https://en.wikipedia.org/wiki/History_of_Delphi_(software)
+[6] https://www.reddit.com/r/programming/comments/lkeapc/26_years_of_delphi/
+[7] https://play.fallows.ca/wp/projects/software-projects/thirty-years-of-delphi-remembered/
+[8] https://www.youtube.com/watch?v=2HoBt0kbNAc
+[9] https://delphi.fandom.com/wiki/Good_Quality_Applications_Built_With_Delphi
+[10] https://www.thecollector.com/delphi-site-history/
+
+## Delphi Projects with the Most Lasting Impact Over 30 Years
+
+Over three decades, several Delphi projects and libraries have had a profound and enduring influence on the Delphi ecosystem and the broader 
+software development community. The following projects stand out for their technical innovation, widespread adoption, and continued relevance:
+
+**1. Virtual-TreeView**  
+A highly flexible and powerful tree view control, Virtual-TreeView has become a staple in both open-source and commercial Delphi applications. 
+Its performance and extensibility have set the standard for advanced UI components in Delphi, making it one of the most influential libraries 
+in the ecosystem[1].
+
+**2. OmniThreadLibrary**  
+This threading library greatly simplified the development of multi-threaded applications in Delphi. Its ease of use and robust feature 
+set have made it the go-to solution for Delphi developers needing parallelism and concurrency, ensuring Delphi apps remain competitive 
+on modern multi-core hardware[1].
+
+**3. DelphiMVCFramework (DMVCFramework)**  
+As web development became critical, DMVCFramework provided Delphi developers with a modern, powerful framework for building 
+RESTful web applications and APIs. Its adoption has helped keep Delphi relevant in server-side and web API development[1].
+
+**4. CEF4Delphi**  
+By enabling the embedding of Chromium-based browsers in Delphi applications, CEF4Delphi has allowed developers to 
+integrate modern web technologies and content directly into native apps, bridging the gap between desktop and web[1].
+
+**5. DUnitX**  
+Unit testing is essential for modern software development, and DUnitX brought advanced, NUnit-inspired testing 
+capabilities to Delphi. Its adoption has fostered better software quality and test-driven development practices in the Delphi community[1].
+
+**6. Delphi-OpenCV**  
+This project brought the power of the OpenCV computer vision library to Delphi developers, opening up new 
+possibilities in image processing and AI within the Delphi ecosystem[1].
+
+**7. Delphi REST Client API**  
+As RESTful APIs became the backbone of modern applications, this library enabled Delphi developers to 
+easily consume web services, ensuring Delphi’s continued viability for connected applications[1].
+
+**8. Awesome Delphi**  
+While not a library or component, this curated list of high-quality Delphi resources has become an essential 
+starting point for developers, helping to foster community and knowledge sharing[1].
+
+**9. Delphi IDE Theme Editor & Delphi IDE Colorizer**  
+These tools have modernized the developer experience, allowing for extensive customization 
+and theming of the Delphi IDE, which has contributed to the productivity and satisfaction of Delphi programmers[1].
+
+---
+
+### Broader Impact
+
+Beyond individual libraries, Delphi itself has had a lasting impact due to its:
+- **Backward compatibility**: Code written decades ago often still compiles and runs, preserving organizational 
+investments and enabling the maintenance of mission-critical systems[2].
+- **Cross-platform evolution**: From Windows 3.1 to modern macOS, Linux, Android, and iOS, 
+Delphi’s frameworks (VCL, FireMonkey) and ecosystem have evolved to support new platforms and technologies[3][4].
+- **Enterprise adoption**: Delphi-powered applications remain in use across industries such as hospitality, 
+telecom, media, and even NASA, a testament to the language’s reliability and the lasting impact of projects built with it[2][4].
+
+These projects and the Delphi platform itself have enabled developers to build robust, high-performance, 
+and long-lived applications, ensuring Delphi’s enduring legacy in the software world.
+
+[1] https://blogs.embarcadero.com/top-10-most-popular-open-source-delphi-projects-on-github-by-star-rating/
+[2] https://www.softacom.com/blog/business/why-do-companies-use-delphi/
+[3] https://delphi.embarcadero.com
+[4] https://delphiaball.co.uk/2025/02/14/happy-30th-delphi/
+[5] https://today.ucsd.edu/story/delphi_project_foretells_future_of_personalized_population_health
+[6] https://www.theregister.com/2025/02/19/delphi_turns_30/
+[7] https://www.linkedin.com/posts/marcocantu_blog-post-getting-close-to-delphis-30th-activity-7291138084006469632-u6q1
+[8] https://www.reddit.com/r/delphi/comments/1iekb3c/getting_close_to_delphis_30th_anniversary/
+[9] https://delphi.fandom.com/wiki/Good_Quality_Applications_Built_With_Delphi
+[10] https://forums.adug.org.au/t/rip-delphi-we-will-always-love-you/60635
+
+## The Ten Worst Delphi Projects Over 30 Years
+
+While Delphi has enabled many successful and influential projects, its long history also includes notable failures and problematic projects. 
+These failures often stem from technical debt, poor architectural decisions, over-reliance on outdated components, or rushed development. 
+Based on available sources and industry commentary, here are ten of the most problematic Delphi projects or patterns from the past three decades:
+
+**1. Dreaded Sorts (THSorts) Demo**  
+Created as a last-minute demo for the Windows 95 launch, this project is infamous for bad programming practices: magic numbers, 
+hardcoded array sizes, UI logic tied directly to data, and unsafe thread handling. It serves as a cautionary example of what not to do in 
+Delphi development[1].
+
+**2. Projects with Rigid UI-Database Coupling**  
+Many business applications built in Delphi directly tied the user interface to database structures. This static 
+dependency made even trivial database changes (like altering a field size) require manual updates across numerous forms, leading to fragile, 
+unmaintainable codebases[2][3].
+
+**3. Component Colossus Projects**  
+Some applications became “functional colossi” by endlessly adding features and customizations for large clients. 
+This led to bloated, overly complex systems that were difficult to maintain, upgrade, or adapt, 
+often driving users to stick with outdated versions[2][3].
+
+**4. Projects Stuck on Old Delphi Versions**  
+Due to deep dependencies on outdated or abandoned third-party components, many projects became impossible to 
+migrate to newer Delphi versions. The cost and risk of porting such projects often outweighed the benefits, 
+leaving organizations stranded on obsolete software[2][3].
+
+**5. Projects Dependent on Discontinued Technologies**  
+Delphi projects built on now-defunct technologies like Kylix, VCL.NET, BDE, or Bold became dead ends when s
+upport was dropped, forcing costly rewrites or abandonment[4].
+
+**6. DLL Hell Projects**  
+Applications that relied on distributing numerous DLLs often suffered from version mismatches and deployment 
+nightmares, causing frequent failures and support headaches[4].
+
+**7. Over-Componentized “Flavor of the Month” Projects**  
+During the golden age of Delphi components, some developers indiscriminately integrated every trending component. 
+This led to unstable, hard-to-update projects as each component required constant maintenance and updates[3].
+
+**8. Projects Broken by Unicode Transition**  
+The introduction of Unicode support in Delphi 2009 rendered many older components incompatible. Projects that couldn’t 
+be updated due to lack of component support were left behind, sometimes requiring complete rewrites[3].
+
+**9. Projects with Inflexible Architectures**  
+Early Delphi projects often lacked modularity or a plugin mechanism, making it nearly impossible to adapt 
+to new requirements or customer customizations without massive code changes[2][3].
+
+**10. “Reinventing the Wheel” Projects**  
+Some teams, due to lack of available or maintained libraries, repeatedly rewrote basic infrastructure or functionality, 
+wasting resources and introducing new bugs instead of leveraging community or vendor solutions[4].
+
+---
+
+These examples highlight common pitfalls in Delphi’s history: hasty demos, architectural rigidity, 
+over-customization, and dependency on obsolete technologies. Many of these issues are not unique to Delphi but are 
+especially pronounced in its ecosystem due to its long legacy and rapid evolution.
+
+[1] https://blog.davidi.com/2022/03/09/the-worst-and-best-delphi-programs-i-ever-created/
+[2] http://www.ibexpert.net/ibe/index.php?n=Doc.WhyTypicalDelphiProjectsOftenFail
+[3] http://ibexpert.com/docu/doku.php?id=01-documentation%3A01-06-white-papers%3Awhy-typical-delphi-projects-fail
+[4] http://delphi.org/2020/07/reasons-not-to-use-delphi/
+[5] https://www.reddit.com/r/programming/comments/5u4fb4/22_years_of_delphi_and_it_still_rocks/
+[6] https://forums.adug.org.au/t/rip-delphi-we-will-always-love-you/60635
+[7] https://play.fallows.ca/wp/projects/software-projects/thirty-years-of-delphi-remembered/
+[8] https://forums.theregister.com/forum/all/2025/02/19/delphi_turns_30/
+[9] https://www.reddit.com/r/delphi/comments/e6yl97/what_criticisms_you_see_are_valid_against_delphi/
+[10] https://www.softacom.com/blog/business/pitfalls-of-delphi-migration-and-ways-to-reduce-risks/
+[11] https://www.glassdoor.com/Reviews/The-Delphi-Group-Reviews-E420151.htm
+[12] https://news.ycombinator.com/item?id=43051598
+[13] https://docwiki.embarcadero.com/RADStudio/Athens/en/List_of_publicly_reported_bugs_fixed_in_12.2
+[14] https://gabrielmoraru.com/my-experience-with-cursor-the-promise-the-reality-and-the-garbage/
+[15] https://arxiv.org/abs/2306.13000
+[16] https://jonlennartaasenden.wordpress.com/2015/05/22/why-do-some-people-hate-delphi-so-much/
+[17] https://news.ycombinator.com/item?id=9712489
+[18] https://stackoverflow.com/questions/9849629/how-to-fix-a-corrupted-project
+[19] https://www.chiefdelphi.com/t/what-are-your-programming-horror-stories/473439?page=3
+
+
+## Most Problematic Delphi Projects Over 30 Years
+
+Several Delphi projects and product decisions have been widely recognized as problematic due to 
+technical, architectural, or strategic missteps. These issues have had lasting negative effects 
+on both individual projects and the broader Delphi ecosystem.
+
+**1. Delphi 8 and Delphi 2005 Releases**  
+Delphi 8 (2003) was a .NET-only release, abandoning native Windows application support—a core 
+strength of Delphi. It was highly criticized for its low quality and inability to create native applications. 
+Delphi 2005, while restoring native support, was plagued by severe bugs and instability at launch, damaging 
+Delphi’s reputation and causing many developers to avoid upgrading[6].
+
+**2. Projects Dependent on Abandoned Technologies (Kylix, VCL.NET, BDE, Bold)**  
+Many Delphi projects were built on technologies like Kylix (Delphi for Linux), VCL.NET, 
+Borland Database Engine (BDE), and Bold. When these technologies were discontinued or 
+poorly supported, projects became dead ends, requiring costly rewrites or total abandonment[4].
+
+**3. Projects Stuck on Old Delphi Versions**  
+A significant number of large-scale Delphi projects remain on outdated versions (e.g., Delphi 5 or 7) 
+because porting millions of lines of code is prohibitively expensive. This is often due to 
+deep dependencies on third-party components that are no longer maintained or compatible 
+with newer Delphi versions. Such projects become increasingly difficult to maintain 
+and modernize, trapping organizations in technological debt[2][5].
+
+**4. Unicode Transition Breakage**  
+The introduction of Unicode in Delphi 2009 rendered many existing components and 
+codebases incompatible. Projects that relied on unmaintained or proprietary components 
+often could not be migrated, resulting in stagnation or forced rewrites[2].
+
+**5. Overly Rigid UI-Database Coupling**  
+Many early Delphi business applications tightly coupled the user interface to 
+database structures. This architectural flaw made even minor database changes 
+require extensive manual updates, leading to fragile and unmaintainable projects[4].
+
+**6. Technical Debt and Poor Documentation**  
+Projects that prioritized rapid development over code quality accumulated 
+significant technical debt. When original developers left and documentation was 
+lacking, these projects became nearly impossible to update or debug, 
+causing long-term maintenance nightmares[5].
+
+**7. DLL Hell and Component Bloat**  
+Some Delphi applications relied on a proliferation of third-party components and 
+DLLs, leading to version conflicts, deployment headaches, and instability—especially 
+as components became obsolete or incompatible with newer Delphi versions[4].
+
+**8. Failed Enterprise Middleware Initiatives**  
+Borland’s push into enterprise middleware (e.g., CORBA, COM, three-tier architectures) 
+in the late 1990s and early 2000s was poorly timed and executed. These efforts failed 
+to gain traction and diverted resources from Delphi’s core strengths, contributing to the platform’s decline[4].
+
+**9. IDE Instability and Usability Issues**  
+Later versions of the Delphi IDE have been criticized for instability, poor 
+error handling, and frustrating copy protection mechanisms. Bugs in the IDE or third-party 
+components could crash the entire environment, hindering productivity and adoption[1].
+
+**10. Projects with Inflexible or Haphazard Architectures**  
+Some Delphi projects suffered from a lack of modularity or were built with ad hoc, 
+poorly planned architectures. This made them brittle and resistant to change, 
+increasing long-term risk and maintenance costs[4][5].
+
+---
+
+These problematic projects and patterns illustrate recurring challenges in the Delphi ecosystem: 
+technological obsolescence, technical debt, architectural rigidity, and the risks of chasing 
+short-lived trends or abandoning core strengths. The result has been a number of high-profile 
+failures and a legacy of difficult-to-maintain codebases that have shaped perceptions of Delphi 
+over its 30-year history.
+
+[1] https://www.reddit.com/r/programming/comments/5u4fb4/22_years_of_delphi_and_it_still_rocks/
+[2] http://www.ibexpert.net/ibe/index.php?n=Doc.WhyTypicalDelphiProjectsOftenFail
+[3] https://forums.adug.org.au/t/rip-delphi-we-will-always-love-you/60635
+[4] https://news.ycombinator.com/item?id=43051598
+[5] https://www.softacom.com/blog/business/pitfalls-of-delphi-migration-and-ways-to-reduce-risks/
+[6] https://en.wikipedia.org/wiki/History_of_Delphi_(software)
+[7] https://devblogs.microsoft.com/oldnewthing/20250408-00/?p=111057
+[8] https://www.youtube.com/watch?v=2HoBt0kbNAc
+
+
+## How Compatibility Problems Contributed to Delphi Project Failures
+
+Compatibility issues have been a significant factor in the failure or stagnation 
+of many Delphi projects over the past 30 years. 
+While Delphi is often praised for its strong backward compatibility, 
+several recurring challenges have undermined long-term project viability:
+
+**1. Binary Incompatibility Between Major Versions**
+- Each major Delphi release is generally binary-incompatible with previous versions, 
+except for rare cases like Delphi 2006 and 2007[4]. This means compiled units (DCUs, 
+BPLs) and third-party components must be rebuilt for each new version. Projects heavily 
+reliant on third-party binaries, especially without source code, often become stuck on old 
+Delphi versions when component vendors stop providing updates[4][7].
+
+**2. Third-Party Component Dependency**
+- Many legacy projects depend on third-party components that are no longer maintained or 
+compatible with newer Delphi releases. When attempting to migrate, teams frequently 
+encounter missing or incompatible binaries, leading to costly and sometimes unfeasible 
+rewrites or abandoned upgrades[4][7].
+
+**3. Source-Level Incompatibilities**
+- Over time, Delphi has moved class and type declarations between units 
+(e.g., TAction and TImageList), requiring code changes for successful compilation 
+in newer versions[5]. Even minor changes in the language or RTL can result in a cascade 
+of errors when compiling older projects, especially those with large codebases or custom components[3].
+
+**4. Unicode Transition**
+- The introduction of Unicode in Delphi 2009 broke compatibility with many older 
+components and codebases, particularly those that manipulated strings or relied on 
+non-Unicode libraries. Projects unable to update all dependencies often remained 
+stuck on pre-Unicode versions or required significant refactoring.
+
+**5. IDE and Build System Issues**
+- Some Delphi versions introduced changes or bugs in the IDE and build systems, causing 
+internal compiler errors or making it difficult to build older projects without extensive modifications[6][3].
+
+**6. Project Lock-In and Technical Debt**
+- The cumulative effect of these compatibility issues is that many Delphi projects 
+remain "locked in" to specific, outdated versions. This technical debt makes maintenance
+ harder, increases security risks, and limits the ability to adopt modern features or platforms[4][7].
+
+**7. Migration Fatigue**
+- The time and effort required to update projects—especially those with many 
+third-party dependencies—can be prohibitive. As a result, organizations often defer upgrades, 
+compounding the problem and increasing the risk of project failure or obsolescence[4][7].
+
+> "I would wager that there are many Delphi teams out there stuck at a particular 
+version due to various third party component issues." [4]
+
+---
+
+In summary, while Delphi's backward compatibility is strong, binary and source-level 
+incompatibilities—especially involving third-party components—have caused many projects 
+to stagnate or fail during migration efforts. The inability to easily update or maintain 
+these projects has been a recurring source of project failure in the Delphi ecosystem[4][7][3].
+
+[1] https://www.reddit.com/r/delphi/comments/qgs6ln/does_delphi_have_compatibility_problems_with/
+[2] https://stackoverflow.com/questions/46394362/delphi-compatibility-issue
+[3] https://en.delphipraxis.net/topic/1394-lots-of-errors-when-trying-to-compile-an-old-project/
+[4] https://ideasawakened.com/post/about-binary-compatibility-on-new-versions-of-delphi
+[5] https://blog.dummzeuch.de/2019/07/28/common-unit-aliases-for-backwards-compatibility-to-older-delphi-versions/
+[6] https://en.delphipraxis.net/topic/8605-delphi-113-unusable-due-to-full-
+build-requiring-onslaught-of-f2084-internal-compiler-errors-from-minor-source-modifications/
+[7] https://www.reddit.com/r/delphi/comments/183tx2o/inheriting_a_delphi_5_project/
+[8] https://blogs.embarcadero.com/why-rad-studio-apps-are-forever/
+      
+      
+## Key Differences in maXbox 5.2.9.170 Compared to Previous Versions
+
+**Enhanced Python Support**
+- Improved compatibility with Python 3.13 and 3.14, 
+along with enhanced templates for multiple 
+Python versions (py2 through py8) in the `bds_delphi.dci` template[1].
+
+**Expanded Learning Resources**
+- The number of tutorials has increased to 146, with the latest 
+addition covering geocode distance calculations (`maxbox_starter142.pdf`)[1].
+
+**Data Science Package Updates**
+- The data science package (`dmath64.dll`) has renewed functions, 
+offering updated capabilities for data analysis and computation[1].
+
+**New Features and Examples**
+- Added new example projects, accessible via SourceForge, to demonstrate 
+new functions and features[1].
+- A new batch file (`maxbox_starter_testsequence51.bat`) introduces ListView event handling[1].
+
+**Game Integration**
+- Integration of the classic board game Go, featuring a dedicated menu and 
+improved game logic for group detection and capture mechanics[1].
+
+**Modernized Internal Functions**
+- Enhanced internal functions now utilize state-of-the-art JSON processing 
+and collection handling for industrial REST API calls, such as fetching 
+weather data using OpenWeatherMap[1].
+
+**Performance and System Information**
+- Updates to the JCLSysInfo library and optimized functions
+ (e.g., `FastLocate2Bytes`) leverage 64-bit CPU instructions 
+ for improved performance on modern systems[1].
+
+**Backward Compatibility**
+- The release maintains source compatibility with previous versions, 
+ensuring a smooth upgrade path[1].
+
+## Summary Table: Notable Changes
+
+| Feature/Aspect                  | 5.2.9.170 (June 2025)                | Previous Versions (e.g., 5.1.4.98)      |
+|---------------------------------|--------------------------------------|-----------------------------------------|
+| Python Version Support          | Python 3.13, 3.14, enhanced templates| Older Python versions, fewer templates  |
+| Tutorials                       | 145, new geocode distance tutorial   | Fewer (less than 142)                   |
+| Data Science Functions          | Renewed in dmath64.dll               | Previous function set                   |
+| Example Projects                | New examples added                   | Existing examples only                  |
+| Game Features                   | Go game integration                  | Not present                             |
+| REST API/JSON Handling          | State-of-the-art, improved           | Less advanced                           |
+| Performance Optimization        | Updated for 64-bit, JCLSysInfo       | Previous optimizations                  |
+| Backward Compatibility          | Maintained                           | N/A                                     |
+
+These enhancements make maXbox 5.2.8.170 a more robust, modern, and versatile scripting and prototyping environment than its predecessors[1][3].
+
+[1] https://maxbox4.wordpress.com/blog/
+[2] https://maxbox4.wordpress.com/tag/coding/
+[3] http://www.softwareschule.ch/download/maxbox_functions.txt   
+
+We download the Guerry dataset, a collection of historical data used in support of 
+Andre-Michel Guerry’s 1833 Essay on the Moral Statistics of France. The data set is hosted 
+online in comma-separated values format (CSV) by the Rdatasets repository. We could download the file 
+locally and then load it using read_csv, but pandas takes care of all of this automatically for us:   
+
+
+Statistic Package Delphi AI
+TestdemoStatisticClassifier64bit.exe
+
+- Beschreibung
+
+Eine wirklich plattformübergreifende Bibliothek für numerische Analysen und Statistikfunktionen, 
+ist in Delphi nicht einfach zu finden. Zumal auch Qualität und Lizenz stimmen muss. 
+In dieser Session tauchen wir in die nützlichsten Pakete ein, die für die Durchführung statistischer 
+Berechnungen bis hin zu fortgeschrittener Modellierung und Datenvisualisierung geeignet sind. 
+Zudem machen wir eine Statistik über die Top und Flops von Delphi Projekten der letzten 30 Jahre.
+
+Diese Session bietet einen Überblick der bekannten Statistik-Bibliotheken mit Delphi und Python. 
+Ein Schwerpunkt liegt auf dem Setup von Python for Delphi Ergebnisse in Delphi selbst.
+
+- Hands-On
+
+- mrMath, mrMatrix, mrAI toolchain einrichten
+- Open AI for Delphi Demo
+- DMath Korrelationen, Mustererkennung und Trends berechnen
+- Vorstellen der 7 bekannten Statistik Methoden
+- Aufzeigen der 5 wichtigsten Diagrammtypen
+- Einrichten einer Energiespeicher Zeitreihe AGSI Projekt Statistik
+
+Inhalt
+
+Überblick über die Statistikpaket mit Delphi und Python.
+Konfiguration und Besonderheiten der Bibliotheken DMath, SKLearn, Statsmodels und DataLab
+Troubleshooting: Typische Fehlschätzungen und ihre Lösungen
+Erste Schritte bei der Umsetzung einer Regression, Cluster und Korrelationsmatrix
+
+Zielgruppe & Anforderungen
+Zielgruppe: 
+
+Entwickler:innen, die Erfahrungen mit der Entwicklung von Statistiken und deren graphische Darstellung haben und 
+in die Data Science Welt einsteigen möchten.
+
+Voraussetzungen:
+
+Grundkenntnisse in Delphi und Statistik sind empfehlenswert. 
+Ein eigener Laptop mit vorinstallierter Delphi-Testversion (RAD Studio Community oder Trial). 
+
+
+The Open Weather Station App (Android only) is ready for use for free just install it from
+https://softwareschule.code.blog/2025/02/20/7-data-science-statistical-methods/
+
+statsmodels
+
+statsmodels is a Python library designed for statistical modeling, hypothesis testing, and data 
+exploration. It provides a wide range of statistical models, including linear regression, time 
+series analysis, and generalized linear models. 
+The library supports both formula-based modeling (similar to R) and direct use of NumPy arrays.
+
+statsmodels is a Python library designed for statistical modeling, hypothesis testing, and data 
+exploration. It provides a wide range of statistical models, including linear regression, time 
+series analysis, and generalized linear models. The library supports both formula-based modeling 
+(similar to R) and direct use of NumPy arrays.
+
+The package includes:
+
+* Standard Fisher LDA classifier
+* Robust (and Fast Robust) version of this classifier
+* Incremental (and Robust) Fisher LDA classifier learning.
+* Support Vector Machines (least squares and lagrangian learning)
+* Naive Bayes
+* Simple Decission stumps
+* Radial basis function
+* C4.5 Decission trees.
+* K-means
+* Ensemble classifiers: AdaBoost, Gentle Boost, Bagging
+* Simple feed forward Neural Nets
+
+https://mrsoft.org/home/index.html
+
+C:\maxbox\maxbox5\pascriptmaster2\pmaster2\restunits\Indy9\maxbox5\maxbox5>py -3.13 -m pip install statsmodels
+Collecting statsmodels
+  Downloading statsmodels-0.14.4-cp313-cp313-win_amd64.whl.metadata (9.5 kB)
+Requirement already satisfied: numpy<3,>=1.22.3 in c:\users\user\appdata\local\programs\python\python313\lib\site-packages (from statsmodels) (2.2.5)
+Requirement already satisfied: scipy!=1.9.2,>=1.8 in c:\users\user\appdata\local\programs\python\python313\lib\site-packages (from statsmodels) (1.15.3)
+Requirement already satisfied: pandas!=2.1.0,>=1.4 in c:\users\user\appdata\local\programs\python\python313\lib\site-packages (from statsmodels) (2.2.3)
+Collecting patsy>=0.5.6 (from statsmodels)
+  Using cached patsy-1.0.1-py2.py3-none-any.whl.metadata (3.3 kB)
+Requirement already satisfied: packaging>=21.3 in c:\users\user\appdata\local\programs\python\python313\lib\site-packages (from statsmodels) (25.0)
+Requirement already satisfied: python-dateutil>=2.8.2 in c:\users\user\appdata\local\programs\python\python313\lib\site-packages (from pandas!=2.1.0,
+>=1.4->statsmodels) (2.9.0.post0)
+Requirement already satisfied: pytz>=2020.1 in c:\users\user\appdata\local\programs\python\python313\lib\site-packages (from pandas!=2.1.0,>=1.4->
+statsmodels) (2025.2)
+Requirement already satisfied: tzdata>=2022.7 in c:\users\user\appdata\local\programs\python\python313\lib\site-packages (from pandas!=2.1.0,>=1.4->
+statsmodels) (2025.2)
+Requirement already satisfied: six>=1.5 in c:\users\user\appdata\local\programs\python\python313\lib\site-packages (from python-dateutil>=2.8.2->
+pandas!=2.1.0,>=1.4->statsmodels) (1.17.0)
+Downloading statsmodels-0.14.4-cp313-cp313-win_amd64.whl (9.8 MB)
+   ???????????????????????????????????????? 9.8/9.8 MB 8.7 MB/s eta 0:00:00
+Using cached patsy-1.0.1-py2.py3-none-any.whl (232 kB)
+Installing collected packages: patsy, statsmodels
+Successfully installed patsy-1.0.1 statsmodels-0.14.4
+
+[notice] A new release of pip is available: 25.0.1 -> 25.1.1
+[notice] To update, run: python.exe -m pip install --upgrade pip

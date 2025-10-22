@@ -1,0 +1,494 @@
+Program DCorrelation3SeabornPy_Compare2MoralData;     
+
+//Purpose: Understanding Array Data export to Py Graph & Plot
+
+//http://www.rosettacode.org/wiki/Prime_decomposition#Pascal☮ ✞ π 📌 🐞 📊  
+//https://rosettacode.org/wiki/Air_mass#Delphi   🐱‍🚀 📊 📊 📊   📈 📈 📊
+//https://medium.com/nerd-for-tech/data-correlation-analysis-712e63c8378e
+
+//{$I owmapikey2.inc}
+
+type DMatrix = array of array of double;
+type TDMatrix = array of array of double;
+var  corrMatrix, mData: DMatrix;       //array[0..3] of array[0..3] of Double;
+     corrVect: array of double;
+
+const PY_Func =
+   'def compute(n):                '+LF+
+   '    result = 0                 '+LF+
+   '    for _ in range(n):         '+LF+
+   '        result += 1            '+LF+
+   '    return result              ';
+ 
+procedure Delphi2_PySolution(loc: string);
+var Data1, Data2 : array of Double; x,y: integer;
+begin
+ with TPythonEngine.Create(Nil) do begin
+   //pythonhome:= PYHOME64;
+   loaddll;
+   autofinalize:= false;
+   try
+     execstr('import io, sys  # Added');
+     execstr('import asyncio  # Added');
+     execstr('output = io.StringIO()') 
+     execstr('sys.stdout = output');  
+     //pip install pandas sqlalchemy psycopg2
+     //execstr('from sqlalchemy import create_engine');  
+     //# Creating a Series at runtime from Delphi Matrix and compute CorrMatrix!
+     execstr('import pandas as pd; import numpy as np');   
+     //4. Matplotlib & Seaborn Matrix 
+     execstr('import matplotlib.pyplot as plt; import seaborn as sns');
+     
+     it:= 0;
+    execstr('arr2 = np.empty(516, dtype = float)');
+     for x:= 1 to 86 do 
+        for y:= 1 to 6 do begin 
+          execstr('arr2['+itoa(it)+']= '+flots(mdata[x][y-1]));
+          inc(it)
+        end; //}
+     execstr('data2 = np.asarray(arr2).reshape(86,6)'+LF+
+             'df = pd.DataFrame(data2)');
+     execstr('fig, ax = plt.subplots(figsize=(8, 6))'+LF+
+             'plt.title("mX5 Delphi Matrix 2 PySeaborn Plot")'+LF+
+             'sns.heatmap(df.corr(), ax=ax,annot=True, fmt=".3f"); plt.show()');
+          //}      *)
+     
+     // visualize Python, precompute Delphi     
+     execstr('arr = np.empty(36, dtype = float)');
+     writ('debug matrix size: '+itoa(length(corrvect)));
+     for it:= 0 to 35 do execstr('arr['+itoa(it)+'] = '+flots(corrVect[it]));
+     execstr('plt.title("mX5 Delphi CorrMatrix 2 PySeaborn Plot7")'+LF+
+             //'data = np.random.rand(4, 4)      '+LF+
+             '# Use for loop above                '+LF+
+             //'for i in range(16):               '+LF+
+             //'  arr[i]='+flots(corrVect[strtoint((evalstr('i')))])+LF+
+             'data = np.asarray(arr).reshape(6,6) '+LF+
+             'labels= ["Crimepers","Crimeprop","Literacy","Donations","Infants ","Suicides"]'+LF+
+             'sns.heatmap(data, annot=True, yticklabels=labels)                                '+LF+  
+             'plt.show()                         ');
+            
+     println('  '+stringreplace(evalstr('output.getvalue().strip()'),
+                                      #10,#13#10,[rfReplaceAll, rfIgnoreCase])); 
+   except
+      raiseError;
+   finally
+      UnloadDll;
+      Free;
+   end;
+ end; 
+end;
+
+
+Procedure SetMatrixLength(var arr: dmatrix; asize1, asize2: Integer);
+var i: Integer;
+begin setlength(arr, asize1);                          //2D
+   for i:= 0 to asize1-1 do SetLength(arr[i], asize2); //3D
+end;
+
+Procedure SetMatrixLength2(var arr: tdmatrix; asize1, asize2: Integer);
+var i: Integer;
+begin setlength(arr, asize1);                          //2D
+   for i:= 0 to asize1-1 do SetLength(arr[i], asize2); //3D
+end;
+
+procedure CalculateCorrelationMatrix2(data: DMatrix; var matrix: DMatrix);
+var  i, j, n: Integer;
+begin
+  n:= Length(data);
+  writ('csize: '+itoa(n));
+  processmessagesOFF;
+  for i:= 1 to 7-1 do
+    for j:= 1 to 7-1 do 
+      matrix[i-1][j-1]:= Correlation(data[i], data[j]);
+  processmessagesON;   
+end;
+
+function CalculateCorrelationMatrix3(data: DMatrix): DMatrix;
+var  i, j, n: Integer;
+begin
+  n:= Length(data);
+  writ('csize: '+itoa(n));
+  processmessagesOFF;
+  for i:= 1 to 7-1 do
+    for j:= 1 to 7-1 do 
+      result[i-1][j-1]:= Correlation(data[i], data[j]);
+  processmessagesON;   
+end;
+
+function PearsonCorrelation(const X, Y: array of Double): Double;
+var
+  i: Integer;
+  n: Integer;
+  sumX, sumY, sumXY, sumX2, sumY2: Double;
+begin
+  n := Length(X);
+  if n <> Length(Y) then
+    Xraise (Exception.Create('Arrays must be of same length'));
+  sumX := 0; sumY := 0; sumXY := 0; sumX2 := 0; sumY2 := 0;
+  for i := 0 to n - 1 do begin
+    sumX := sumX + X[i];
+    sumY := sumY + Y[i];
+    sumXY := sumXY + X[i] * Y[i];
+    sumX2 := sumX2 + X[i] * X[i];
+    sumY2 := sumY2 + Y[i] * Y[i];
+  end;
+  Result := (n * sumXY - sumX * sumY) /
+            Sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+end;
+
+//procedure ComputeCorrelationMatrix(const Data: array of array of Double; var CorrMatrix: array of array of Double);
+procedure ComputeCorrelationMatrix(const Data: DMatrix; var CorrMatrix: DMatrix);
+var
+  i, j, k, nVars, nObs: Integer;
+  colI, colJ: array of Double;
+begin
+  nObs:= Length(Data);
+  nVars:= Length(Data[0]);
+  //SetLength(CorrMatrix, nVars, nVars);
+  SetMatrixLength(corrMatrix, nvars, nvars);
+  for i:= 0 to nVars-1  do begin
+    SetLength(colI, nObs);
+    for j:= 0 to nObs - 1 do
+      colI[j]:= Data[j][i];
+    for j:= i to nVars-1  do begin
+      SetLength(colJ, nObs);
+      for k:= 0 to nObs - 1 do
+        colJ[k]:= Data[k][j];
+      CorrMatrix[i][j]:= PearsonCorrelation(colI, colJ);
+      CorrMatrix[j][i]:= CorrMatrix[i][j]; // Matrix is symmetric
+    end;
+  end;
+end;
+
+function CorrelationMatrixF(const Data: TDMatrix): TDMatrix;
+var Cols, Rows, i, j, k: Integer;
+    ColI, ColJ: array of Double;
+begin
+  Rows:= Length(Data);
+  if Rows = 0 then Exit; //(nil);
+  Cols:= Length(Data[0]);
+  //SetLength(Result, Cols, Cols);
+  SetMatrixLength2(result, cols, cols);
+
+  for i:= 0 to Cols-1 do begin
+    // Extract column i
+    SetLength(ColI, Rows);
+    for k:= 0 to Rows-1 do
+      ColI[k]:= Data[k][i];
+
+    for j:= 0 to Cols-1 do begin
+      // Extract column j
+      SetLength(ColJ, Rows);
+      for k:= 0 to Rows-1 do
+        ColJ[k]:= Data[k][j];
+      Result[i][j]:= PearsonCorrelation(ColI, ColJ);
+    end;
+  end;
+end;
+
+procedure TStringListToMatrix(strList: TStringList; var matrix: DMatrix);
+var i, j: Integer;
+  RowData: TStringList;
+begin
+  if strList.Count = 0 then Exit;
+  // Create a temporary TStringList to parse each row
+  RowData:= TStringList.Create;
+  try
+    RowData.Delimiter:= ','; // Assuming comma-separated values
+    RowData.StrictDelimiter:= True;
+    //RowData.commatext
+    // Resize matrix to match the TStringList dimensions
+    SetLength(matrix, strList.Count);
+    for i := 1 to strList.Count - 1 do begin
+      RowData.DelimitedText:= strList[i];
+      //writ('debug '+itoa(rowdata.count));
+      SetLength(Matrix[i], RowData.Count);
+      for j:= 4 to RowData.Count - 15 do begin   //slice 4-9
+        Matrix[i][j-4]:= strtofloat(RowData[j]);
+        //writ('debug '+flots(matrix[i][j]));
+      end;
+    end;
+  finally
+    RowData.Free;
+  end;
+end;
+
+
+procedure TForm1DataCreate(Sender: TObject);
+var i,j,tz: integer;
+  //mData: dMatrix; //array of array of Double;
+  S : TStringList;
+begin
+  // Example reference data as 4 features with 7 samples
+ { SetMatrixLength(mData, 4, 7);
+  SetMatrixLength(corrMatrix, 4, 4);
+  mData[0]:= [1.0, 2.0, 3.0, 4.0, 5.0,6.0,7.0];
+  mData[1]:= [22.5, 32.0, 42.0, 52.0,55.7,50.1,55.5];
+  mData[2]:= [15.0, 16.0, 17.0, 19.0,28.9,30.0,32.4];
+  mData[3]:= [25.0, 126.0, 127.0, 119.0,118.9,120.8,12.7];
+  writeln('Test Matrix Data TM: '+flots(mdata[2][3]));
+  CalculateCorrelationMatrix2(mdata, corrMatrix);}
+  { 3   Crime_pers       86 non-null     int64  
+    4   Crime_prop       86 non-null     int64  
+    5   Literacy         86 non-null     int64  
+    6   Donations        86 non-null     int64  
+    7   Infants          86 non-null     int64  
+    8   Suicides         86 non-null     int64  max. Haute-Loire 163241}
+  
+  // Example reference data as 6 features with 86 samples (observations)
+  S:= TStringList.Create;
+  try
+    //GetEnvironmentVars(S,false);
+    S.StrictDelimiter := false;
+    S.LineBreak := #10;
+    //S1.Delimiter := ',';
+    //S.NameValueSeparator:= ',';   
+    s.loadfromfile(exepath+'\examples\1417_export_dataframe.csv');
+    writ('fsize1: '+itoa(s.count));
+   
+  {  s.commatext:= s.text;
+    writ('fsize2: '+itoa(s.count));   //87*24
+    //for it:= 0 to s.count-1 do write(s[it]);
+    tz:= -1;
+    setLength(corrvect, 36)
+    for i:= 25 to s.count-1800-1 do begin
+      if i mod 24 = 0 then writeln('');
+        Write(Format('%s ',[s[i]]));
+        for it:= i+3 to 33 do
+          corrvect[alinc(tz,1)]:= strtofloat(s[it]);
+        //if i mod 24 = 0 then writeln('')
+    end;  //}
+    
+    SetMatrixLength(mData, 86, 6);
+    TStringListToMatrix(s, mData);  
+     
+    for i:= 1 to 86-80 do begin
+      for j:= 0 to 5 do begin
+        Write(Format('%8.3f ',[mdata[i][j]]));
+      end;
+      writeln('')
+    end;  //}
+     // SetMatrixLength(corrMatrix, 6, 6);
+     //corrmatrix:= CalculateCorrelationMatrix3(mdata);
+   finally
+    S.Free;
+  end;  
+  
+  //ComputeCorrelationMatrix(mdata, corrMatrix);
+  corrmatrix:=  CorrelationMatrixF(mdata)
+  
+  // Show Correlationmatrix & fill Vector
+  tz:= -1;
+  setLength(corrvect, 36)
+  for i:= 0 to 5 do begin
+    for j:= 0 to 5 do begin
+      Write(Format('%8.4f ',[corrMatrix[i][j]]));
+      corrvect[alinc(tz,1)]:= corrMatrix[i][j];
+    end;  
+    WriteLn('');
+  end;  //}
+end;
+
+var dc: array of TInteger;  
+ 
+begin   //@main
+   //https://www.kaggle.com/code/maxkleiner/notebook10dae7045a/
+   //LLM_Torch_PySolution('Lucerne');
+   //Seaborn_Lambda_PySolution('Visp');
+   //GetString( var Source : Ansistr; const Separator : Ansistr) : Ansistr
+   TestMatrixClass;
+   Writeln('Correlation Matrix Delphi Solution:_____'+CR);
+   TForm1DataCreate(self);
+   
+   //writeln('Test Matrix Data TM test value: '+flots(corrMatrix[1][3]));
+   Writeln('Seaborn Data Science Py Solution:_____'+CR);
+   Delphi2_PySolution('Mulhouse');
+   
+   {This code calculates the correlation matrix for three variables, each with five data points.
+   The correlation matrix is ​​stored and output as a two-dimensional array. 
+   Note that the diagonal elements of the matrix will always be 1, since they represent 
+   the correlation of a variable with itself. }
+   
+   {
+   Project_Functions_Weather_PySolution('Basel, CH');
+   sleep(1000);
+   Writeln('Pascal Restclient Weather Solutions:_____');
+   println(TRestClient5_AskWeather('Basel, CH'));
+   }
+   //GetMorseTable(dots:Bool):Str;;  //whole table!
+   //println(GetMorseTable(true));  //whole table!
+End.
+
+
+ref:    https://medium.com/@Sabrina-Carpenter/if-you-can-answer-these-7-concepts-correctly-youre-decent-at-python-8a21391e5911
+        https://bobswinkels.com/posts/multiprocessing-python-windows-jupyter/
+        https://community.esri.com/t5/python-questions/multiprocessing-using-script-tool-in-pro/td-p/415708
+        https://www.zeitmaschine.tv/_zm/uploads/reis/html5/1632322578743.mp4
+        https://x.com/i/status/1889295047192981796
+        https://de.slideshare.net/slideshow/maxbox_starter138_top7_statistical_methods-pdf/275863941
+        https://de.scribd.com/document/832126274/Maxbox-Starter139-Top5-Data-Diagram-Types
+        https://stackabuse.com/bytes/calculate-correlation-of-dataframe-featurescolumns-with-pandas/
+        https://colab.research.google.com/drive/1s11Z1o8RImYyzdRFCPokNeFBlVpTdlVv?usp=sharing
+        
+  check teechart statistic program 
+        
+  I think that this behaviour is due to multiprocessing architecture. 
+  While you "create thread" you do not create thread, you starting second python 
+  interpreter which connected to first with some pipe, socket or shared memory magic. 
+  Becouse GIL you have no better way to fully load cpu in python, so only way to 
+  fix is to check thread and pass creating second window.      
+  When the parallel processes are started, instead of new python processes, 
+  several new instances of ArcGISPro are opened.
+        
+Scikit-learns model.score(X,y) calculation works on co-efficient of determination i.e R^2 is a 
+simple function that takes model.score= (X_test,y_test). It doesn't require y_predicted value 
+to be supplied externally to calculate the score for you, rather it calculates y_predicted internally
+ and uses it in the calculations.
+ 
+Mean Function: Calculates the average of an array.
+Covariance Function: Computes the covariance between two arrays.
+Correlation Function: Uses covariance and standard deviations to compute the correlation coefficient.
+ComputeCorrelationMatrix: Iterates through all variable pairs to compute the correlation matrix.
+PrintMatrix: Outputs the matrix to the console.
+
+https://www.bahnonline.ch/5472/tee-stiftung-in-den-niederlanden-gibt-ram-an-transportmuseum-ab/
+https://www.gofundme.com/f/aankoop-teetrein-fase-1   
+
+debug: 428-Unequal or bad counts of array elements 855 err:20
+debug: 429-Unequal or bad counts of array elements 855 err:20
+Exception: Unequal or bad counts of array elements at 855.340
+
+Die Kriterien von OpenAPIs
+Die Menge der Open APIs ist mittlerweile so gross, so dass wir einige Grundlagen und Prinzipien 
+näher anschauen. Der beste Weg um zu verstehen wie APIs funktionieren, ist natürlich sie auszuprobieren. 
+Während die meisten APIs den Zugriff über API-Keys erfordern oder über komplizierte 
+Authentifizierungs- und Autorisierungsmethoden verfügen, gibt es auch offene Services ohne 
+jegliche Anforderungen und Lizenzen. Dies ist besonders nützlich für Einsteiger, 
+da wir sofort mit der Erkundung beginnen können. 
+Auch für die Webentwicklung, die einfach auf einen Beispieldatensatz für ihre App z
+ugreifen möchten; bspw. beziehen die meisten Wetter-Apps ihre Vorhersagen von einer 
+Wetter-API, anstatt selbst Wetterstationen zu betreiben. Kurz gesagt geht es 
+beim API-Testen darum, die angebotenen Dienste anhand der gewünschten Anforderung 
+in Bezug auf Funktionalität, Leistung, Wartbarkeit und Sicherheit der Anwendung 
+als Ganzes zu überprüfen. 
+
+Leider enthalten die bereitgestellten Suchergebnisse keine spezifischen Beispiele für Delphi-Code zur Berechnung 
+einer Korrelationsmatrix. Die Ergebnisse konzentrieren sich hauptsächlich auf allgemeine 
+Informationen zur Korrelation und zur Delphi-Methode als Prognoseinstrument, 
+aber nicht auf die Programmierung in Delphi.
+
+Data representation of gas in storage as a timeline AGSI dataset
+“There are many kinds of data scientists: a) Those who dive in data are the best.“
+
+EKON 29
+Data Science mit Delphi und Python
+This data science tutorial explains the so called AGSI data storage and his visualization of the 
+timeline. AGSI is the Aggregated Gas Storage Inventory and offers you the possibility to be 
+kept up to date whenever a new service announcement or update from one of our data providers 
+is posted on the website.
+
+Diese Data Science-Session erläutert anhand eines erfolgten Projektes im 2022, den sogenannten AGSI-Datenspeicher 
+und seine Visualisierung der Zeitachse und deren Prognose. AGSI steht für Aggregated Gas Storage Inventory und bietet einen
+Fundus für Datenanalyse und deren Interpretation. Anhand von 5 konkreten Diagrammtypen (Bar Chart, Scatter Plot,
+Histogram, Box Plot und Korrelationsmatrix) werden die Visualisierungs-Techniken in Delphi und Python gezeigt.
+
+https://blogs.embarcadero.com/why-a-data-scientist-chooses-delphi-for-powerful-real-world-visualizations/
+
+[notice] A new release of pip is available: 24.0 -> 25.0.1
+[notice] To update, run: python.exe -m pip install --upgrade pip
+
+C:\maxbox\maxbox4\maxbox5\maxbox51\>
+
+To **compute a correlation matrix in Delphi**, you need to:
+
+1. **Organize your data** as a matrix (2D array), where each row is an observation and each column is a variable.
+2. **Calculate the Pearson correlation coefficient** for each pair of variables (columns).
+3. **Store the results** in a new square matrix, where the element at (i, j) is the correlation 
+between variable i and variable j.
+
+Delphi does not have a built-in correlation matrix function, but you can implement one using standard 
+math operations. Here’s a clear example of how to do this in Delphi code:
+
+```delphi
+function PearsonCorrelation(const X, Y: array of Double): Double;
+var
+  i: Integer;
+  n: Integer;
+  sumX, sumY, sumXY, sumX2, sumY2: Double;
+begin
+  n := Length(X);
+  if n <> Length(Y) then
+    raise Exception.Create('Arrays must be the same length');
+  sumX := 0; sumY := 0; sumXY := 0; sumX2 := 0; sumY2 := 0;
+  for i := 0 to n - 1 do
+  begin
+    sumX := sumX + X[i];
+    sumY := sumY + Y[i];
+    sumXY := sumXY + X[i] * Y[i];
+    sumX2 := sumX2 + X[i] * X[i];
+    sumY2 := sumY2 + Y[i] * Y[i];
+  end;
+  Result := (n * sumXY - sumX * sumY) /
+            Sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+end;
+
+procedure ComputeCorrelationMatrix(const Data: array of array of Double; 
+var CorrMatrix: array of array of Double);
+var
+  i, j, nVars, nObs: Integer;
+  colI, colJ: array of Double;
+begin
+  nObs := Length(Data);
+  nVars := Length(Data[0]);
+  SetLength(CorrMatrix, nVars, nVars);
+  for i := 0 to nVars - 1 do
+  begin
+    SetLength(colI, nObs);
+    for j := 0 to nObs - 1 do
+      colI[j] := Data[j][i];
+    for j := i to nVars - 1 do
+    begin
+      SetLength(colJ, nObs);
+      for var k := 0 to nObs - 1 do
+        colJ[k] := Data[k][j];
+      CorrMatrix[i][j] := PearsonCorrelation(colI, colJ);
+      CorrMatrix[j][i] := CorrMatrix[i][j]; // Matrix is symmetric
+    end;
+  end;
+end;
+```
+
+**How this works:**
+- The `PearsonCorrelation` function computes the correlation between two arrays (variables).
+- The `ComputeCorrelationMatrix` procedure loops over all pairs of columns in your data, computes their correlation, and 
+fills the matrix.
+
+**Notes:**
+- This code assumes your data is stored as `Data[Observation][Variable]`, i.e., each row is an observation, each column 
+is a variable.
+- For large datasets, consider using or adapting an existing matrix library for Delphi, such as [mrmath][2], 
+which can handle matrix operations more efficiently.
+
+**References to similar approaches in other languages:**
+- The logic mirrors the approach used in Python and R, where you standardize data and use dot products or 
+built-in correlation functions for efficiency[1][3].
+- For very large matrices, memory management becomes crucial; in Delphi, this may require chunking data or using 
+memory-mapped files, as is done in Python with numpy.memmap[1].
+
+**Summary:**  
+You can compute a correlation matrix in Delphi by iterating over all pairs of variables, extracting columns, 
+and applying the Pearson correlation formula. For more advanced matrix operations or large datasets, consider 
+using a Delphi matrix library[2].
+
+[1] https://stackoverflow.com/questions/52427933/how-to-calculate-a-very-large-correlation-matrix
+[2] https://github.com/mikerabat/mrmath
+[3] https://www.displayr.com/how-to-create-a-correlation-matrix-in-r/
+[4] https://en.wikipedia.org/wiki/Principal_component_analysis
+[5] https://superuser.com/questions/1504902/conditional-correlation
+[6] https://www.youtube.com/watch?v=6mw5OYLji9c
+[7] https://lazarus.lazarus.freepascal.narkive.com/3GDeLYAW/fast-mathematical-matrix-operations
+[8] https://www.sciencedirect.com/science/article/pii/S2215016121001941
+[9] https://www.lohninger.com/math2.html
+
+----app_template_loaded_code----
+----File newtemplate.txt not exists - now saved!----
