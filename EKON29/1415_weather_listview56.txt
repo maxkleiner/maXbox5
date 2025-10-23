@@ -1,0 +1,1872 @@
+program PatternFrmDesignStudy_Weather_Report_Station529_56_EKON29;
+
+//========================================================================
+//  free for all(o) 2003 - 2023-2025, Max Kleiner  - still on progress 64bit!
+//  sample application for the book Delphi Design Patterns  need: AutoScale@dmath64
+//  proofed first by IBZ and BFH V 4.2.7, #locs:1707
+// V5.2.9 complete migration to 64bit with enhanced listview and modern regex -more to do
+// V5.2.9.190 set country to list , modern regex and street maps
+// V5.2.9.196 http_stream (HTTP_GetStream), pipestream
+// V5.2.9.196 V with edgeview weatherbox overview maps - btn overview  -need WebView2Loader.dll
+// V5.2.9.198 VI with forecaster regression - minus temp regex bugfix temp":([\d\.\-]+).*
+//#TODO: forecast model update+4, graph normalize days + legend, check errorbars 
+// getrealip jsonunescape exception to fix - or better solve as stream back -httpget_stream
+//========================================================================
+//{$UNDEF PATTERNS}
+{$DEFINE PATTERNS}
+
+//{$R *.DFM}
+ 
+ function ListView_SetTextColor(hwnd: HWND; clrText: TColorRef): Bool; forward;
+ function FindDesktopWindow: HWND; forward;
+ function IsDesktopTransparent: Boolean; forward;
+ procedure SetDesktopIconColor(Foreground,Background: TColor; Trans:Boolean); forward;
+ procedure SetImageTemperatur(alistitem: Tlistitem); forward;
+ //procedure SetImageTemperaturPredict(alistitem: Tlistitem; aicon: string); forward;
+ procedure TFrm_UpdateClick(Sender: TObject); forward;
+ Procedure sunrisesetRouter(lon, lat: float); forward;
+ function GetGeoInfoMap4save(const lat,lon, zoom: double; asize: integer;
+                               const UrlGeoLookupInfo, apath: string): string; forward;
+ procedure Meteo_Overview(select: byte); forward;                              
+ 
+var
+   StatusBar1: TStatusBar;
+    MainMenu1: TMainMenu;
+    ImageList1: TCustomImageList;
+    ImageList2: TCustomImageList;
+    progBar: TProgressBar;
+    TreeView1: TTreeView;
+    Splitter1: TSplitter;
+    view, pview: TListView;
+    ImageList5: TImageList;
+   // MATestCase1: TMenuItem;
+    imageearth: TImage;    //acell: TCell;
+    dlgSearch: TFindDialog;
+    ws_url: string;
+  {$IFDEF PATTERNS}
+    myWS: IVCLScanner;
+    //myFac: T_RIOFactory;
+  {$ENDIF}
+     ListItem: TListItem;
+      myEdit: TEdit;
+      statBar1, statbar2: TStatusBar;  //statbar2 for forecast
+      selectFile: string;
+      hh,mm: dword;
+     ss,ms: dWord;
+    //dlgSearch: TFindDialog;
+    //ws_url: string;
+    asock: TCustomSocket; //TClientSocket; // TServerSocket;
+    actlocation, actlocationpredict: string;    //bad habit
+    ageofrm: TForm;
+    zoomf, latf, lonf, latf2, lonf2: double;
+
+ const LVM_FIRST  = $1000;
+ const LVM_SETCOLUMNWIDTH = LVM_FIRST + 30;
+       LVM_SETTEXTCOLOR        = LVM_FIRST + 36;
+       LVM_GETTEXTBKCOLOR      = LVM_FIRST + 37;
+       LVM_SETTEXTBKCOLOR      = LVM_FIRST + 38;
+       LVM_REDRAWITEMS         = LVM_FIRST + 21;
+       LVM_GETITEMCOUNT        = LVM_FIRST + 4;
+       COLOR_DESKTOP = 1;
+       COLOR_MAX = 15;
+
+{@To get access weather API you need own API key whatever account you chose!!}
+//https://home.openweathermap.org/api_keys
+ {
+  "message": "Not Authorized",
+  "error_detail": "Direct access not allowed"
+  }
+
+  UrlWeatherReport25=
+     'http://api.openweathermap.org/data/2.5/weather?q=%s&units=metric&APPID'+
+                                      '=dd3239f11431abadb21a58ff59cab9a1';
+   
+   //breitschbox key https://home.openweathermap.org/api_keys                                   
+  UrlWeatherReport25_Forecast=
+     'http://api.openweathermap.org/data/2.5/forecast?q=%s&units=metric&APPID'+
+                                      '=dd3239f11431abadb21a58ff59cab9a1';
+                                      
+  //http://api.openweathermap.org/data/2.5/forecast?q=bern&units=metric&APPID=55013bf3d09cfb0619989a00ed5bed09                                    
+                                      
+  mapboxAPIEKON27='https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/%.2f,%.2f,%.2f,0,60/%dx%d?access_token='+
+            'pk.eyJ1IjoibWF4Ym94IiwiYSI6ImNsZ2t5aXdvdzFrZXozcXJyangwbHVxenYifQ._AQqFCDI-PrUqh0bnnebeA';
+ 
+  mapboxDIRECT ='https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/6.95,50.9333,12,0,60/400x400?access_token='+
+               'pk.eyJ1IjoibWF4Ym94IiwiYSI6ImNsZ2t5aXdvdzFrZXozcXJyangwbHVxenYifQ._AQqFCDI-PrUqh0bnnebeA';
+ 
+ // mapboxAPIEKON27= 'https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/-122.4241,37.78,15.25,0,60/400x400?access_token='+
+ //'pk.eyJ1IjoibWF4Ym94IiwiYSI6ImNsZ2t5aXdvdzFrZXozcXJyangwbHVxenYifQ._AQqFCDI-PrUqh0bnnebeA';
+
+ {Imagery sources
+
+Mapbox Satellite imagery comes from a variety of sources depending on zoom level and geographic availability:
+    Zoom levels 0–8 use de-clouded data from NASA MODIS satellites.
+    Zoom levels 9–12 use primarily Maxar satellite imagery and NASA/USGS Landsat 5 & 7 imagery in limited locations.
+    Zoom levels 13+ use a combination of open and proprietary sources, including Maxar's Vivid product 
+    for most of the world, Nearmap aerial imagery over US cities, and 
+    open aerial imagery from Denmark, France, Germany and other regions.}
+
+
+const WeatherREX = 
+    //test: '.*Äàòà\s*Êó?ñ\s*Êó?ñ ïîê.\s*Êó?ñ ï?îä.\s*Êóðñ íà?[^<\d]*' 
+    // kairo ---> Al ‘Atabah  ----> [\w\s‘]
+    '"main":"([\w\s]+)".*"description":"([\w\s]+)".*"temp":([\d\.\-]+).*'+
+  // '"main":"([\w\s]+)".*"description":"([\w\s]+)".*"temp":([\d\.]+).*'; //+
+   '"temp_min":([\d\.\-]+).*"temp_max":([\d\.\-]+).*"pressure":([0-9]+).*"humidity":([0-9]+).*'+
+    '"country":"([\w\s]+).*"name":"([\w\s‘]+)"';    
+    
+  WeatherREX2 = 
+    '"id":([\w]+).*"main":"([\w\s]+)".*"description":"([\w\s]+)".*"temp":([\d\.\-]+).*'+
+    '"temp_min":([\d\.\-]+).*"temp_max":([\d\.\-]+).*'+     //5+6
+    '"pressure":([0-9]+).*'+                                //7
+    '"humidity":([0-9]+).*'+                                //8
+    '"country":"([\w\s]+).*"name":"([\w\s]+)"';            //6+7  name as city
+    
+  // forecast  city, time, temp, bar, humid, description: string;
+  WeatherREX2Predict = 
+    '"id":([\w]+).*"main":"([\w\s]+)".*"description":"([\w\s]+)".*"temp":([\d\.\-]+).*"temp_max":([\d\.\-]+).*'+
+    '"pressure":([0-9]+).*'+                                //7
+    '"humidity":([0-9]+).*'+                                //8
+    '"country":"([\w\s]+).*"name":"([\w\s‘]+)"';            //9+10
+ 
+ Const GEOCoordREX = '"lon":([\d\.-]+).*,"lat":([\d\.-]+).*';  
+  
+  JSONStrconst=  
+'GEO_Weather_Report: {"coord":{"lon":14.16,"lat":46.62},"weather":[{"id":501,"main":"Rain","description":"moderate rain","icon":"10d"}],'+
+'"base":"cmc stations","main":{"temp":19.93,"pressure":1009,'+
+'"humidity":64,"temp_min":17,"temp_max":21.67},"wind":{"speed":2.6,"deg":200},"rain":{"1h":1.17},"clouds":{"all":75},"dt":1439818945,'+
+'"sys":{"type":1,"id":5931,"message":0.0042,"country":"AT","'+
+'sunrise":1439784246,"sunset":1439834986},"id":2771894,"name":"Maria Worth","cod":200}';
+
+//problem {"type":1,"id":6392,"message":0.0034,"country":"EG","sunrise":1495076362,"sunset":1495125834},"id":7922173,"name":"Al â€˜Atabah","cod":200}
+
+ jsonip= 
+  'MyPublicIP: { '+
+  '"ip": "188.60.54.133",'+
+  '"hostname": "133.54.60.188.dynamic.wline.res.cust.swisscom.ch",'+
+  '"city": "Lausanne",'+
+  '"region": "Vaud",'+
+  '"country": "CH",'+
+  '"loc": "46.5200,6.6300",'+
+  '"org": "AS3303 Swisscom (Switzerland) Ltd",'+
+  '"postal": "1003"}';
+  
+  type Tweatherrex = record
+       city, country, temp, bar, humid, line, 
+       descript, description, id, time, coord, 
+       tempmin, tempmax: string;
+   end; 
+   
+   type Tweatherpredict = record
+       city, time, temp, bar, humid, description: string;
+   end;                                                         //*)
+
+  var wrec: Tweatherrex; 
+      wpred: Tweatherpredict;
+   
+  function GEOCoord2Point(apistr: string): TFloatPoint;
+  var mt: Tmatch;
+   begin
+    //setdecimalseparator('.')
+     with TregEx.create1(GEOCoordREX) do try
+       if isMatch(apistr) then begin
+         mt:= Match(apistr);  
+         //PrintF('Coord at  %s and %s ', [mt.groups[1].value ,mt.groups[2].value]); 
+         result.x:= strtofloat(mt.groups[1].value)
+         result.y:= strtofloat(mt.groups[2].value) 
+       end;  
+     finally               
+       free;
+    end;  
+  end; 
+   
+function GetGeoWeather2(const location: string;
+                             const UrlRestAPI: string): string;
+var lHTTP: TIdHTTP;
+    lStream: TStringStream;
+begin
+  lHTTP:= TIdHTTP.Create(NIL);
+  lStream:= TStringStream.Create('');
+  try
+     try
+       lHTTP.Get1(Format(UrlRestAPI,[location]),lStream);
+     except
+       //lHTTP.Get1(Format(UrlGeoLookupInfo2,[location]),lStream);
+        //if something wrong try using a backup server.
+     end;
+     lStream.Seek(0,0);
+     result:= 'GEO_Weather_Report: '+lStream.ReadString(lStream.Size);
+     lStream.Seek(0,0);
+     writ(formatjson(lStream.ReadString(lStream.Size)));
+  finally
+    lHTTP.Free;
+    lStream.Free;
+  end;
+end;   
+   
+procedure getREGEX_WeatherStation(Sender: TObject; actlocation: string); 
+var http1: TIDHTTP;
+  srb: string;
+begin 
+  if  actlocation = '' then
+    actlocation:= 'Mainz';
+  srb:= '';
+  srb:= GetGeoWeather2(actlocation, UrlWeatherReport25);
+    writeln(srb);
+      writeln('temp live at: '+actlocation+' '+copy(srb,pos('"temp"',srb)+7,5))
+      writeln('pressure live: '+copy(srb,pos('"pressure"',srb)+11,4))
+      writeln('humidity live: '+copy(srb,pos('"humidity"',srb)+11,2))
+  //with tregex.create
+  with TRegExpr.Create do try 
+     Expression:= weatherREX; 
+     {if Exec(srb) then begin 
+       PrintF('Weather Temp at %s in %s and %s humidity',
+                                  [Match[1] ,Match[4], Match[3]+'%']); 
+      end;  }
+    finally Free; 
+  end;
+   //text2html
+end;  
+
+   //@main collector regex enumerator
+   
+  procedure getMultipleWeather(apistr: string);
+  var latf, lonf: double; mat: TMatch;
+  begin
+    latf:= GEOCoord2Point(apistr).y  
+    lonf:= GEOCoord2Point(apistr).x 
+    latf2:= latf; lonf2:= lonf;  
+    writ('debug latlon:'+flots(latf)+apistr)
+
+   with TregEx.create1(weatherREX) do begin
+    //if ismatch(apistr) then
+    //writ(formatjson(apistr));
+     mat:= Match(apistr)  
+     writ('debug match:'+botostr(ismatch(apistr)))
+      PrintF('Weather Temp2 at %s° in %s and %s humidity, pressure %s',
+                     [mat.groups[3].value ,mat.groups[7+2].value,mat.groups[5+2].value+'%',
+                                          {mat.groups[6+1].value,}mat.groups[4+2].value]);   //)*)
+       wrec.temp:=mat.groups[3].value;
+        wrec.tempmin:= mat.groups[4].value;
+        wrec.tempmax:= mat.groups[4+1].value;;
+        wrec.bar:= mat.groups[4+2].value;
+        wrec.humid:= mat.groups[5+2].value; 
+        wrec.city:=mat.groups[7+2].value;
+        wrec.country:= mat.groups[6+2].value;
+        actlocation:= wrec.city;
+        wrec.description:=mat.groups[2].value
+        wrec.coord:= format('%.2f',[latf])+'° '+format('%.2f',[lonf]); 
+        wrec.descript:= mat.groups[1].value;
+        //sunrisesetRouter(lonf,latf);
+       free;
+     end;  
+      writeln('Coord of '+actlocation +' : '+floattostr(latf)+' '+floattostr(lonf)); //}
+   end;      //*)
+             //(*
+  procedure getMultipleWeatherForecast(apistr: string);
+  var mt: TMatch;
+  begin
+   with TRegEx.Create1(weatherREX2Predict) do try 
+      if isMatch(apistr) then begin
+       writ('mmmmmmmmmmma__________');
+         mt:= Match(apistr);  
+        PrintF('Weather Id:%s is %s in: %s at %s° of %s pressure with %s humid',
+                   [mt.groups[1].value,mt.groups[2].value,mt.groups[3].value,
+                   mt.groups[4].value,mt.groups[5].value,mt.groups[5+2].value+'%']); 
+        //showmessage(match[2])
+        wpred.city:= mt.groups[1].value;
+        wpred.description:= mt.groups[2].value;
+        wpred.temp:= mt.groups[3].value;
+        wpred.bar:= mt.groups[4].value;
+        wpred.humid:= mt.groups[5+2].value;
+        //sunrisesetRouter(lonf,latf)   
+        //showmessage(wrec.line)       
+      end else showmessage('REGEX Forecast apistr not Executed');
+        except
+          showmessage(ExceptionToString(ExceptionType, ExceptionParam));
+        finally Free; 
+      end;
+    end;       //*)
+ 
+ //https://www.weather-forecast.com/locations/Berne/forecasts/latest
+procedure AddlistItem(Item: TListItem);
+var anum: float;
+begin
+  with Item do begin  
+    Caption:= wrec.id+'  '+wrec.city+' :'+wrec.country;
+    SubItems.Add(wrec.temp+'° hPa: '+wrec.bar+' humid: '
+         +wrec.humid+'% '+'at '+wrec.coord);
+    SubItems.Add(wrec.description);
+    anum:=StrToFloat(copy(wrec.temp, 1, 2));
+    anum:= anum / 2
+    // check for minus sign - this predict model has to be changed
+    anum:= ((strtofloat(wrec.tempmax)+strtofloat(wrec.temp)/5) + strtofloat(wrec.tempmin))/2;
+    SubItems.Add(format('%.2f',[anum]));
+  end;
+end; 
+
+    
+ function FindDesktopWindow: HWND;
+   var Window: HWND;
+   begin
+      Window:= FindWindow('Progman','Program Manager');
+      Window:= FindWindowEx(Window,0,'SHELLDLL_DefView','');
+      Window:= FindWindowEx(Window,0,'SysListView32','');
+      Result:= Window;
+   end;
+
+function ListView_GetTextBkColor(hwnd: HWND): TColorRef;
+begin
+  Result:= SendMessage(hwnd, LVM_GETTEXTBKCOLOR, 0, 0);
+end;
+
+function ListView_SetTextBkColor(hwnd: HWND; clrTextBk: TColorRef): Bool;
+begin
+  Result:= Bool( SendMessage(hwnd, LVM_SETTEXTBKCOLOR, 0, clrTextBk) );
+end;
+
+function ListView_RedrawItems(hwndLV: HWND; iFirst, iLast: Integer): Bool;
+begin
+  Result:= Bool( SendMessage(hwndLV, LVM_REDRAWITEMS, iFirst, iLast) );
+end;
+
+function ListView_GetItemCount(hWnd: HWND): Integer;
+begin
+  Result:= SendMessage(hWnd, LVM_GETITEMCOUNT, 0, 0);
+end;
+
+function IsDesktopTransparent: Boolean;
+var BkColor: COLORREF;
+begin
+   BkColor:= ListView_GetTextBkColor(FindDesktopWindow);
+     if BkColor  <> $FFFFFFFF then
+      Result:= False
+     else
+      Result:= True;
+end;
+
+procedure SetDesktopIconColor(Foreground, Background: TColor; Trans: Boolean);
+var  Window: HWND;
+begin
+   Window:= FindDesktopWindow;
+     if Trans = True then
+      ListView_SetTextBkColor(Window,$FFFFFFFF)
+     else
+      ListView_SetTextBkColor(Window,Background);
+   ListView_SetTextColor(Window, Foreground);
+   ListView_RedrawItems(Window,0,ListView_GetItemCount(Window) - 1);
+   UpdateWindow(Window);
+end;
+
+  var aFrm, aPfrm: TForm;
+ 
+ function GetGeoWeather(const location: string;
+                             const UrlRestAPI: string): string;
+  var  lStream: TStringStream;  asyn: TSynwInfo;
+    //dl: TDownloadURL;
+begin
+  lStream:= TStringStream.Create('');
+  try
+     try
+       HTTP_GetStream(Format(UrlRestAPI,[location]),lStream);
+       //writeln('html back: '+lHTTP.Get(Format(UrlRestAPI,[location])));
+     except
+       //lHTTP.Get1(Format(UrlGeoLookupInfo2,[location]),lStream);
+        //if something wrong try using a backup server.
+       //writeln('html back: '+GetURLAsString('http://api.openweathermap.org'));
+       writeln('OWeather_Map Exception: '+Gethtm(UrlWeatherReport25))
+    end;
+     lStream.Seek(0,0);
+     //result:= 'GEO_Weather_Report2: '+UTF8ToString(lStream.ReadString(lStream.Size));
+     result:= 'GEO_Weather_Report2: '+(lStream.ReadString(lStream.Size));
+  finally
+    lStream.Free;
+  end;
+end;
+
+Const  RealIP_REX = '"city": "([üöä\w\s]*).*"country": "([\w\s]+).*"';  
+
+ var LocalCity, LocalCountry: string;
+
+  function GetRealIP2(): String;
+  var  LJsonObj: TJSONObject;  mt: TMatch;
+  str: string;
+  ahttp : TIdHttp;
+  begin
+    str:='';
+    ahttp:= TIdHTTP.Create(Nil);
+    try             
+        //str:= (ahttp.Get1('http://ipinfo.io/json'));
+        str:= UTF8toString(HttpGetDirect2('http://ipinfo.io/json')) ;
+        writ('real ip back: '+str)
+        result:= formatJson(str);
+        LJsonObj:= TJSONObject.create4((str));
+      with TregEx.create1((RealIP_REX)) do try
+        writ('ip back2: '+str)
+        if isMatch((str)) then begin
+          mt:= Match(str);  
+          //PrintF('Coord at  %s and %s ', [mt.groups[1].value ,mt.groups[2].value]); 
+          LocalCity:=(mt.groups[1].value)
+          LocalCountry:=(mt.groups[2].value) 
+          PrintF('IP Weather Local City Name: %s ',[mt.groups[1].value])  
+          PrintF('IP Weather Local Country Name: %s ',[mt.groups[2].value])  
+          localcity:= StringReplace(localcity, 'ä', 'ae', [rfReplaceAll]);
+          localcity:= StringReplace(localcity, 'ö', 'oe', [rfReplaceAll]);
+          localcity:= StringReplace(localcity, 'ü', 'ue', [rfReplaceAll]);
+          writeln('aeo name convert: '+localcity)
+       end else writeln('ip localcity not found');
+     finally               
+       free;  
+     end;  
+    Except
+      writeln('get real ip EXCEPTION shock')
+      raiselastException;
+    end;
+      result:= str;
+      LJsonObj.Free;
+      ahttp.Free;
+  end;
+
+
+  //**************************Event Handlers*******************************
+  
+ //var trackval: integer; //progbar: TProgressbar;
+  
+  procedure TFrm1_trackSpeedChange(Sender: TObject);
+  begin
+    //mt.Interval:= 1000 div tB.Position;
+    //writeln(intToStr(1000 div TTrackbar(sender).Position));
+    writeln(intToStr(TTrackbar(sender).Position));
+    Progbar.Position:= TTrackbar(sender).Position*10;
+  end;
+ 
+  procedure TFrm1_progressChange(Sender: TObject);
+  begin
+    //mt.Interval:= 1000 div tB.Position;
+    //writeln(intToStr(1000 div TTrackbar(sender).Position));
+    writeln(intToStr(TTrackbar(sender).Position));
+  end;
+  
+  procedure TFrm1_closeForm(Sender: TObject; var Action: TCloseAction);
+  begin
+    imagelist1.Free;
+    imagelist2.Free;   
+    view.Free;
+    action:= caFree;
+    afrm:= NIL;
+    Screen.Cursor:= crDefault
+    writeln('geo map6 form free and API closed');
+  end;
+  
+  procedure TFrm1_CloseClick(Sender: TObject);
+  begin
+    afrm.Close;    //invoke TFrm1_closeForm from onclose
+    writeln('geo map form close and free at: '+datetimetostr(now));
+  end;
+  
+  procedure Map_CloseClick(Sender: TObject; var action: TCloseAction);
+  begin
+    action:= cafree;
+    writeln('only mapform close at: '+datetimetostr(now));
+  end;
+  
+  const MEDIAPATH =  'examples\';
+  
+  procedure TFrm1_AddClick(Sender: TObject);
+  begin
+    actlocation:= removespaces(myedit.text);
+    //actlocation:= TrimSpacesL(myedit.text);
+    TFrm_updateclick(self)
+  end;
+  
+ procedure btnZoomPlusClick2(Sender: TObject);
+  var abitmap: TBitmap;
+    zoomval: integer;
+ begin 
+   try
+    //abitmap.Assign(MainForm.imgMain.Picture.Bitmap);
+    zoomf:= zoomf-1
+     GetGeoInfoMap4save(latf,lonf,zoomf,650,mapboxAPIEKON27,
+                                //ExePath+'mX4mapbox_duesseldorf2.png')
+                                 ExePath+'examples\mX5mapbox_weatherzoom4.png')
+    //SetWorldTransform(ageofrm.Canvas.Handle, ageofrm);
+   finally
+    //abitmap.Free
+   end;
+ end;  
+
+var APATHGLOB: string;
+
+procedure Save1Click(Sender: TObject);
+begin
+  openfile(APATHGLOB)
+end;
+
+  function GetGeoInfoMap4save(const lat,lon, zoom: double; asize: integer;
+                               const UrlGeoLookupInfo, apath: string): string;
+  var pngStream: TMemoryStream;
+      internalzoomf: double;
+      MainMenu1: TMainMenu;
+      File1: TMenuItem;
+  begin
+    pngStream:= TMemoryStream.Create;
+      try
+        HttpGet(Format(UrlGeoLookupInfo,[lon,lat,zoom, asize-50,asize-50]), pngStream);
+      except
+        //lHTTP.Get1(Format(UrlGeoLookupInfo2,[IpAddress]), lStream);
+        //if something wrong try using backup server.
+        writeln(ExceptionToString(ExceptionType, ExceptionParam));
+      end;
+  with TLinearBitmap.Create do try
+    pngStream.Position:= 0;
+    LoadFromStream2(pngStream,'PNG');
+    internalzoomf:= 16;
+     MainMenu1:= TMainMenu.create(self)
+     ageofrm:= getForm2(asize+8,asize+8, clgreen, 
+                                   'GEO MAP Weather 5.5: '+'zoom: '+floattostr(zoomf));
+     ageofrm.Menu := MainMenu1;
+     file1 := TMenuItem.create(ageofrm);
+     with file1 do begin
+      //parent:= form1;
+       Caption := 'Open &File Save...'
+       mainmenu1.Items.Add(file1); 
+       OnClick := @Save1Click;
+     end;                               
+     ageofrm.ondblclick:= @btnZoomPlusClick2;
+     ageofrm.onclose:= @Map_CloseClick;
+     paintToCanvas(ageofrm.canvas, Rect(2,2,Width,Height),false);
+    //paintToCanvas(getform2(asize+15,asize+15,clred, 'GEO MAP Weather 3.0').canvas, 
+      //                           Rect(5,5,Width,Height),false);
+    SaveToFile(apath);
+    APATHGLOB:= apath;
+  finally
+    Dispose;
+    Free;
+    pngStream.Free;
+  end;
+end;    
+
+function GetGeoInfoMap5save(const lat,lon, zoom: double; asize: integer;
+                               const UrlGeoLookupInfo, apath: string): string;
+  var
+    pngStream: TMemoryStream;
+    internalzoomf: double;
+    MainMenu1: TMainMenu;
+    File1: TMenuItem;
+  begin
+    pngStream:= TMemoryStream.Create;
+      try
+        HttpGet(Format(UrlGeoLookupInfo,[lon,lat,zoom, asize-50,asize-50]), pngStream);
+      except
+        //lHTTP.Get1(Format(UrlGeoLookupInfo2,[IpAddress]), lStream);
+        writeln(ExceptionToString(ExceptionType, ExceptionParam));
+      end;
+    try
+      writ('size of geosat pic '+itoa(pngstream.size));
+      pngStream.Position:= 0;
+      pngStream.SaveToFile(apath);
+      APATHGLOB:= apath;
+    finally
+     //Dispose;
+     //Free;
+     pngStream.Free;
+  end;
+end;    
+
+ procedure ListdblClick(Sender: TObject);
+  begin
+      writeln(objecttostring(sender))
+      //writeln(TListview(sender).items[3].caption);
+      writeln(TListview(sender).selected.caption);
+      writeln(copy(TListview(sender).selected.caption,3,20));
+      actlocation:= copy(TListview(sender).selected.caption,3,20);
+      writeln('this acvt replace1: '+actlocation)
+      actlocation:= StrReplaceChar(actlocation, ':',',')
+      writeln('this acvt replace2: '+actlocation)
+     if isInternetconnected then begin
+       sr:= GetGeoWeather(removespaces(actlocation), UrlWeatherReport25);
+       writeln(sr)
+       statbar1.panels.items[1].text:= sr;   //add to x4
+       statbar1.hint:= sr;
+     end;  
+        latf:= GEOCoord2Point(sr).y  
+        lonf:= GEOCoord2Point(sr).x    
+        writeln('coord of '+actlocation +' : '
+                   +floattostr(latf)+' '+floattostr(lonf));
+     // GetGeoInfoMap4save(latf,lonf,zoomf,650,mapboxAPIEKON27,
+       //                         ExePath+'mX4mapbox_weatherapp4.png')
+      //GetGeoInfoMap5save(0,0,0,200,mapboxDIRECT, exepath+'examples\mapbox5.png');  
+       GetGeoInfoMap5save(latf,lonf,zoomf,600,mapboxAPIEKON27,
+                                ExePath+'examples\mapbox52.png')                           
+      openDoc(exepath+'examples\mapbox52.png');                          
+  end;
+  
+ procedure ListClick2(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+  //var latf, lonf: double;
+  begin
+    {if mT <> NIL then
+      mt.enabled:= not mt.enabled; }
+      writeln(objecttostring(sender))
+      //writeln(TListview(sender).items[3].caption);
+      writeln(TListview(sender).selected.caption);
+      writeln('location '+copy(TListview(sender).selected.caption,3,20));
+      actlocation:= copy(TListview(sender).selected.caption,3,20);
+      //actlocationpredict:= copy(TListview(sender).selected.caption,3,20);
+      writeln('this acvt replace: '+actlocation)
+      actlocation:= StrReplaceChar(actlocation, ':',',')
+      actlocationpredict:= removespaces(StrReplaceChar(actlocation, ':',','))
+     if isInternetconnected then begin
+       sr:= GetGeoWeather(removespaces(actlocation), UrlWeatherReport25);
+       writeln(sr)
+       statbar1.panels.items[1].text:= sr;   //add to x4
+       statbar1.hint:= sr;
+     end;  
+      // sunrisesetRouter(lonf,latf);
+      // openDoc('C:\maXbox\EKON20\EKON20_Scripts\imagesServer\cologne_dom.bmp')
+  end;
+  
+ 
+ procedure ListClickPredict(Sender:TObject;Button:TMouseButton; Shift:TShiftState;X,Y:Integer);
+  //var latf, lonf: double;
+  begin
+      //  writeln(TListview(sender).selected.caption);
+      //actlocation:= copy(TListview(sender).selected.caption,3,20);
+       //statbar2.panels.items[1].text:= TListview(sender).selected.caption;  
+       writeln(itoa(TListview(sender).itemindex)) 
+      // writeln(Tlistview(sender).items[TListview(sender).itemindex].subitems[1]);     
+      statbar2.panels.items[1].text:= 
+           TListview(sender).items[TListview(sender).itemindex].subitems[0];   
+      writeln('itemindex: '+ TListview(sender).items[TListview(sender).itemindex].subitems[1]);
+      statbar2.hint:= statbar2.panels.items[1].text;
+  end;
+ 
+  procedure tbtnScanClick(Sender: TObject);
+  begin
+    {if mT <> NIL then
+      mt.enabled:= not mt.enabled; }
+      writeln(objecttostring(sender))
+      if isInternet then begin
+       sr:= GetGeoWeather(removespaces(actlocation), UrlWeatherReport25);
+       writeln(sr)
+     end;
+  end;
+
+const PicPath = '\examples\images\';
+ 
+procedure EditColumn(Item: TListItem; Col: byte; const Text: string);
+begin
+if Col = 0 then
+    Item.Caption:= Text
+  else begin
+   while Item.SubItems.Count < Col do
+      Item.SubItems.Add('');
+      Item.SubItems[Col -1]:= Text;
+  end;
+end;
+
+procedure ChangeList(AListView: TListView; const ARowIndex, AColIndex: Integer; 
+                           const ANewContent: string);
+var i: Integer; vItem: TListItem;
+begin
+  vItem:= AListView.Items[ARowIndex];
+  if AColIndex=0 then
+    vItem.Caption:= ANewContent
+  else begin
+    for i := vItem.SubItems.Count to AColIndex+1 do
+    vItem.SubItems.Add('');
+    vItem.SubItems[AColIndex]:= ANewContent;
+  end;
+end;
+
+  procedure TFrm_UpdateClick(Sender: TObject);
+  begin
+    ListView_SetTextBkColor(view.handle, $7dcced) //$8deeed) // $9cc123)
+     if isInternetconnected then begin
+      writeln('update of '+actlocation)
+       sr:= GetGeoWeather(actlocation, UrlWeatherReport25);
+       writeln('update: '+sr+' '+actlocation)
+       getMultipleWeather(sr)
+       ListItem:= view.Items.Add;
+       AddlistItem(listitem)
+       SetImageTemperatur(listitem) 
+       listitem.makevisible(false);
+       //View.Items.Item[0].MakeVisible(false); //scrolls up if necessary
+        //ListView1.SetFocus; // sets focus on the listview
+       //Listitem.TopIndex := -1 + ListBox1.Items.Count; 
+       statbar1.panels.items[1].text:= sr;
+      statbar1.hint:= sr;      //*)
+     // @debug writeln(sr)
+   end;
+end;
+
+const
+  N     = 38;     { Number of points }     //5 days = 5*8(*3)
+  Alpha = 0.05;  { Significance level }
+
+   //(*
+procedure WriteRegressionResults(X, Y, Ycalc, B : TVector;
+                       V              : TMatrix;
+                       Test           : TRegTest;
+                       Tc, Fc         : Float);
+{ ------------------------------------------------------------------
+  Writes results to screen
+  ------------------------------------------------------------------ }
+var
+  Line1,
+  Line2 : String;   { Separating lines }
+  Delta : Float;    { Residual }
+  Sr    : Float;    { Residual standard deviation }
+  SB    : Float;    { Standard deviations of parameters }
+  I     : Integer;  { Loop variable }
+begin
+  Line1:= StrChar(73, '-');
+  Line2:= StrChar(43, '=');
+  WriteLn(Line2);
+  WriteLn('Linear regression: Y = B(0) + B(1) * X');
+  WriteLn(Line1);
+  WriteLn('Parameter    Est.value         Std.dev.        '+
+          floattostr(100 * (1 - Alpha))+ '% Confidence Interval');
+  WriteLn(Line1);
+    for I:= 0 to 1 do begin
+      SB := Sqrt(V[I][I]);
+      PrintF('B(%d) %17.8f %17.8f %17.8f ; %17.8f',
+                         [I,B[I],SB,(B[I]- Tc * SB),(B[I] + Tc * SB)])          
+    end;
+  WriteLn(Line1);
+  WriteLn('Number of observations get: n  = '+itoa(N));
+
+  with Test do begin
+      Sr:= Sqrt(Vr);
+      WriteLn('Residual error              : s    = '+floattoStr(Sr));
+      WriteLn('Coeffic. of correlation     : r    = '+floattostr((Sgn(B[1])*Sqrt(R2))));
+      WriteLn('Coefficient of determination: r2  = '+floattostr(R2));
+      {WriteLn('Adjusted coeff. of determination  : r2a      = ', R2a:10:4);
+      WriteLn('Varic ratio (explained/resid.) : F(', Nu1:3,',', Nu2:3, ')= ',F:10:4);
+      WriteLn('Critical variance ratio : F(p = ', (1 - Alpha):4:2, ') = ',Fc:10:4);}
+    end;
+
+  WriteLn(Line1);
+  PrintF(' %-8s %-6s %-12s %-12s %-12s %-12s',
+                 ['i','weight Y obs.','Y calc.','Residual','Std.dev.','Std.res.']);
+  WriteLn(Line1);
+  for I := 1 to N do begin
+      Delta := Y[I] - Ycalc[I];
+      //WriteLn(I:3, Y[I]:14:4, Ycalc[I]:14:4, Delta:14:4, Sr:14:4, (Delta/ Sr):14:4);
+      PrintF('B(%d) %12.4f %12.4f %12.4f %12.4f %12.4f',
+                         [I,Y[I],Ycalc[I],Delta,Sr, (Delta / Sr)])          
+  end;
+  WriteLn(Line2);
+end;
+
+procedure AutoScale2(X : TVector; Lb, Ub : Integer; Scale : TScale;
+                    var XMin, XMax, XStep : Float); external 'AutoScale@dmath64';
+
+procedure letForecastRegression_Graph(datlist: TStringlist);
+var afrm: TForm; acanvas: TCanvas;
+  B : TVector;  { Regression parameters }
+  XX, YY : TVector;   { Data }
+  Ycalc  : TVector;   { Computed Y values }
+  V      : TMatrix;   { Variance-covariance matrix }
+  Test   : TRegTest;  { Statistical tests }
+  Tc     : Float;     { Critical t value }
+  Fc     : Float;     { Critical F value }
+  I      : Integer;   { Loop variable }
+  Ymin, Ymax, Ystep: float;    Scale : TScale;
+  Ymin2: float;
+  X : TVector; aScale : TScale; var XMin, XMax, XStep : Float;
+begin
+{ Dimension arrays }
+  DimVector(XX, N);
+  DimVector(YY, N);
+  DimVector(Ycalc, N);
+  DimVector(B, 1);
+  DimMatrix(V, 1, 1);
+  
+  //InitGraphics( 0, 0);
+  aFrm:= getForm2(1100,440, clweblightgreen,'weather forecast graphX'); //sizeable!
+  acanvas:= aFrm.canvas;
+  acanvas.FillRect(Rect(5, 5, afrm.Width, afrm.Height));
+  { Read data }
+    for I := 1 to N do begin
+      XX[I] := I /37;
+      YY[I] := strtofloat(datlist[I])/41;
+    end;
+  { Perform regression }
+  LinFit(XX, YY, 1, N, B, V); 
+  
+  { Compute predicted Y values }
+  for I := 1 to N do
+    Ycalc[I] := B[0] + B[1] * XX[I];
+  { Update variance-covariance matrix and compute statistical tests }
+  RegTest(YY, Ycalc, 1, N, V, 0, 1, Test);
+  { Compute Student's t and Snedecor's F }
+  //Tc := InvStudent(N - 2, 1 - 0.5 * Alpha);
+  //Fc := InvSnedecor(1, N - 2, 1 - Alpha);
+  { Write results }
+  WriteRegressionResults(XX, YY, Ycalc, B, V, Test, Tc, Fc);  
+  
+  SetWindow(afrm.canvas, 10, 150, 135, 150, True);    //35 or 135
+  //Procedure AutoScale(X:TVector; Lb,Ub:Int; Scale:TScale; var XMin,XMax,XStep:Float)
+  Ymin:= -0.5; Ymax:= 0.9; Ystep:= 1;
+  //AutoScale(X ,1,N-1,smNormal,xmin, xmax, xstep);            
+  //TScaleMode', '(smNormal,smStretch,smScale,smResize,smOptimal, smOptimalScaled )');
+  //TScale', '( LinScale, LogScale )');
+  //AutoScale2(Y, 1, N, LinScale, Ymin, Ymax, Ystep);
+  //SetOxScale2(Linscale, Xmin, Xmax, Xstep);
+  SetOyScale(LinScale, Ymin, Ymax, Ystep);       //for minus -temp 
+
+  SetGraphTitle('5 Days Linear Weather Regression Demo for '+actlocationpredict+' '+datetostr(now));
+  afrm.caption:= '5 Days Linear Weather Regression Demo for '+actlocationpredict+' '+datetostr(now);  
+  SetOxTitle('X_Time = 5 Days');
+  SetOyTitle('Y_Temp -10+35');               
+  PlotOxAxis(afrm.canvas);
+  PlotOyAxis(afrm.canvas);
+  //PlotGrid(afrm.Canvas, bothGrid);
+  WriteGraphTitle(afrm.canvas);
+  //SetClipping(True);
+  SetLineParam(4, psSolid, 0, clred);  { Don't connect points }
+  //PlotCurve(afrm.canvas,(XX), YY, 1, N-1, 1);
+  //PlotPoint(afrm.canvas, 10, 20, 3)
+  PlotCurveWithErrorBars(afrm.canvas,(XX), YY, Ycalc, 1, 1, N-1, 1)
+  for I := 1 to N do
+    Ycalc[I] := (B[0] + B[1] * XX[I]);
+  SetLineParam(1, psSolid, 0, clblue);   
+  PlotCurve(afrm.canvas,(XX), Ycalc, 1, N-1, 1);  
+  writeln('Regression calc & meteo data fit done')
+  
+end;    //*)
+
+
+procedure Edit1KeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then begin
+    Key := #0;  
+    actlocation:= removespaces(myedit.text);
+    //actlocation:= TrimSpacesL(myedit.text);
+    TFrm_updateclick(self)
+    if sender is TListview then
+    writeln('list view return key pressed at: '+(TListview(sender).selected.caption));
+    //S := Edit1.Text;
+    //Edit1.Clear;
+  end;
+end;
+
+function ListView_SetTextColor(hwnd: HWND; clrText: TColorRef): Bool;
+begin
+  Result:= Bool( SendMessage(hwnd, LVM_SETTEXTCOLOR, 0, clrText) );
+end;
+
+Const PBM_SETBARCOLOR = (WM_USER + 9);
+//(*
+   Procedure initTabletmode;
+   var  aMessage: TMessage;
+   begin
+     //Application.HintColor := clAqua;   // color of your choice
+     Application.HintColor := $8deeed
+     Application.HintMouseMessage(Self, aMessage)
+     Application.HintPause := 250;      // 250 mSec before hint is shown
+     Application.HintHidePause := 13000; // hint disappears after 3 secs
+   end;
+
+   procedure SetImageTemperatur(alistitem: Tlistitem);
+   begin
+     setDecimalSeparator('.')
+     if wrec.temp <> '' then begin
+     if trunc(strtofloat(wrec.temp)) < 5 then
+    
+     //machine learning hint
+        alistitem.imageindex:= random(1)+2;
+            if trunc(strtofloat(wrec.temp)) < 2 then
+     //if wrec.temp < '5' then
+        alistitem.imageindex:= 3;
+     if (trunc(strtofloat(wrec.temp)) >= 5) and (trunc(strtofloat(wrec.temp)) <= 10) then
+     //if wrec.temp < '5' then
+        alistitem.imageindex:= 1; 
+     if trunc(strtofloat(wrec.temp)) >= 11 then
+     //if wrec.temp < '5' then
+        alistitem.imageindex:= 0;
+     if wrec.descript= 'Rain' then
+        alistitem.imageindex:= 2;
+     if wrec.descript= 'Thunderstorm' then
+        alistitem.imageindex:= 2;   
+     if wrec.descript= 'Clouds' then
+        alistitem.imageindex:= 1;
+     if wrec.descript= 'Drizzle' then
+        alistitem.imageindex:= 1;   
+     if wrec.descript= 'Mist' then
+        alistitem.imageindex:= 1;   
+     if wrec.descript= 'Snow' then
+        alistitem.imageindex:= 3;      
+     if wrec.descript= 'Haze' then
+        alistitem.imageindex:= random(1)+1;   
+    end;    
+   end;        //*)
+   
+//   (*
+  // (*
+   //get a real server without async problems and lost file size!
+   procedure CheckBitmapIcons;
+   begin
+    if not fileExists(exepath+'WeatherImageList.dat')  then begin
+     //DownloadFile('http://www.softwareschule.ch/images/weatherimagelist.dat',
+       //              exepath+'WeatherImageList.dat')  
+       if isinternetconnected then begin
+         wGetX2('http://www.kleiner.ch/images/weatherimagelist.txt',
+                                             exepath+'WeatherImageList.dat');
+                ShowmessageBig('second download starts..., please confirm!')
+         wGetX2('http://www.kleiner.ch/images/weatherimagelist1.txt',
+                                           exepath+'WeatherImageList1.dat');
+         writeln('imagelist *.dat has been downloaded at: ' +exepath)                                     
+       end else showmessagebig('connect to internet for imagelist dload');
+      end;                                                 
+   end;           // *)
+   
+//predict section with forecast model___________________________________________
+
+procedure TFrm2_closeForm(Sender: TObject; var Action: TCloseAction);
+  begin
+    {if mt <> NIL then begin
+      mT.enabled:= false;
+      mT.Free;
+      mT:= NIL;
+    end;}
+    ///afrm.Free;  
+    {if assigned(FPicRed) then
+       FPicRed.Free;
+       FPicRed:= NIL;
+    if assigned(FStorage) then
+       FStorage.Free;
+       FStorage:= NIL;
+    imagelist1.Free;
+    imagelist2.Free;   
+    view.Free;  }
+    //action:= caFree;
+    //aPfrm:= NIL;
+    Screen.Cursor:= crDefault
+    writeln('geo map6 forecaster form free');
+  end;
+
+Procedure loadPredictForm;
+   var  //statBar1: TStatusBar;
+       NewColumn: TListColumn; 
+       asr: AnsiString;
+       //atool: TCoolBar;
+       ListItem: TListItem;
+  begin
+    aPFrm:= TForm.Create(self);
+    //mT:= TTimer.Create(self);
+    //mt.onTimer:= @TFrm1_timerRedrawTimer;
+    //mt.interval:= MILLISECONDS;
+    //mt.free;  in on close            
+    with aPFrm do begin
+      Caption:= '********** maXbox Weather Station7 Forecaster ***********';  
+      //top:= 30;
+      height:= 790; width:= 1050;
+      Position:= poScreenCenter;
+      formstyle:= fsstayontop;
+      Icon.LoadFromResourceName(HInstance,'ZHISTOGRAM'); //NEWREPORT');
+      //Color:= clBlack;
+      onClose:= @TFrm2_closeForm;
+      //onPaint:= @TFrm1_FormPaint;
+      Canvas.Pen.color:= clBlue;
+      Canvas.Pen.Width:= 10;
+      BorderIcons:= [biSystemMenu, biMinimize];
+      BorderStyle:= bsSingle;
+      //borderWidth:= 4;
+      scaled:= true;
+      autoscroll:= true;
+      Show;
+   //canvas.brush.bitmap:= getBitmapObject(Exepath+'examples\images\bmp47.bmp');
+      //Canvas.FillRect(Rect(50,50,500,200));
+      //canvas.draw(0,200, getbitmap(Exepath+'\examples\citymax.bmp'));
+      //Show;
+    end;
+    pview:= TListview.create(aFrm);
+    with pview do begin
+      parent:= aPFrm;
+      setbounds(10,15,990,695)
+      //columns:= listitem  
+      DoubleBuffered:= False
+      FlatScrollBars:= True
+      readonly:= false;
+      gridLines:= true; 
+        RowSelect:= True; 
+        NewColumn:= Columns.Add; 
+        NewColumn.Caption:= 'City:Country'; 
+        newColumn.width:= 145; 
+        newcolumn.alignment:= taLeftJustify;
+        //newcolumn.color //newColumn.autosize:= true;
+       // newColumn.imageindex:= 1;
+       NewColumn:= Columns.add;
+       NewColumn.Caption:= 'Weather Forecast Sensor';            
+       newColumn.width:= 520; 
+      //ListItem:= view.Items[1].rows.Add;
+      //view.Items[1].caption:= 'sensor second';
+       NewColumn:= Columns.add;
+       NewColumn.Caption:= 'Description';
+       newColumn.width:= 210; 
+       NewColumn:= Columns.add;
+       NewColumn.Caption:= 'TFCast';
+       newColumn.width:= 80; 
+       {sListItem:= view.Items.Add;
+       slistitem.caption:= 'temp.name';
+       slistitem.subitems[1].caption:='temp.name'
+        }
+       onmousedown:= @listclickpredict;
+       HotTrack:= True;
+       HotTrackStyles:= [htHandPoint];
+       //IconOptions.AutoArrange = True
+       RowSelect:= True;
+       //ParentShowHint:= False;
+       hint:= 'Dblclick for Detail Map';
+       ShowHint:= True;
+       font.size:= 10
+       SmallImages:= ImageList2;
+       //StateImages: = ImageList2;
+       //TabOrder = 4
+       //ListView_SetTextColor(View.Handle, $123ADA)
+       //ListView_SetTextBkColor(view.handle, $ADA123)
+       ListView_SetTextBkColor(pview.handle, $8deeed) // $9cc123)
+       //@test data  {ViewStyle:= vsReport;  end;} 
+         
+      viewstyle:= vsreport;
+      readonly:= false;
+      //ListItem:= view.Items.Add;
+      ListItem:= pview.Items.Add;
+      ListItem.Caption:= '805 Forecast List Line';
+      //ListItem.SubItems.Add(' Add a new city above ');
+      ListItem.SubItems.Add('Add a new city or town to the list');
+      ListItem.SubItems.Add('mX 5.2.9.198');
+      items[0].EditCaption;      //
+   
+       //EditColumn(listitem,0, 'maxbox')
+      {ListItem:= view.Items.Add;
+      ListItem.Caption:= '200  Bern city test4';
+      EditColumn(listitem,1, 'hot images on a coolbar')
+      EditColumn(listitem,2, 'mX4.6.2.10')  }
+    end;
+    statbar2:= TStatusBar.Create(apFrm);
+    with statbar2 do begin
+      simplepanel:= false;
+      parent:= apFrm;
+      showhint:= true;
+       parentcolor:= false;
+       color:= clred;
+      //panels.color:= clnavy;
+      //sizeGrip
+      hint:= 'this is a Weather Forecast in maXcalc';
+      Panels.add;
+        panels.items[0].width:= 200;
+        panels.items[0].text:= DateTimeToInternetStr(Now, true);
+      Panels.add;
+        panels.items[1].width:= 150;
+        panels.items[1].text:= '150 get the forecaster solution';
+    end;
+  
+    if isInternetconnected then begin
+    sr:= GetGeoWeather('kiruna', UrlWeatherReport25);
+     getMultipleWeather(sr)
+     ListItem:= pview.Items.Add;
+     SetImageTemperatur(listitem)
+      AddlistItem(listitem)
+     writeln(sr)
+     sr:= GetGeoWeather('trieste', UrlWeatherReport25);
+     getMultipleWeather(sr)
+     ListItem:= pview.Items.Add;
+     SetImageTemperatur(listitem)
+     //listitem.imageindex:= 2
+      AddlistItem(listitem)
+     writeln(sr)
+   end else begin
+      getMultipleWeather(JSONSTRConst)
+      ListItem:= pview.Items.Add;
+     with ListItem do begin  
+       Caption:= wrec.id+'  '+wrec.city;
+       SubItems.Add(wrec.temp+' ° temp bar: '+wrec.bar+' of humid: '+wrec.humid+'%');
+       SubItems.Add(wrec.descript);
+       imageindex:= 2
+     end;
+     //statbar2.panels.items[1].text:= jsonstr;
+     statbar2.hint:= pview.hint; //jsonstr;
+    //AnsiInsert( var dst : AnsiString; const src : AnsiString; index : Integer)
+    end;
+    statbar2.hint:= pview.hint
+    //This Number:  176 is this ASCII  °
+      //view.subItems[2].caption:= 'sensor second';
+    //ViewStyle:=vsReport;
+  //end;  
+ end;  
+
+procedure SetImageTemperaturPredict(alistitem: Tlistitem; aicon: string);
+   begin
+     setDecimalSeparator('.')
+     (*if wrec.temp <> '' then begin
+     if trunc(strtofloat(wrec.temp)) < 5 then
+     //if wrec.temp < '5' then
+     //machine learning
+        alistitem.imageindex:= random(1)+2;
+            if trunc(strtofloat(wrec.temp)) < 2 then
+     //if wrec.temp < '5' then
+        alistitem.imageindex:= 3;
+     if (trunc(strtofloat(wrec.temp)) >= 5) and (trunc(strtofloat(wrec.temp)) <= 10) then
+     //if wrec.temp < '5' then
+        alistitem.imageindex:= 1; 
+     if trunc(strtofloat(wrec.temp)) >= 11 then
+     //if wrec.temp < '5' then
+        alistitem.imageindex:= 0;    *)
+     case aicon of
+         '01d','01n': alistitem.imageindex:= 0;         //clear
+         '04d','04n','03n','02n','02d': alistitem.imageindex:= 1; //clouds
+         '10n','10d': alistitem.imageindex:= 2;         //rain
+         '13d','13n': alistitem.imageindex:= 3;         //snow
+         else alistitem.imageindex:= random(1)+1; 
+     end;    
+     {if wrec.descript= 'Rain' then
+        alistitem.imageindex:= 2;
+     if wrec.descript= 'Thunderstorm' then
+        alistitem.imageindex:= 2;   
+     if wrec.descript= 'Clouds' then
+        alistitem.imageindex:= 1;
+     if wrec.descript= 'Mist' then
+        alistitem.imageindex:= 1;   
+     if wrec.descript= 'Haze' then
+        alistitem.imageindex:= random(1)+1; }  
+    //end;    
+   end;    
+   
+procedure TFrm_ForecastClick(Sender: TObject);    
+var tmps, srt, descript, atemp, aicon: string;
+  mlist, templist: TStringlist;  k: integer;
+begin                                           //instance of pview!
+     {bfrm.canvas.draw(335,30, FPicRed);
+     actlocation:= myedit.text;
+     getIPWeatherData(actlocation)  
+     anamtr.value:= atemper;//strtoint(copy(atemper,0,2))
+     aind.value:= apressure div 15
+     apress.value:= apressure;
+     ahumi.value:= ahumidity; }
+    
+     if isInternetconnected then begin
+       srt:= GetGeoWeather(actlocationpredict, UrlWeatherReport25_Forecast);
+       //StrtoList( s : string; const List : TStrings; const delimiter : char)
+       mlist:= TStringlist.create;
+       templist:= TStringlist.create;
+       Strtolist(srt, mlist, '}')
+       writeln('Count of forecast list line: '+itoa(mlist.count)+' for '+actlocation)
+       //writeln(mlist.text)
+       for k:= 0 to mlist.count-1 do begin     //out for console
+         if pos('"dt_txt":',mlist.strings[k]) > 0 then
+           tmps:=  mlist.strings[k] ;
+           if pos('"temp":',mlist.strings[k]) > 0 then 
+             writeln(itoa(k)+tmps+' '+mlist.strings[k]+CRLF); 
+           if pos('"main":',mlist.strings[k]) > 0 then
+             writeln(itoa(k)+mlist.strings[k]+CRLF);   
+        end;   
+       mlist.free;
+       writeln('Forecast for: '+mlist.text+' '+actlocation)
+       writeln('Forecast end report for: '+actlocation)
+       loadpredictForm;
+       //getMultipleWeatherForecast(srt)
+       //ListView_SetTextBkColor(pview.handle, $7dcced) //$8deeed) // $9cc123)
+       mlist:= TStringlist.create;
+       Strtolist(srt, mlist, '}')
+       writeln('Count of forecast list2: '+itoa(mlist.count))
+       //writeln(mlist.text)
+       for k:= 0 to mlist.count-2 do begin
+         if pos('"dt_txt":',mlist.strings[k]) > 0 then begin
+           //tmps:=  itoa(k)+' '+mlist.strings[k] ;
+           tmps:= copy(mlist.strings[k],pos('"dt_txt":',mlist.strings[k])+10,17)
+           //if pos('"temp":',mlist.strings[k]) > 0 then
+              if pos('"temp":',mlist.strings[k+1]) > 0 then begin
+                tmps:= tmps+' '+mlist.strings[k+1];
+                //([\d\.\-]+).*
+                with TPerlRegEx.Create do begin;
+                   Options:= [preCaseLess]; 
+                   RegEx:= '"temp":([\d\.\-]+){2,}';  // for temperature float
+                   //subject:= copy(mlist.strings[k+1],pos('"temp":',mlist.strings[k+1])+7,6)
+                   subject:= mlist.strings[k+1];
+                   if match then atemp:= copy(groups[0],8,6);  //word filter
+                   Free;
+                end; 
+                {Remember that you have a complete programming language at your disposal. 
+                I've noticed people tend to decide they need to use regex and then forget about
+                 everything else they can do.   }
+                //if pos(',',atemp) > 0 then atemp:= StrReplaceChar(atemp,',','.');
+                //if pos('"',atemp) > 0 then atemp:= StrReplaceChar(atemp,'"','0');
+                templist.add((atemp));       
+               end; 
+              if pos('"main":',mlist.strings[k+2]) > 0 then begin
+                //descript:= mlist.strings[k+2]; 
+                descript:= copy(mlist.strings[k+2],pos('"main":',mlist.strings[k+2])+7,60); 
+                aicon:= copy(mlist.strings[k+2],pos('"icon":',mlist.strings[k+2])+8,3)  
+              end;  
+           //getMultipleWeatherForecast(mlist.strings[k]);
+           ListItem:= pview.Items.Add;
+           //AddlistItemPredict(listitem)
+           with listItem do begin  
+             Caption:= actlocationpredict;
+             //SubItems.Add(wpred.temp+'° hPa: '+wpred.bar+' humid: '
+               //   +wpred.humid+'% ');
+             SubItems.Add(tmps);
+             //anum:=StrToFloat(copy(wpred.temp, 1, 2));
+             //anum:= ((strtofloat(wrec.tempmax) + strtofloat(wrec.tempmin))/2)
+              SubItems.Add(descript);
+              SubItems.Add(atemp);
+              SetImageTemperaturPredict(listitem, aicon) 
+           end;
+          end; 
+           {if pos('"temp":',mlist.strings[k]) > 0 then
+             writeln(itoa(k)+tmps+' '+mlist.strings[k]+CRLF); 
+           if pos('"main":',mlist.strings[k]) > 0 then
+             writeln(itoa(k)+mlist.strings[k]+CRLF);  } 
+        end;   
+       mlist.free;
+       for it:= 1 to templist.count-1 do write(templist[it]+ ' ');
+       letForecastRegression_Graph(templist);
+       templist.Free;
+       
+       //ListItem:= view.Items.Add;
+       //AddlistItem(listitem)
+       //SetImageTemperatur(listitem) 
+       //listitem.makevisible(false); //}
+       //View.Items.Item[0].MakeVisible(false); //scrolls up if necessary
+        //ListView1.SetFocus; // sets focus on the listview
+       //Listitem.TopIndex := -1 + ListBox1.Items.Count; 
+       //statbar2.panels.items[1].text:= srt;
+      //statbar2.hint:= srt;
+     // @debug writeln(sr)
+   end;
+   //loadpredictForm;
+end;
+
+procedure TFrm_OverviewClick(Sender: TObject); 
+begin
+  //Meteo_Overview(1);  as select in browser edit field to go
+  Meteo_Overview(2); 
+end;   
+
+   
+   //(*
+   //**************************Form Builder*******************************
+   Procedure loadWMainForm;
+   var tB: TTrackBar;
+      //statBar1: TStatusBar;
+       NewColumn: TListColumn; 
+       atool: TToolBar; colorbox:TColorbox;
+       asr: AnsiString;
+       ListItem: TListItem;
+       image, image1, image2, image3: TBitmap;
+       sunr, suns: string;
+  begin
+    //setupAnimation;
+    aFrm:= TForm.Create(self);
+    //mT:= TTimer.Create(self);
+    //mt.onTimer:= @TFrm1_timerRedrawTimer;
+    //mt.interval:= MILLISECONDS;
+    with aFrm do begin
+      Caption:= '********** maXbox5 Weather Station8Map: type new+york for 2 names find ***********'; 
+      setbounds(0,0,1200, 910) 
+      Position:= poScreenCenter;
+      formstyle:= fsstayontop;
+      Icon.LoadFromResourceName(HInstance,'XGMAPS'); //'XDENDRON'); //'MOON'); //NEWREPORT');
+      //Color:= clBlack;
+      onClose:= @TFrm1_closeForm;
+      //onPaint:= @TFrm1_FormPaint;
+      Canvas.Pen.color:= clBlue;
+      Canvas.Pen.Width:= 15;
+      BorderIcons:= [biSystemMenu, biMinimize];
+      BorderStyle:= bsSingle;
+      //borderWidth:= 4;
+      scaled:= true;
+      autoscroll:= true;
+      Show;
+    end;
+    with TBitBtn.Create(aFrm) do begin
+      Parent:= aFrm;
+      setbounds(790,735,170,65);
+      caption:= '&Update';  //flat
+      font.size:= 15;
+      glyph.LoadFromResourceName(getHINSTANCE,'CL_MPPAUSE'); 
+      mXButton(02,02,width, height,15,15,handle);
+      //event handler
+      onClick:= @TFrm_UpdateClick;
+    end;
+    with TBitBtn.Create(aFrm) do begin
+      Parent:= aFrm;
+      setbounds(610,735,170,65);
+      caption:= '&Forecast';
+      font.size:= 15;
+      glyph.LoadFromResourceName(getHINSTANCE,'VPDOTS'); //TOPASSISTANT'); 
+      mXButton(02,02,width, height,15,15,handle);
+      //event handler
+      onClick:= @TFrm_ForecastClick;
+    end;
+     with TBitBtn.Create(aFrm) do begin
+      Parent:= aFrm;
+      setbounds(430,735,170,65);
+      caption:= '&Overview';
+      font.size:= 15;
+      glyph.LoadFromResourceName(getHINSTANCE,'COLS'); //TOPASSISTANT'); 
+      mXButton(02,02,width, height,15,15,handle);
+      //event handler
+      onClick:= @TFrm_OverviewClick;
+    end;
+    with TBitBtn.Create(aFrm) do begin
+      Parent:= aFrm;
+      setbounds(970,735,170,65);
+      caption:= '&Close';
+      font.size:= 15;
+      glyph.LoadFromResourceName(getHINSTANCE,'CL_MPSTOP'); 
+      mXButton(02,02,width, height,15,15,handle);
+      onClick:= @TFrm1_CloseClick;
+    end;
+    tB:= TTrackBar.create(aFrm);
+    with tB do begin
+      parent:= aFrm;
+      setBounds(40,735,230,70);
+      Min:= 10; Max:= 100
+      Frequency:= 10
+      Position:= 1000 div 50;
+      linesize:= 15;
+      ThumbLength:= 55;
+      SetFocus;
+      OnChange:= @TFrm1_trackSpeedChange;
+    end;
+    statbar1:= TStatusBar.Create(aFrm);
+    with statbar1 do begin
+      parent:= aFrm;
+      align:= albottom;
+      showhint:= true;
+       parentcolor:= false;
+       color:= clred;
+      //panels.color:= clnavy;  //sizeGrip
+      hint:= 'this is a Weather LED BoX in maXcalc';
+      Panels.add;
+        panels.items[0].width:= 200;
+        panels.items[0].text:= DateTimeToInternetStr(Now, true);
+      Panels.add;
+        panels.items[1].width:= 150;
+        panels.items[1].text:= '150 get the solution';
+    end;
+     
+  //If owner is NIl it is not actually part of the main form.    
+  imagelist1:= TCustomImageList.Create(NIL);
+  ReadComponentResFile(exepath+'WeatherImageList1.dat', imagelist1);
+  with imagelist1 do begin
+       Height:= 39; Width:= 39;
+       Add(image,NIL);
+       Add(image1,NIL);
+       Add(image2,NIL);
+  end;
+  //WriteComponentResFile(exepath+'WeatherImageList1.dat', imagelist1);
+  imagelist2:= TCustomImageList.Create(aFrm);
+  // deserialize object stream to imagelist
+  ReadComponentResFile(exepath+'WeatherImageList.dat',imagelist2);
+  with imagelist2 do begin
+       Height:= 39; Width:= 39;
+       Add(image,NIL);
+       Add(image1,NIL);
+       Add(image2,NIL);
+       Add(image3,NIL);
+  end;
+  //serialize imagelist object to object stream file
+  //WriteComponentResFile('WeatherImageList.dat', imagelist2);
+    atool:= TToolBar.create(aFrm);
+    with atool do begin
+      setBounds(10,5,200,80)
+      Parent:= aFrm;
+      //Align:= altop;
+      parentcolor:= false;
+      ButtonHeight:= 50;
+      ButtonWidth:= 90;
+      EdgeInner:= esNone;
+      EdgeOuter:= esNone;
+      Flat:= True;
+      HotImages:= ImageList2;
+      Images:= ImageList1;
+      ShowCaptions:= True;
+      //TabOrder = 0
+      color:= clnavy;
+      Transparent:= True;
+      show;
+     end; 
+      with TToolbutton.create(atool) do  begin
+        parent:= atool;   //flat:= true;
+        Caption:= '&Open';
+        ImageIndex:= 2;
+        //ParentShowHint:= False
+        ShowHint:= False
+        //OnClick:= @OpenWeatherList;
+      end; 
+      with TToolbutton.create(atool) do  begin
+        parent:= atool;
+        Caption:= '&Add';
+        ImageIndex:= 1;
+        //ParentShowHint:= False
+        ShowHint:= False
+        OnClick:= @TFrm1_AddClick
+      end;            
+      with TToolbutton.create(atool) do  begin
+        parent:= atool;
+        Caption:= '&Scan';
+        ImageIndex:= 0;
+        OnClick:= @tbtnScanClick
+      end; 
+    myEdit:= TEdit.create(aFrm);
+     with myEdit do begin
+      parent:= afrm;
+      text:= ' Klagenfurt';
+      borderstyle:= bsnone;
+      setbounds(200,10,290,50);
+      color:= clweblightblue; //$8deeed //clnavy
+      font.color:= clwebdarkred; //$7dcced; //$0deeed; //clred;
+      //font.style:= [fsbold]
+      font.size:= 18;
+      //onkeypreview:= true;
+      //onenter:= @updateClick;
+      onkeypress:= @Edit1KeyPress;
+     show
+    end; 
+    imageearth:= TImage.create(afrm);
+    with imageearth do begin
+      parent:= atool;
+      setbounds(800,0,680,120)
+      //function loadjpegresource5(_instance: cardinal; aresname: string): Graphics.TBitmap;
+      Picture.bitmap:= loadjpegresource5(hinstance, 'EARTH2'); 
+      bringtofront;
+      stretch:= true;
+    end;
+   DecodeTime(now,hh,mm,ss,ms);
+   progbar:= TProgressbar.create(afrm);   
+   with progbar do begin
+     parent:= aFrm;
+     Align:= albottom;
+     Max:= (24*60);
+     position:= tb.position;
+     Position:= (hh * 60)+mm;
+     Brush.Color := clTeal;
+     SendMessage(Handle, PBM_SETBARCOLOR, 0, clYellow); 
+     //onchange:= @TFrm1_progressChange;
+   end;
+
+    view:= TListview.create(aFrm);
+    with view do begin
+      parent:= aFrm;
+      setbounds(10,70,1155,650)
+      //columns:= listitem  
+      DoubleBuffered:= False
+      FlatScrollBars:= True
+      readonly:= false;
+      gridLines:= true; 
+        RowSelect:= True; 
+        NewColumn:= Columns.Add; 
+        NewColumn.Caption:= 'City:Country'; 
+        newColumn.width:= 245; 
+        newcolumn.alignment:= taLeftJustify;
+        //newcolumn.color //newColumn.autosize:= true;
+       // newColumn.imageindex:= 1;
+       NewColumn:= Columns.add;
+       NewColumn.Caption:= 'Weather Sensors';            
+       newColumn.width:= 575; 
+      //ListItem:= view.Items[1].rows.Add;
+      //view.Items[1].caption:= 'sensor second';
+       NewColumn:= Columns.add;
+       NewColumn.Caption:= 'Description';
+       newColumn.width:= 250; 
+       NewColumn:= Columns.add;
+       NewColumn.Caption:= 'FCast';
+       newColumn.width:= 80; 
+       HotTrack:= True;
+       HotTrackStyles:= [htHandPoint];
+       //IconOptions.AutoArrange = True
+       RowSelect:= True;
+       ParentShowHint:= False;
+       hint:= 'Dblclick for Geo Map';
+       ShowHint:= True;
+       font.size:= 14
+       SmallImages:= ImageList2;
+       //ListView_SetTextColor(View.Handle, $123ADA)
+       //ListView_SetTextBkColor(view.handle, $ADA123)
+       ListView_SetTextBkColor(view.handle, $8deeed) // $9cc123)
+       ondblclick:= @listdblclick;
+       onmousedown:= @listclick2;
+       onkeypress:= @edit1KeyPress;
+       //@test dataset -
+       {ViewStyle:= vsReport;
+       for It:= Application.ComponentCount - 1 downto 0 do begin
+       Temp:= application.Components[It];
+       begin
+         ListItem:= view.Items.Add;
+         ListItem.Caption:= Temp.Name;
+         //listitem.subitems.add(temp.name)
+       end;
+      end;} 
+      viewstyle:= vsreport;
+      readonly:= false;
+      ListItem:= view.Items.Add;
+      ListItem.Caption:= '809  Cologne';
+      //ListItem.SubItems.Add(' Add a new city above ');
+      ListItem.SubItems.Add('Add a new city or town to the list');
+      ListItem.SubItems.Add('mX 5.2.9.198');
+      items[0].EditCaption;      //
+   //update test
+   if isInternetconnected then begin
+     sr:= GetGeoWeather('kiruna', UrlWeatherReport25);
+     //showmessage(sr)
+     getMultipleWeather(sr)
+     ListItem:= view.Items.Add;
+     SetImageTemperatur(listitem)
+     //listitem.imageindex:= 2
+      AddlistItem(listitem)
+     writeln(sr)
+     sr:= GetGeoWeather('trieste', UrlWeatherReport25);
+     getMultipleWeather(sr)
+     ListItem:= view.Items.Add;
+     SetImageTemperatur(listitem)
+     //listitem.imageindex:= 2
+      AddlistItem(listitem)
+     sr:= GetGeoWeather('koeln', UrlWeatherReport25);
+     getMultipleWeather(sr)
+     ListItem:= view.Items.Add;
+     SetImageTemperatur(listitem)
+     // listitem.imageindex:= 2
+     AddlistItem(listitem)
+      writeln(sr)
+     getMultipleWeather(GetGeoWeather('klagenfurt', UrlWeatherReport25))
+     ListItem:= view.Items.Add;
+      SetImageTemperatur(listitem)
+      AddlistItem(listitem)
+      ListView_SetTextBkColor(view.handle, $7dcced) // $9cc123)  0dcced
+     writeln(sr)
+     getMultipleWeather(GetGeoWeather('paris', UrlWeatherReport25))
+     ListItem:= view.Items.Add;
+     SetImageTemperatur(listitem)
+     AddlistItem(listitem)
+     sr:= GetGeoWeather('bern', UrlWeatherReport25);
+     getMultipleWeather(sr);
+     ListItem:= view.Items.Add;
+     SetImageTemperatur(listitem)
+      AddlistItem(listitem)
+      writeln('Bern sunsettest: '+sr)
+      writeln(copy(sr, pos('sunrise":',sr)+9,10))
+      sunr:= copy(sr, pos('sunrise":',sr)+9,10);
+       writeln('Bern sunrise: '
+               +datetimetostr(UnixDateTimeToDelphiDateTime(strtoint(sunr))))
+      suns:= copy(sr, pos('sunset":',sr)+8,10);
+       writeln('Bern sunset: '
+               +datetimetostr(UnixDateTimeToDelphiDateTime(strtoint(suns))))
+     getMultipleWeather(GetGeoWeather('stockholm', UrlWeatherReport25))
+     ListItem:= view.Items.Add;
+     SetImageTemperatur(listitem)
+      AddlistItem(listitem)
+     getMultipleWeather(GetGeoWeather('havana', UrlWeatherReport25))
+     ListItem:= view.Items.Add;
+     SetImageTemperatur(listitem)
+      AddlistItem(listitem)
+     getMultipleWeather(GetGeoWeather('tokyo', UrlWeatherReport25))
+     ListItem:= view.Items.Add;
+     SetImageTemperatur(listitem)
+      AddlistItem(listitem)
+     //listitem.imageindex:= 2
+     statbar1.panels.items[1].text:= sr;
+     statbar1.hint:= sr;
+    end else begin
+       getMultipleWeather(JSONSTRConst)
+       ListItem:= view.Items.Add;
+        with ListItem do begin  
+          Caption:= wrec.id+'  '+wrec.city;
+          SubItems.Add(wrec.temp+' ° temp bar: '+wrec.bar+' of humid: '+wrec.humid+'%');
+          SubItems.Add(wrec.descript);
+          imageindex:= 2
+        end;
+      statbar1.panels.items[1].text:= JSONSTRConst;
+      statbar1.hint:= JSONSTRConst;
+      //AnsiInsert( var dst : AnsiString; const src : AnsiString; index : Integer)
+      asr:= ansistring(getbigpi);
+      end;  //else
+     end;
+    //This Number:  176 is this ASCII  °
+      //view.subItems[2].caption:= 'sensor second';
+     //end;   
+   end;
+    //end;                 //*)
+ 
+ //(*  //This Number:  176 is this ASCII  °
+      //view.subItems[2].caption:= 'sensor second';
+ //(*
+  Procedure sunrisesetRouter(lon, lat: float);
+  var rs: TSTRiseSetRec;
+  UT: TSTDateTimeRec; iday:  TDateTime;
+  begin
+   UT.D:= currentdate;
+   UT.T:= currenttime;
+   //UT.T:= incdays(UT.D,1);
+   iday:= date;
+   iday:= adddays(iday,1);
+   writeln(sttimetotimestring('hh:mm',UT.T,false))
+   for it:= 0 to 25 do begin
+      //iday:= adddays(iday,1);
+      //UT.d:= iday;
+       ut.d:= stincdate(ut.d, it,0,0);
+       rs:= sunriseset(UT.d, lon, lat);
+     with rs do begin
+       if orise >-1 then 
+         writeln('sunrise of '+stdatetodatestring('dd.mm.yyyy',ut.d,false)+' : '
+                     +#9+sttimetotimestring('hh:mm',
+                   orise, false)+#9+ ' sunSet: '+
+                   sttimetotimestring('hh:mm', oset, false)); 
+       end;
+    end;      
+  end;     //*)
+  
+  procedure Meteo_Overview(select: byte);
+  var sr: string; latf, lonf: double;
+  begin
+    with TEdgeViewForm.create(self) do begin
+     width:= 1500;
+     pagecontrol1.height:= 40;
+     icon.loadfromresourcename(hinstance,'XJICON');
+     Caption:= 'maXbox5 EdgeView2BrowserFeed_GEOWeatherReport' ;
+     panel1.parentcolor:= false;
+     panel1.ParentBackground:= false;
+     panel1.color:= clnavy;
+     //memoJavaScript.height:= 180;
+     //edit1.text:= 'https://docwiki.embarcadero.com/Libraries/Sydney/en/System.RegularExpressions';
+     //edit1.text:= 'https://www.latlong.net/c/?lat='+flots(latlong.lat)+'&long='+flots(latlong.long);
+     //btngoclick(self);
+      //OnNewWindowRequested
+       sr:= GetGeoWeather(removespaces(actlocation), UrlWeatherReport25);
+       latf:= GEOCoord2Point(sr).y  
+       lonf:= GEOCoord2Point(sr).x 
+     if select = 1 then 
+        navigate('https://www.latlong.net/c/?lat='+flots(latf)+'&long='+flots(lonf));
+     if select = 2 then
+        navigate('https://wttr.in/'+actlocation);  
+     edit1.text:= 'https://www.latlong.net/c/?lat='+flots(latf)+'&long='+flots(lonf);
+     //navigate('https://www.latlong.net/c/?lat='+flots(latf)+'&long='+flots(lonf));
+     //memoJavaScript.text:= 'alert("hello Delphi! and maXbox5 JS Geocoding")';
+     //btnExecuteScriptClick(self);
+         //}
+     //sleep(2000)
+     //memoHTML.Text:= JS_InitFunc;
+     //btnSetSourceClick(self); 
+     //memoJavaScript.text:= JS_InitFunc;
+     {sleep(1500);
+     btnGeoCodeClick(self);  }
+      showmodal;
+      free;
+     end;
+   end;  
+   
+  
+begin  //@main
+  initTabletmode;
+  CheckBitmapIcons;
+  //getREGEX_WeatherStation(Sender: TObject; actlocation: string); 
+  getREGEX_WeatherStation(self, 'Bern');
+   if not InitGraphics(950, 310) then  begin{ 640x480 16 color }
+      Writeln('Unable to set stat graphic mode');
+      //Exit;
+    end;    //*)
+  loadWMainForm;
+  if decimalseparator <> '.' then 
+       showmessageBig('you might have a decimal problem - we help you to switch to .');
+  writeln('decimalseparator: '+decimalseparator)
+  setdecimalseparator('.')
+   with maxform1 do begin
+      with memo2 do begin
+        color:= clblack;
+        font.color:= clweborange;
+        font.size:= 12;
+      end;  
+   end;
+   writeln(itoa((hh * 60)+mm))
+   //property Socket: TClientWinSocket read FClientSocket;}
+   writeln('köln test time: '+datetimetostr(UnixDateTimeToDelphiDateTime(1750563334)))
+   writeln('Sunriseset table of Bern, CH')
+   sunrisesetRouter(7.4474,46.9481);
+   if isInternetconnected then begin
+      writeln('GetRealIP2_string: '+formatJson(GetRealIP2));
+      writeln('Weather Report date: '+DateTimeToInternetStr(now, true))
+     // sr:= GetGeoWeather(localcity+','+localcountry, UrlWeatherReport25);
+     //getMultipleWeather(sr)
+     if localcity <> '' then       
+       myedit.text:= localcity+','+localcountry else
+       myedit.text:= ' Klagenfurt';
+    end;
+    //init   breitschbox apikey for testing
+    writ(GetWeatherReport_OWM('Bern,CH','dd3239f11431abadb21a58ff59cab9a1'));
+    zoomf:= 13;
+    raiselastwin32;
+    //trect3 //opaque //tgamestate tboard tcellstate tgameform
+   //writ(formatjson(GetRealIP2()));
+   //writ(GetGeoInfoMap5save(0,0,0,200,mapboxDIRECT, exepath+'examples\mapbox5.png'));
+   //openDoc(exepath+'examples\mapbox5.png');
+   //copyfrombitmap  //print(getAscii) //8     ¦     8        *)
+   //tdoubledynarray //tdoublematrix gausswin
+End.
+--------------------------------------------------------------------------------
+
+Ref: https://maxbox4.wordpress.com/2025/10/02/ekon-29-statistic-packages-slides/
+Dec: without internet
+debug: 332- 4294967295 err:0
+debug: 333-Socket Error # 11001
+Host not found. 856 err:20
+GEO_Weather_Report: 
+
+https://github.com/project-jedi/jcl/blob/master/jcl/examples/windows/delphitools/common/ToolsUtils.pas
+
+Doc: https://docs.mapbox.com/help/glossary/access-token/
+var 
+  aFrm: TForm;
+  mT: TTimer;
+  tB: TTrackBar;
+  statBar1: TStatusBar;
+  
+  http://www.whoishostingthis.com/resources/delphi/
+
+//**************************Form Builder*******************************
+procedure loadForm;
+ var tB: TTrackBar;
+begin
+  aFrm:= TForm.Create(self);
+  //mT:= TTimer.Create(self);
+  //mt.onTimer:= @TFrm1_timerRedrawTimer;
+  //mt.interval:= MILLISECONDS;
+  //mt.free;  in on close            
+  with aFrm do begin
+    Caption:= '********** Form Template ***********';  
+    height:= 510;
+    width:= 700;
+    Position:= poScreenCenter;
+    //Color:= clBlack;
+    onClose:= @TFrm1_closeForm;
+    //onPaint:= @TFrm1_FormPaint;
+    Canvas.Pen.color:= clBlue;
+    Canvas.Pen.Width:= 15;
+    BorderIcons = [biSystemMenu, biMinimize]
+   BorderStyle = bsSingle
+    Show;
+    canvas.brush.bitmap:= getBitmapObject(Exepath+'examples\images\bmp47.bmp');
+    Canvas.FillRect(Rect(600,300,100,100));
+  end;
+  with TBitBtn.Create(aFrm) do begin
+    Parent:= aFrm;
+    setbounds(310,390,150,55);
+    caption:= 'Pause';
+    font.size:= 12;
+    glyph.LoadFromResourceName(getHINSTANCE,'CL_MPPAUSE'); 
+    mXButton(05,05,width, height,12,12,handle);
+    //event handler
+    onClick:= @TFrm1_PauseClick;
+  end;
+  with TBitBtn.Create(aFrm) do begin
+    Parent:= aFrm;
+    setbounds(490,390,150, 55);
+    caption:= 'Close';
+    font.size:= 12;
+    glyph.LoadFromResourceName(getHINSTANCE,'CL_MPSTOP'); 
+    mXButton(05,05,width, height,12,12,handle);
+    onClick:= @TFrm1_CloseClick;
+  end;
+  tB:= TTrackBar.create(aFrm);
+  with tB do begin
+    parent:= aFrm;
+    setBounds(40,402,230,40);
+    Min:= 10; Max:= 100
+    Frequency:= 10
+    Position:= 1000 div 50;
+    linesize:= 4;
+    ThumbLength:= 30;
+    SetFocus;
+    OnChange:= @TFrm1_trackSpeedChange;
+  end;
+  statbar1:= TStatusBar.Create(aFrm);
+  with statbar1 do begin
+    parent:= aFrm;
+    showhint:= true;
+    //sizegrip
+    hint:= 'this is a LED BoX';
+    Panels.add;
+      panels.items[0].width:= 200;
+      panels.items[0].text:= '200';
+    Panels.add;
+      panels.items[1].width:= 150;
+      panels.items[1].text:= '150';
+  end;
+end;  
+
+procedure TfrmMain.EdgeBrowserNewWindowRequested(Sender: TCustomEdgeBrowser; Args: TNewWindowRequestedEventArgs);
+var
+  PUri: PWideChar;
+  Url: string;
+begin
+  //* Navigate to the history page
+  pgeMain.ActivePage := tabHistory;
+
+  //* Open link in another WebView2 (new tab):
+  Args.ArgsInterface.Get_uri(PUri);
+  Url := PUri;
+  CoTaskMemFree(PUri);
+  EdgeBrowserHistory.Navigate(Url);
+  Args.ArgsInterface.Set_Handled(1);
+end;
+      
+      The set of APIs within a device family is broken down into subdivisions known as API contracts. 
+      See Device families.
+
+This reference topic enumerates for Windows 10 all of the API contracts and their versions, with links to the
+ and the APIs within each, with links to topics with more info on each particular API contract.
+
+http://www.streamlineicons.com/img/preview/preview-free-pack.svg
+
+http://sm-artists.com/?page_id=925
+
+https://thecattlecrew.wordpress.com/2014/10/31/analyse-der-software-qualitat-mit-sonarqube/
+
+GetRealIP2_string: {
+  "ip": "85.4.239.55",
+  "hostname": "55.239.4.85.dynamic.wline.res.cust.swisscom.ch",
+  "city": "Tann",
+  "region": "Zurich",
+  "country": "CH",
+  "loc": "47.2682,8.8479",
+  "org": "AS3303 Swisscom (Switzerland) Ltd",
+  "postal": "8632"
+}
+Weather Report date: Fri, 18 Dec 2015 10:50:16 +0100
+Local Weather Sensor: Tann CH
+Weather Id:802 is Clouds in: Tann at 6.35 of 1027 pressure with 100% humidity
+
+http://www.poertschach.at/de/wetter/detail#_webcams
+
+Havana, La Habana, Cuba | 23° 7' 48"N, 82° 23' 24"W
+coord of   Havana :CU : -82.36 23.14
+
+Cologne, North Rhine-Westphalia, Germany | 50.95°N, 6.97°E
+coord of   Koeln :DE : 6.96 50.94
+
+http://www.wolframalpha.com/input/?i=coordante+sydney,+au
+
+Klagenfurt, Carinthia, Austria | 46.62°N, 14.31°E
+coord of   Klagenfurt :AT : 46.62 14.31
+
+
+https://translate.google.com/?sl=de&tl=en&text=praktikum%20in%20zwei%20gruppen%20zusammen
+%0AGruppe%201%20OpenSSL%2C%20Signtool%20mit%20Python%2C%20Bj%C3%B6rn%0AGruppe%202%20OpenSSL%
+20im%20Tor%20Browser%20als%20Onion%2C%20Sandro%0A%0AGrundschutz%3A%0AVerf%C3%BCgbarkeit%0
+AVerl%C3%A4sslichkeit%20(Integrit%C3%A4t)%0AVertraulichkeit%0AVerbindlichkeit%0A%0ARisiko
+%20bei%20%20Password%20fischen%0AR%20%3D%2020%20*%2070%20%3D%2014%0AR%20RussRoul%20%20%3D%201%2
+F6%20*%20100%20%3D%201%2F6%20%3D%200%2C27%3F%0A%2B%20positive%205%2F6%20*%20100%20%3D%205%2
+F6%0ASicherheit%20%3D%201%20-%20Risiko%20%3D%2086%20%3D%20Schwellenwert%20%3E%2070%0A
+Restrisiko%20%3D%2014%0Aunpredictability%0A%0Aerstelle%20eine%20konfusionsmatrix%20mit%20
+den%205%20f%C3%A4llen%0A%20%20%20%20%20%200%20%20%20%20%20%20%20%20%20%20%201%0A0%20%20%20%
+20%20%20%20%20%20%20I%20%20%20%20%20%20%0A%20%20%20%20%20---------------
+%0A1%20%20%20%20%20%20%20%20%20%20I%20%20%20%20%200%0A%20&op=translate
+
+   ___              __   ___    _
+  / __|__ _ _ __  __\ \ / (_)__(_)___ _ _
+ | (_ / _` | '  \/ -_) V /| (_-< / _ \ ' \
+  \___\__,_|_|_|_\___|\_/ |_/__/_\___/_||_|
+                  Toolkit™
+
