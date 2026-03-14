@@ -1,0 +1,33 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        7.4474,
+                        46.948
+                    ],
+                    [
+                        51.5074,
+                        -0.1278
+                    ],
+                    [
+                        35.6762,
+                        139.6503
+                    ],
+                    [
+                        7.4474,
+                        46.948
+                    ]
+                ]
+            },
+            "properties": {
+                "name": "Bern City Center",
+                "timestamp": "2026-03-14 19:53:11"
+            }
+        }
+    ]
+}
