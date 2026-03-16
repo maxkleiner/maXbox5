@@ -1,0 +1,33 @@
+{
+    "type":"FeatureCollection","name":"citypolygon","max":[180.0,83.65],"min":[-180.0,-90.0],
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        7.4474,
+                        46.948
+                    ],
+                    [
+                        7.4535,
+                        46.9542
+                    ],
+                    [
+                        7.46,
+                        46.95
+                    ],
+                    [
+                        7.4474,
+                        46.948
+                    ]
+                ]
+            },
+            "properties": {
+                "name": "Bern City Center",
+                "timestamp": "2026-03-14 14:10:25"
+            }
+        }
+    ]
+}
