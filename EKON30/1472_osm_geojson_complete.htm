@@ -1,0 +1,111 @@
+Here’s a complete, runnable HTML example that loads OpenStreetMap tiles and displays GeoJSON data using Leaflet.js.
+This works entirely in the browser without a backend.
+
+HTML + JavaScript
+Html<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OpenStreetMap with GeoJSON</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <style>
+        #map {
+            height: 100vh; /* Full screen height */
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+    // Initialize the map
+    const map = L.map('map').setView([46.948, 7.447], 13); // Centered on Bern, CH
+
+    // Add OpenStreetMap tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Example GeoJSON data (Point + Polygon)
+    const geojsonData = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": { "name": "Sample Point" },
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [7.447, 46.948] // lon, lat
+                }
+            },
+            {
+                "type": "Feature",
+                "properties": { "name": "Sample Polygon" },
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [[
+                        [7.445, 46.947],
+                        [7.449, 46.947],
+                        [7.449, 46.950],
+                        [7.445, 46.950],
+                        [7.445, 46.947]
+                    ]]
+                }
+            }
+        ]
+    };
+
+    // Add GeoJSON layer with styling and popup
+    L.geoJSON(geojsonData, {
+        style: feature => ({
+            color: feature.properties.name === "Sample Polygon" ? "blue" : "red",
+            weight: 2
+        }),
+        pointToLayer: (feature, latlng) => {
+            return L.circleMarker(latlng, {
+                radius: 6,
+                fillColor: "red",
+                color: "#000",
+                weight: 1,
+                opacity: 1,
+                fillOpacity: 0.8
+            });
+        },
+        onEachFeature: (feature, layer) => {
+            if (feature.properties && feature.properties.name) {
+                layer.bindPopup(feature.properties.name);
+            }
+        }
+    }).addTo(map);
+</script>
+
+</body>
+</html>
+
+
+How it works
+
+Leaflet.js loads OpenStreetMap tiles.
+A GeoJSON object is defined inline (you can also load it from a .geojson file via fetch()).
+L.geoJSON() renders the features with custom styles and popups.
+Supports points, lines, and polygons.
+
+
+✅ Tip:
+If you have a .geojson file, replace the inline geojsonData with:
+Javascriptfetch('data.geojson')
+  .then(res => res.json())
+  .then(data => L.geoJSON(data).addTo(map));
+
+
+If you want, I can extend this example to load live GeoJSON data directly from OpenStreetMap using Overpass API so you can query real map features dynamically.
+Do you want me to prepare that version?
