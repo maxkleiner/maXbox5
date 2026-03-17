@@ -192,8 +192,33 @@ All maXbox Tutorials Table 2016/2017/2018/2019/2020/2021/2022/2023/2024/2025
     Tutor 157 Statistic Packages EKON 29, October 2025
     Tutor 158 Unicode Enumerator, October 2025
     Tutor 159 Geocode Unicode, October 2025
+    Tutor 160 Open Railway Map, November 2025
+    Tutor 161 Highway to Shell, November 2025
+    Tutor 162 Train a Classifier 2, November 2025
+    Tutor 163 Statsmodels_for_Python_and_Delphi, November 2025
+    Tutor 164 Machinelearningsteps, November 2025
+    Tutor 165 New Addons & Plugins, December 2025
+    Tutor 166 maXbox5 Overview wordpress, January 2026
+    Tutor 167 Free Google Translator API, February 2026
+    Tutor 168 Free Google Translator API II, February 2026
+    Tutor 169 Rosetta Code Site, February 2026
+    Tutor 170 Locoduino API, March 2026
+    Tutor 171 Barcode API, March 2026
+    Tutor 172 GeoJSON View, March 2026
+    Tutor 173 GeoJSON in Google Maps, March 2026
+    Tutor 174 GeoJSON in OpenStreetMaps, March 2026
+    Tutor 175 Geo Intelligence, Apri 2026
 
 
+https://teetrains.wordpress.com/2026/03/17/geojson-in-osm/
+https://teetrains.wordpress.com/2026/03/11/barcode-api/
+https://teetrains.wordpress.com/2026/03/14/geojson/
+https://maxbox6.wordpress.com/2026/02/11/free-google-translator-api-ii/
+https://maxbox6.wordpress.com/maxbox/
+https://maxbox6.wordpress.com/2026/02/06/free-google-translator-api/
+https://maxbox6.wordpress.com/2025/11/30/starter165_addons/
+https://maxbox6.wordpress.com/2025/11/25/machinelearning-steps/
+https://github.com/maxkleiner/OpenRailwayMap-api/tree/master/tests
 https://maxbox4.wordpress.com/2025/06/05/code-focus/
 https://medium.com/@maxkleiner1/data-correlation-analysis-712e63c8378e
 https://softwareschule.code.blog/2025/01/20/google-gemini-api/
