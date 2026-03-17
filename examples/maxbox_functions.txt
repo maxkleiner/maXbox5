@@ -6,28 +6,126 @@
 
 /////////////////////////////////////////////////////////////////////////////
 ref Help Extract Functions of maXbox4.exe BigBitBox API HEX in BOX47 BOX51   
-Release Notes maXbox 5.1.6.98 August 2024 mX516 beta64-bit at the bottom 😀😀 😎👮🤗   
+Release Notes maXbox 5.1.6.98 August 2024 mX516 beta64-bit at the bottom 😀😀 😎👮🤗 
+Release Notes maXbox 5.2.9.198 September 2025 mX529 beta64-bit🐞
+  
 -----------------------------------------------------------------------------
 file EXE:34.04 MB(35,697,944) V4.7.6.50 June. 2023 EKON26/BASTA/JAX/IBZ/SWS/PASCON
 file EXE:71.49 MB(74,966,712) V5.1.6.98 August 2024 EKON28/BASTA/JAX/IBZ/SWS/PASCON
-file EXE:74.85 MB(78,486,696) V5.2.9.185 July 2025 D12.1 EKON29/ Delphi Summit/ ICT
+file EXE:78.12 MB(81,919,144) V5.2.9.198 September 2025 D12.1 EKON29/ Delphi Summit/ ICT
 *****************Now the Funclist********************************************** 
 Funclist Func : 22257_; Source Compiled: 3’348’308 lines  🌈🙏🏻🔭
 *****************Now the Proclist********************************************** 
 Proclist Proc Size is: 13051_ ᛗᚨᛪᛒᛟᛪ
 *****************Now Constructors********************************************** 
 Constructlist Constructor Size is: 2052_
-def head: max: maXbox11_: 18/07/2025 16:55:20
+def head: max: maXbox11_: 17/03/2026 20:55:20
 file E:\maxbox\maxbox3\docs\maxbox_extract_funclist476_.txt  
 doc file: maxbox_extract_funclist476.txt(sort function)maxbox_functions_sortlist.txt
 all unit file: http://www.softwareschule.ch/examples/packages.txt
 all unit file2:http://www.softwareschule.ch/unitlist.htm
 -------------------------------------------------------------------------
 Funclist total Size all is: 373372! Constructor, Func and Procedure
-AExtraxt of EXE Functions of maXbox4.exe, locs of file = 49848_
+AExtraxt of EXE Functions of maXbox4.exe, locs of file = 51926_
 ASize of EXE: 35,697,944 bytes  CRC32: 38562FA8      
 SHA1: of maXbox4.exe (4.7.6.50) D047DBD5412C3E4A436089018B9C7FACF17A2EB5 
 SHA-256 193679043c46821c4b2460269111ff112e7c67b49e9cd9d951854e61bceedac7
+
+*****************************************************************
+Release Notes maXbox 5.2.9.198 September 2025 mX529 beta64-bit🐞
+*****************************************************************
+SynEdit upgrade, DisplayFlowControl, Structural Highlighting
+GeoMap View3 upgrade, Tutorial3 Modular upgrade folding
+SynEdit highlighter updates: JScript, Python, Pascal, C++
+WebView2 loader upgrade getScriptresult() of JavaScript
+Print & Export Rededesign - menu/File/Print Studio5
+maxform1.SystemInfo1Click - menu/Debug/System Info
+Modules Count_: 3860 Units maXbox5_29beta190.xml
+
+03.09.2025 17:25
+Release Notes maXbox 5.2.9.198 September 2025 
+SHA1: 5.2.9.198 maXbox5.exe 5a51dfe26c9f57e6c51f47bc9e72625a79646b51
+SHA1: ZIP maxbox52.zip AAA6C16CC1311A2C0DA28B212A8FBEB12FD9D1EB 
+https://metadefender.com/results/file/bzI1MDkwM29YdEJzNTU0eGhwVGpKRkljX1ln_mdaas
+https://www.virustotal.com/gui/file/5e07c6c0537e5077007b74d12b586da6a60885545b2f471cf4c1ca2aae2d886e/detection
+
+*****************************************************************
+Release Notes maXbox 5.2.9.196 August 2025 mX529 beta64-bit🐞
+*****************************************************************
+- TProcess3 class with TInput/TOutputPipeStream3 
+  https://github.com/z505/TProcess-Delphi/blob/master/dprocess.pas
+- graphics32/blob/master/DocProcessor /Help/Pas2Doc Processor Demo
+- dll64 import info routines uPSC_dll.pas, GR32_System, GR32_Math
+- more mp3 examples/Sternenhaufen_Max_SunoAI.mp3
+- update compatible for Python3.13 and Python3.14 P4D export
+- Modules Count_: 3845 Units maXbox5_29beta190.xml
+
+05.08.2025 17:25
+Release Notes maXbox 5.2.9.196 August 2025 
+SHA1: 5.2.9.196 maXbox5.exe e4bcc187fa0fd6007be376b20f9f55b8df020acb
+SHA1: ZIP maxbox52.zip 291467F21298C6EB123052236C457455819AB688 
+https://metadefender.com/results/file/bzI1MDgwNU40dWpXQVFEb2Z5WkhHeER2LUc_mdaas
+https://www.virustotal.com/gui/file/e80d61bab6ee0a6e0df30cd96d5f70a07e49e25a613b4f54b6f69925806cf3c5/detection
+
+*****************************************************************
+Release Notes maXbox 5.2.9.195 July 2025 mX529 beta64-bit🐞
+*****************************************************************
+- ConvertPngToJpeg-ConvertJpegToPng - image.picture.loadfromstream
+- graphics32/blob/master/DocProcessor /Help/Pas2Doc Processor Demo
+- add examples on https://sourceforge.net/projects/maxbox5/files/
+- mp3 async stream collector: 1422_mp3stream_sternenhaufen2.txt
+- unit SimpleDOM; Library base uPSI_SimpleDOM
+- update compatible for Python3.13 and Python3.14 P4D export
+- ChessBoard migrate fix 64bit https://github.com/maxkleiner/Pascal-Chess
+- Modules Count_: 3836 Units maXbox5_29beta190.xml
+
+29.07.2025 20:25
+Release Notes maXbox 5.2.9.195 July 2025 
+SHA1: 5.2.9.195 maXbox5.exe f0ca69e57a50a33ce4d84c7fa9c0d5273995f51f
+SHA1: ZIP maxbox52.zip 58EA91F56E0E2C0F4FFDD8C24E5267A13C14B1A3 
+https://metadefender.com/results/file/bzI1MDcyODM4eHRSb3FMaHNaQ3l6clVabndv_mdaas
+https://www.virustotal.com/gui/file/8102f4cf17b4ae8ee0038f86502e1148c3efd2bd263bb2b39d3c01181b23710a/detection
+
+*****************************************************************
+Release Notes maXbox 5.2.9.190 July 2025 mX529 beta64-bit🐞
+*****************************************************************
+- fixed bigbug in debugger/preprocessor -see tutor_146 debugging
+- now 152 Tutorials last: Tutor 149 Statistic Package, July 2025
+- dmath64.dll renew functions data science package II
+- maxbox_starter_testsequence52.bat added listview events
+- new examples on https://sourceforge.net/projects/maxbox5/files/
+- ESC song available: examples/Sternenhaufen_Max_SunoAI.mp3
+- update compatible for Python3.13 and Python3.14 P4D export
+- https://github.com/maxkleiner/PythonEnvironments/tree/main
+- GO game menu/view/GoGame5 -TGoForm1-TGoBlock-TGoBoard-MinesweeperX5
+- 64bit migrate DA Checkers, DA Othello /Options/Add Ons/Reversi
+- ChessBoard migrate 64bit https://github.com/maxkleiner/Pascal-Chess
+- Modules Count_: 3819 Units maXbox5_29beta190.xml
+
+22.07.2025 09:25
+Release Notes maXbox 5.2.9.190 July 2025 
+SHA1: 5.2.9.190 maXbox5.exe c950a055083157f5f0834cf9496617ac041d333e
+SHA1: ZIP maxbox52.zip ED61B2EFA98E490D91A9E0216354697FC3EB4154 
+https://metadefender.com/results/file/bzI1MDcyMjA3QlpVUC12RTRWWTFuWXFiNjlF_mdaas
+https://www.virustotal.com/gui/file/36f9e713265c15a545bc7e82dd3867b243283ab43aa309b53487f9b2a1b0c49a/detection
+https://hybrid-analysis.com/sample/36f9e713265c15a545bc7e82dd3867b243283ab43aa309b53487f9b2a1b0c49a
+
+Header
+Target Machine x64 
+Compilation Timestamp 2025-07-22 07:35:26 UTC
+Entry Point 53021952
+Contained Sections 11
+Size 75.65 MB (79328424 bytes) (79,328,424 bytes)
+
+2025-07 Cumulative Update for Windows 11 Version 24H2 for x64-based Systems (KB5062553)
+2025-07 Cumulative Update for .NET Framework 3.5 and 4.8.1 for Windows 11, version 24H2 for x64 (KB5056579)
+2025-06 Cumulative Update for Windows 11 Version 24H2 for x64-based Systems (KB5063060)
+
+maxkleiner
+22.07.2025 15:53
+Release Notes maXbox 5.2.9.190 II July 2025 mX529 64-bit🐞
+SHA1: 5.2.9.190 maXbox5.exe c950a055083157f5f0834cf9496617ac041d333e
+SHA1: ZIP maxbox52.zip ED61B2EFA98E490D91A9E0216354697FC3EB4154
 
 *****************************************************************
 Release Notes maXbox 5.2.9.185 July 2025 mX529 beta64-bit🐞
@@ -328,7 +426,12 @@ function RegAutoExecEnabled(const ExecKind: TExecKind; const Name: string; out C
   setdebugOn;
  setDebugOFF;
 
-Fix stringstring use with writestring instead of createstring
+    stringStream bug
+Fix stringStream use with writestring instead of createstring
+
+  sst:= TStringstream.create('');
+  sst.writestring( astringlist.text);
+   writ((sst.datastring));
 
 name value fix with   S.NameValueSeparator:= '=';      //!!
 
@@ -17687,6 +17790,33 @@ begin
  Func GetMercProjectionToLong( const ProjLong : extended) : extended;
  Func GetMercProjectionToLat( const ProjLat : extended) : extended;
   SIRegister_TPrimes(CL);
+procedure SIRegister_TPrimes(CL: TPSPascalCompiler);
+begin
+  //with RegClassS(CL,'TObject', 'TPrimes') do
+  with CL.AddClassN(CL.FindClass('TObject'),'TPrimes') do begin
+    Prime', 'TInt64Array', iptrw);
+    nbrprimes', 'integer', iptrw);
+    nbrfactors', 'integer', iptrw);
+    nbrcanonicalfactors', 'integer', iptrw);
+    nbrdivisors', 'integer', iptrw);
+    Factors', 'TInt64Array', iptrw);
+    CanonicalFactors', 'TInt64PointArray', iptrw);
+    Divisors', 'TInt64Array', iptrw);
+    Function GetNextPrime( n : int64) : int64');
+    Function GetPrevPrime( n : int64) : int64');
+    Function IsPrime( n : int64) : boolean');
+    Procedure GetFactors( const n : int64)');
+    Function MaxPrimeInTable : int64');
+    Function GetNthPrime( const n : integer) : int64');
+    Procedure GetCanonicalFactors( const n : int64)');
+    Procedure GetDivisors( const n : int64)');
+    Function Getnbrdivisors( n : int64) : integer');
+    Function radical( n : int64) : int64');
+    Constructor Create');
+    Procedure Free');
+ end;
+end;
+
   //RIRegister_TPrimes(CL);
  //ConstantN('deg','LongInt').SetInt( char( 176));
  ConstantN('minmark','LongInt').SetInt(( 180));
@@ -24285,6 +24415,160 @@ begin
   end;
 end;
 
+ (*----------------------------------------------------------------------------*)
+procedure SIRegister_TJsonObject2(CL: TPSPascalCompiler);
+begin
+  //with RegClassS(CL,'TJsonBase', 'TJsonObject') do
+  with CL.AddClassN(CL.FindClass('TJsonBase'),'TJsonObject2') do begin
+    RegisterMethod('Constructor Create( AOwner : TJsonBase)');
+    RegisterMethod('Procedure Free');
+    RegisterMethod('Procedure Parse( JsonString : String)');
+    RegisterMethod('Procedure Assign( Source : TJsonBase)');
+    RegisterMethod('Procedure Merge( Addition : TJsonObject2)');
+    RegisterMethod('Function Stringify : String');
+    RegisterMethod('Function Add( const Name : String) : TJsonPair');
+    RegisterMethod('Function Insert( const Index : Integer; const Name : String) : TJsonPair');
+    RegisterMethod('Function Put9( const Name : String; const Value : TJsonEmpty) : TJsonValue;');
+    RegisterMethod('Function Put10( const Name : String; const Value : TJsonNull) : TJsonValue;');
+    RegisterMethod('Function Put11( const Name : String; const Value : Boolean) : TJsonValue;');
+    RegisterMethod('Function Put12( const Name : String; const Value : Integer) : TJsonValue;');
+    RegisterMethod('Function Put13( const Name : String; const Value : Extended) : TJsonValue;');
+    RegisterMethod('Function Put14( const Name : String; const Value : String) : TJsonValue;');
+    RegisterMethod('Function Put15( const Name : String; const Value : TJsonArray2) : TJsonValue;');
+    RegisterMethod('Function Put16( const Name : String; const Value : TJsonObject2) : TJsonValue;');
+    RegisterMethod('Function Put17( const Name : String; const Value : TJsonValue) : TJsonValue;');
+    RegisterMethod('Function Put18( const Value : TJsonPair) : TJsonValue;');
+    RegisterMethod('Function Putbool( const Name : String; const Value : Boolean) : TJsonValue;');
+    RegisterMethod('Function Putint( const Name : String; const Value : Integer) : TJsonValue;');
+    RegisterMethod('Function Putext( const Name : String; const Value : Extended) : TJsonValue;');
+    RegisterMethod('Function Putstr( const Name : String; const Value : String) : TJsonValue;');
+    RegisterMethod('Function Putarr( const Name : String; const Value : TJsonArray2) : TJsonValue;');
+    RegisterMethod('Function Putobj( const Name : String; const Value : TJsonObject2) : TJsonValue;');
+    RegisterMethod('Function Putval( const Name : String; const Value : TJsonValue) : TJsonValue;');
+    RegisterMethod('Function Putpair( const Value : TJsonPair) : TJsonValue;');
+
+    RegisterMethod('Function Find( const Name : String) : Integer');
+    RegisterMethod('Procedure Delete19( const Index : Integer);');
+    RegisterMethod('Procedure Delete20( const Name : String);');
+    RegisterMethod('Procedure Clear');
+    RegisterProperty('Count', 'Integer', iptr);
+    RegisterProperty('Items', 'TJsonPair Integer', iptr);
+    RegisterProperty('Values', 'TJsonValue String', iptr);
+    SetDefaultPropery('Values');
+    RegisterProperty('AutoAdd', 'Boolean', iptrw);
+  end;
+end;
+
+(*----------------------------------------------------------------------------*)
+procedure SIRegister_TJsonPair(CL: TPSPascalCompiler);
+begin
+  //with RegClassS(CL,'TJsonBase', 'TJsonPair') do
+  with CL.AddClassN(CL.FindClass('TJsonBase'),'TJsonPair') do begin
+    RegisterMethod('Constructor Create( AOwner : TJsonBase; const AName : String)');
+    RegisterMethod('Procedure Free');
+    RegisterMethod('Procedure Parse( JsonString : String)');
+    RegisterMethod('Function Stringify : String');
+    RegisterMethod('Procedure Assign( Source : TJsonBase)');
+    RegisterProperty('Name', 'String', iptrw);
+    RegisterProperty('Value', 'TJsonValue', iptr);
+  end;
+end;
+
+(*----------------------------------------------------------------------------*)
+procedure SIRegister_TJsonArray2(CL: TPSPascalCompiler);
+begin
+  //with RegClassS(CL,'TJsonBase', 'TJsonArray2') do
+  with CL.AddClassN(CL.FindClass('TJsonBase'),'TJsonArray2') do begin
+    RegisterMethod('Constructor Create( AOwner : TJsonBase)');
+    RegisterMethod('Procedure Free');
+    RegisterMethod('Procedure Parse( JsonString : String)');
+    RegisterMethod('Function Stringify : String');
+    RegisterMethod('Procedure Assign( Source : TJsonBase)');
+    RegisterMethod('Procedure Merge( Addition : TJsonArray2)');
+    RegisterMethod('Function Add : TJsonValue');
+    RegisterMethod('Function Insert( const Index : Integer) : TJsonValue');
+    RegisterMethod('Function Put0( const Value : TJsonEmpty) : TJsonValue;');
+    RegisterMethod('Function Put1( const Value : TJsonNull) : TJsonValue;');
+    RegisterMethod('Function Put2( const Value : Boolean) : TJsonValue;');
+    RegisterMethod('Function Put3( const Value : Integer) : TJsonValue;');
+    RegisterMethod('Function Put4( const Value : Extended) : TJsonValue;');
+    RegisterMethod('Function Put5( conx1st Value : String) : TJsonValue;');
+    RegisterMethod('Function Put6( const Value : TJsonArray2) : TJsonValue;');
+    RegisterMethod('Function Put7( const Value : TJsonObject2) : TJsonValue;');
+    RegisterMethod('Function Put8( const Value : TJsonValue) : TJsonValue;');
+    RegisterMethod('Procedure Delete( const Index : Integer)');
+    RegisterMethod('Procedure Clear');
+    RegisterProperty('Count', 'Integer', iptr);
+    RegisterProperty('Items', 'TJsonValue Integer', iptr);
+    SetDefaultPropery('Items');
+  end;
+end;
+
+(*----------------------------------------------------------------------------*)
+procedure SIRegister_TJsonValue(CL: TPSPascalCompiler);
+begin
+  //with RegClassS(CL,'TJsonBase', 'TJsonValue') do
+  with CL.AddClassN(CL.FindClass('TJsonBase'),'TJsonValue') do begin
+    RegisterMethod('Constructor Create( AOwner : TJsonBase)');
+   RegisterMethod('Procedure Free');
+    RegisterMethod('Procedure Parse( JsonString : String)');
+    RegisterMethod('Function Stringify : String');
+    RegisterMethod('Procedure Assign( Source : TJsonBase)');
+    RegisterMethod('Procedure Clear');
+    RegisterProperty('ValueType', 'TJsonValueType', iptr);
+    RegisterProperty('AsString', 'String', iptrw);
+    RegisterProperty('AsNumber', 'Extended', iptrw);
+    RegisterProperty('AsInteger', 'Integer', iptrw);
+    RegisterProperty('AsBoolean', 'Boolean', iptrw);
+    RegisterProperty('AsObject', 'TJsonObject2', iptrw);
+    RegisterProperty('AsArray', 'TJsonArray2', iptrw);
+    RegisterProperty('IsNull', 'Boolean', iptrw);
+    RegisterProperty('IsEmpty', 'Boolean', iptrw);
+  end;
+end;
+
+(*----------------------------------------------------------------------------*)
+procedure SIRegister_TJsonBase(CL: TPSPascalCompiler);
+begin
+  //with RegClassS(CL,'TObject', 'TJsonBase') do
+  with CL.AddClassN(CL.FindClass('TObject'),'TJsonBase') do  begin
+    RegisterMethod('Constructor Create( AOwner : TJsonBase)');
+    RegisterMethod('Procedure Free');
+    RegisterMethod('Procedure Parse( JsonString : String)');
+    RegisterMethod('Function Stringify : String');
+    RegisterMethod('Procedure Assign( Source : TJsonBase)');
+    RegisterMethod('Function Encode( const S : String) : String');
+    RegisterMethod('Function Decode( const S : String) : String');
+    RegisterMethod('Procedure Split( const S : String; const Delimiter : Char; Strings : TStrings)');
+    RegisterMethod('Function IsJsonObject( const S : String) : Boolean');
+    RegisterMethod('Function IsJsonArray( const S : String) : Boolean');
+    RegisterMethod('Function IsJsonString( const S : String) : Boolean');
+    RegisterMethod('Function IsJsonNumber( const S : String) : Boolean');
+    RegisterMethod('Function IsJsonBoolean( const S : String) : Boolean');
+    RegisterMethod('Function IsJsonNull( const S : String) : Boolean');
+    RegisterMethod('Function AnalyzeJsonValueType( const S : String) : TJsonValueType');
+    RegisterProperty('Owner', 'TJsonBase', iptr);
+  end;
+end;
+
+(*----------------------------------------------------------------------------*)
+procedure SIRegister_Jsons(CL: TPSPascalCompiler);
+begin
+  CL.AddTypeS('TJsonValueType', '( jvNone, jvNull, jvString, jvNumber, jvBoolean, jvObject, jvArray )');
+  CL.AddTypeS('TJsonStructType', '( jsNone, jsArray, jsObject )');
+  CL.AddTypeS('TJsonNull', '( jsnull2 )');
+  CL.AddTypeS('TJsonEmpty', '( jsempty )');
+  SIRegister_TJsonBase(CL);
+  CL.AddClassN(CL.FindClass('TOBJECT'),'TJsonObject2');
+  CL.AddClassN(CL.FindClass('TOBJECT'),'TJsonArray2');
+  SIRegister_TJsonValue(CL);
+  SIRegister_TJsonArray2(CL);
+  SIRegister_TJsonPair(CL);
+  SIRegister_TJsonObject2(CL);
+  SIRegister_TJson(CL);
+end;
+                          
+
 (*----------------------------------------------------------------------------*)
 Proc SIRegister_Jsons(CL: TPSPascalCompiler);
 begin
@@ -25384,7 +25668,17 @@ begin
   else
     raise Exception.Create('Invalid encoding detected');
   end;
-end;
+end; 
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta charset="utf-8">                                                                         
+
+If you want to show a telescope 🔭 as  ðŸ”
+then you can use jsonunescape or hex in utf16 be:
+     write((#$D83D#$DE4F));  //D83D DE4F   UTF16 BE
+     writ(#$D83D#$DD2D)  //utf16 bE   surrogate !
+     writ(JSONUnescape('\ud83d\udd2d',#13)); //utf16 BE surrogate
+ //https://apps.timwhitlock.info/unicode/inspect?s=%F0%9F%99%8F     
 
 https://stackoverflow.com/questions/14107717/decode-utf-8-encoded-cyrillic-with-delphi-2007
 (* === compile-time registration functions === *)
@@ -26348,7 +26642,7 @@ begin
   eng.free;
 end;
 
-//python template
+//python template   - python schema
 with TPythonEngine.Create(Nil) do begin
   pythonhome:= 'C:\Users\max\AppData\Local\Programs\Python\Python36-32\';
   try
@@ -26379,6 +26673,126 @@ with TPythonEngine.Create(Nil) do begin
        free;
     end;
   end; 
+  
+  //python template III  
+   with TPythonEngine.Create(Nil) do begin
+    autofinalize:= false;
+    loadDLL;
+    try
+      ExecString('import sys');
+      ExecString(PYFUNC);
+      println('pyout: '+evalstr('countJewels("taAAbbbb","aA"),sys.version'));
+      println('pyout: '+evalstr('countJewels("12345643","34"),sys.version'));
+      addclient(TEngineClient.create(nil));
+      writeln('PythonOK '+botostr(PythonOK)+ ' clcount:'+itoa(clientcount));
+    except
+      raiseError;
+    finally
+      unloadDll;
+      Free;
+    end;  
+  end;  
+  
+  // python template IV with print formating
+  
+procedure MagicSquare_PySolution(loc: string);
+begin
+ with TPythonEngine.Create(Nil) do begin
+   //pythonhome:= PYHOME64;
+   loaddll;
+   autofinalize:= false;
+   try
+      Execstring('import re, math, random');
+      Execstring('from urllib.request import urlopen');
+      Execstring('from string import punctuation');
+      Execstring('from collections import Counter, defaultdict')
+    // Execstring('import plotly.express as px');
+    
+    //# The War of the Worlds, by H. G. Wells  or Time Machine
+      //Execstring('text_url = ''http://www.gutenberg.org/files/36/36-0.txt'''+LF+
+        Execstring('text_url = '+(TIMEMACHINE)+''+LF+
+      //  Execstring('text_url = '+(WAROFWORLDS)+''+LF+              
+                  //'text_start = ''No one would have believed''       '+LF+
+                  'text_start = ''The thing the Time Traveller held'''+LF+
+                  'sentence_ending = ''.!?''                         '+LF+
+                  'sentence_pausing = '',;:''                        ');   
+                  
+      Execstring(PYFUNC_MAGIC);
+      Execstring(PYFUNC_READ);
+      Execstring(PYFUNC_READ2);
+      Execstring(PYFUNC_READ3);
+   
+    // 7. Enumerate Function  
+     //Execstr('Sphere = collections.namedtuple("Sphere", "cx cy cz r")');   
+     //Execstr('V3 = collections.namedtuple("V3", "x y z")'); 
+     Execstr('import io, sys');               
+     execstr('output = io.StringIO()') 
+     execstr('sys.stdout = output')  
+     //execstr('V3 = {-50, 30, 50}') 
+     //execstr('light = normalize(-50, 30, 50, V3)'); 
+     
+     execstr('for n in (3, 5, 7):                      '+LF+ 
+             '  print(''\p Order %i\p=======\p'' % n)  '+LF+ 
+             '  magic(n)                                ');  
+             
+     execstr('txt_with_pauses_and_endings=remove_punctuation(read_book(text_url,text_start))'+LF+ 
+             'word2next, word2next2 = word_follows_words(txt_with_pauses_and_endings)       '+LF+ 
+             '#%%                                                                           '+LF+ 
+             'sentence = gen_sentence(word2next, word2next2)                                '+LF+ 
+             'print(sentence)                                                               ');   
+                
+     //writeln(StringReplace('res: '+CRLF+EvalStr('magic(n)'),
+     //                              '\p',CRLF,[rfReplaceAll]));         
+     //println(evalstr('(output.getvalue().strip())'));   
+     println(StringReplace(evalstr('(output.getvalue().strip())'),
+                                    '\p',CRLF,[rfReplaceAll]));                  
+   except
+      raiseError;
+   finally
+      UnloadDll;
+      Free;
+   end;
+ end; 
+end; 
+
+ // python template V with print formating & RegEx
+ 
+procedure DetSentence_PySolution(loc: string);
+begin
+ with TPythonEngine.Create(Nil) do begin
+   //pythonhome:= PYHOME64;
+   loaddll;
+   autofinalize:= false;
+   try
+     Execstring('import io, sys');    
+     Execstring('import re, math, random');
+     Execstring('txt = """                                                                 '+LF+
+       'Hi there, how are you today? I''d like to present to you the washing machine 9001. '+LF+
+       'You have been nominated to win one of these! Just make sure you don''t break it""" ');  
+    
+     Execstring(PYFUNC_PTOTYPE);
+     execstr('output = io.StringIO()'+LF+ 
+             'sys.stdout = output'); 
+     execstr('txt= re.sub("\n", "", txt)'+LF+ 
+             'pars=[s.strip()for s in re.split("(?:(?:(?<=[\?\!\.])(?:))|(?:(?:)(?=[\?\!\.])))",txt)]'+LF+ 
+             'if len(pars) % 2:                               ' +LF+
+             '   pars.append("")  # if ends without punctuation '); 
+        
+     execstr('for i in range(0, len(pars)-1, 2):'+LF+ 
+             '   print((pars[i]+pars[i+1]).ljust(52),"==>",haspunctotype(pars[i+1]),"\p")');
+                
+     //println(evalstr('(output.getvalue().strip())'));   
+     println(StringReplace(evalstr('(output.getvalue().strip())'),
+                                    '\p',CRLF,[rfReplaceAll]));                  
+   except
+      raiseError;
+   finally
+      UnloadDll;
+      Free;
+   end;
+ end; 
+end; 
+
   
  // This is a new method in VarPyth, but I'll put it here just in case....
 function VarPyToStrings(const AValue : Variant; const AStrings: TStrings): Integer;
@@ -27050,10 +27464,10 @@ begin
  Procedure TestDataParallelism( NN : TNNet);
  //CL.AddDelphiFunction('Procedure TestConvolutionOpenCL(platform_id:cl_platform_id;device_id:cl_device_id);
  //CL.AddDelphiFunction('Procedure TestFullConnectOpenCL(platform_id:cl_platform_id;device_id:cl_device_id);
- Procedure RebuildPatternOnPreviousPatterns( Calculated : TNNetVolume; LocalWeight : TNNetVolume; PrevLayer : TNNetNeuronList; PrevStride : integer; ReLU : boolean; 
- Threshold : TNeuralFloat);
- Procedure RebuildNeuronListOnPreviousPatterns( CalculatedLayer : TNNetNeuronList; CurrentLayer,PrevLayer:TNNetNeuronList;PrevStride:integer;ReLU:boolean;Threshold:
- TNeuralFloat);InputLayer := 
+ Procedure RebuildPatternOnPreviousPatterns(Calculated:TNNetVolume;LocalWeight:TNNetVolume;PrevLayer:TNNetNeuronList;PrevStride:integer;ReLU:boolean; 
+ Threshold:TNeuralFloat);
+ Procedure RebuildNeuronListOnPreviousPatterns(CalculatedLayer:TNNetNeuronList;CurrentLayer,PrevLayer:TNNetNeuronList;PrevStride:integer;ReLU:boolean;Threshold:
+ TNeuralFloat);InputLayer:= 
  function NN.AddDenseNetBlockCAI70(InnerConvNum,iConvNeuronCount,0, netconv,ChkUseSeparableConv.Checked, ChkMovingNorm.Checked,nil,nil, 0,1,1.0,1,1,1);
 end;
 
@@ -27100,7 +27514,7 @@ begin
  Procedure LoadTinyImageIntoTImage( var TI : TTinyImage; var Image : TImage);
  Procedure LoadTISingleChannelIntoImage( var TI : TTinySingleChannelImage; var Image : TImage);
  Procedure ShowNeurons(pNeuronList:TNNetNeuronList;var pImage:TImageDynArr;startImage,filterSize,color_encoding:int;ScalePerImage:bool;
- Procedure CreateAscentImages(GrBoxNeurons:TGroupBox;var pImage:TImageDynArr;var pLabelX,pLabelY:TLabelDynArr; ImagesNum:integer;inputSize,displaySize,imagesPerRow integer);
+ Procedure CreateAscentImages(GrBoxNeurons:TGroupBox;var pImage:TImageDynArr;var pLabelX,pLabelY:TLabelDynArr;ImagesNum:integer;inputSize,displaySize,imagesPerRow integer);
  Procedure CreateNeuronImages(GrBoxNeurons:TGroupBox;var pImage:TImageDynArr;var pLabelX,pLabelY:TLabelDynArr;pNeuronList:TNNetNeuronList;filterSize,imagesPerRow,
  NeuronNum:integer);
  Procedure FreeNeuronImages( var pImage : TImageDynArr; var pLabelX, pLabelY : TLabelDynArr);
@@ -35670,6 +36084,25 @@ begin //encodedURL:= Format(UrlGoogleQrCode,[Width,Height,C_Level, HTTPEncode(Da
   end;
 end;
 
+function APIBarcode3(AURL,atype,url_name,afile: string): boolean;
+var encodedURL:String; mapStream: TMemoryStream;
+begin
+ encodedURL:= Format(AURL,[urlencode(atype),urlencode(url_name)]);
+  mapStream:= TMemoryStream.create;
+  try
+    Wininet_HttpGet(EncodedURL, mapStream);   //WinInet
+    mapStream.Position:= 0;
+    mapStream.Savetofile(afile); // OpenDoc(apath);
+    result:= true;
+    S_ShellExecute(afile,'',seCmdOpen);
+  except 
+    writeln('HTTPS: '+ExceptiontoString(exceptiontype,exceptionparam));
+    result:= false;  
+  finally
+    mapStream.Free;
+  end;
+end;  
+
 Web Request API HTTPSend:
 
 //http://synapse.ararat.cz/doc/help/httpsend.THTTPSend.html#@Description
@@ -35876,6 +36309,32 @@ procedure SaveString3(const AFile, AText: string; Append: Boolean);  //UTF8
 procedure SaveStringUC(const AFile, AText: string; Append: Boolean);  //UTF8 - Unicode
 function LoadFile3(const FileName: TFileName): string;
 function LoadFileUC(const FileName: TFileName): string;
+
+Example:
+Lines := TStringList.Create;
+lines.linebreak:= CRLF
+Lines.LoadFromFile('C:\maxbox\maxbox51\examples\examples\rsamixed.txt');   
+you get the exception cause the encoder wants to read mixed ansi as utf8.
+Exception: No mapping for the Unicode character exists in the target multi-byte code page at 880.561
+
+ Solution that your script file is saved with the correct encoding format
+
+ SaveStringUC('C:\maxbox\maxbox51\examples\examples\rsamixed2correct.txt',
+               FileToAnsiStr('C:\maxbox\maxbox51\examples\examples\rsamixed.txt'),false);  //UTF8
+ Lines.LoadFromFile('C:\maxbox\maxbox51\examples\examples\rsamixed2correct.txt');  
+
+{This method try to convert url encoded chars only in UTF-8 without any fallback on Windows-1252. String %E0 is Windows-1252 
+encoding for à, but delphi only conver UTF-8 version: %C3%A0. 
+The error "no mapping for the Unicode character exists in the target multi-byte code page" typically occurs when a script does 
+not use valid UTF-8 or UTF-16 encoding. To resolve this issue, 
+ensure that your script file is saved with the correct encoding format.
+This error occurs when Delphi tries to convert a Unicode character that doesn't have a 
+corresponding representation in the target multi-byte code page. 
+This often happens when dealing with file operations or URL encoding/decoding.}
+
+//binary raw test
+  savestring(exepath+'maxbox5copy.exe',loadfile(exepath+'maxbox5.exe'));
+  openfile(exepath+'maxbox5copy.exe');
 
 combination test:
 writeln(loadfileUC(ExePath+’upsi_allfunctionslist2.txt’));
@@ -39042,6 +39501,31 @@ begin
   Result:= C in CharSet;
 end;
 
+set of byte concept
+Function ByteInSet5(C: char; const abyteSet: bytecharset):Bool;
+begin
+  Result:= C in abyteSet;
+end;
+chkset3:= flcStrToCharSetB(chr(byte(a)));
+  chkset3:= chkset3+flcStrToCharSetB(chr(byte(b)));
+  chkset3:= chkset3+flcStrToCharSetB(chr(byte(c)));
+  chkset3:= chkset3+flcStrToCharSetB(chr(byte(d)));
+  chkset3:= chkset3+flcStrToCharSetB(chr(byte(e)));
+  chkset3:= chkset3+flcStrToCharSetB(chr(byte(f)));
+  chkset3:= chkset3+flcStrToCharSetB(chr(byte(g)));
+  
+//find the lowest entry
+    mn:= LoDgt;
+    For i:= LoDgt to HiDgt do
+      IF ByteInSet5(chr(byte(i)),chkset3) then Begin
+        mn:= i;
+        BREAK;
+      end;
+      
+//IF f in [loDGt..Hidgt]then
+          IF ((f >= loDGt) and (f <= Hidgt)) then Begin
+            g:= sum-f;        
+
 //Runtimer Spec Functions Edition 190 and more code blocks
 Func ApWinExecAndWait32(FileName:PChar;CommandLine:PChar; Visibility:Int):Int;
 Func KillTask(ExeFileName:Str): Int;
@@ -40094,7 +40578,7 @@ The first step the following components, maybe we will add further in the future
 
 All Tutorials list Tutorial list
 //////////////////////////////////////////////////////////////////////////////
-All maXbox Tutorials Table of Content 2014/2015/2016/2017/2018/2019/2020/2021/2022/2023/2024/2025
+All maXbox Tutorials Table of Content 2014/2015/2016/2017/2018/2019/2020/2021/2022/2023/2024/2025/2026
 ///////////////////////////////////////////////////////////////////////////////
   Tutorial 00 Function-Coding  (Blix the Programmer)
   Tutorial 01 Procedural-Coding
@@ -40261,7 +40745,41 @@ All maXbox Tutorials Table of Content 2014/2015/2016/2017/2018/2019/2020/2021/20
   Tutor 149 Statistic Package, July 2025
   Tutor 150 Chess Board 64bit, July 2025
   Tutor 151 DA Checkers & Othello Board 64bit, July 2025
+  Tutor 152 MP3 Sound Engine Stream Shell 64bit, July 2025
+  Tutor 153 Pas2Doc Processor, August 2025
+  Tutor 154 File Operators, August 2025
+  Tutor 155 Multi-Coding, September 2025
+  Tutor 156 5 Games Collection, September 2025
+  Tutor 157 Statistic Packages EKON 29, October 2025
+  Tutor 158 Unicode Enumerator, October 2025
+  Tutor 159 Geocode Unicode, October 2025
+  Tutor 160 Open Railway Map, November 2025
+  Tutor 161 Highway to Shell, November 2025
+  Tutor 162 Train a Classifier 2, November 2025
+  Tutor 163 Statsmodels_for_Python_and_Delphi, November 2025
+  Tutor 164 Machinelearningsteps, November 2025
+  Tutor 165 New Addons and Plugins, December 2025
+  Tutor 166 maXbox5 Overview wordpress, January 2026
+  Tutor 167 Free Google Translator API, February 2026
+  Tutor 168 Free Google Translator API II, February 2026
+  Tutor 169 Rosetta Code Site, February 2026
+  Tutor 170 Locoduino API, March 2026
+  Tutor 171 Barcode API, March 2026
+  Tutor 172 GeoJSON API, March 2026
+  Tutor 173 GeoJSON on GMaps, March 2026
+  Tutor 174 GeoJSON on OSM, March 2026
+  Tutor 175 Geo Intelligence, April 2026 
+
   
+  maXbox5 Top 5 Algorithms, February 2025
+  maXbox5 Tester- the soul of code, July 2024
+  maXbox5 Hybrid Analysis, July 2024
+  
+  https://teetrains.wordpress.com/2026/03/17/geojson-in-osm/
+  https://maxbox6.wohttps://maxkleiner1.medium.com/free-google-translator-api-486a0529cb01
+  https://www.academia.edu/164468548/Maxbox_starter167_FreeTranslatorAPI_maXbox
+  https://unibe-ch.academia.edu/MaxKleiner/Papersrdpress.com/2025/11/25/machinelearning-steps/
+  https://github.com/maxkleiner/OpenRailwayMap-api/tree/master/tests
   https://de.scribd.com/document/852985000/Maxbox-Starter142-Geocoding-Distance
   https://softwareschule.code.blog/2025/04/23/geocoding-distance%f0%9f%90%9e/
   https://medium.com/@maxkleiner1/geocoding-distance-32a47f57023d
@@ -40317,6 +40835,7 @@ https://github.com/maxkleiner/python4delphi/blob/master/Source/PythonEngine.pas
 {$ All maXbox 4 or maXbox5 Examples List Exampleslist  }
 https://github.com/maxkleiner/maXbox3/releases
 https://github.com/maxkleiner/maXbox4/releases
+https://github.com/maxkleiner/maXbox5
 http://www.softwareschule.ch/download/exampleedition2016.zip
 
 *********************************************************************************************
@@ -42064,7 +42583,118 @@ maxbox_starter149_Statistic_Package_Statsmodels.pdf
 1317_doublecheckScreenshot2025-07-09123521.png   1417_clusterstatsScreenshot2025-07-09090259.png
 maxbox_starter150_Chess_Board_Engine.pdf         655_arduino_chess64.txt
 655_arduino_chess64engine.txt                    1419_MinesweeperVclUI.FormsGameForm12.pas
-                    
+1420_DelphiAIDev.Utils.pas                       778_advapi32_dll_SHA256_runas64_2.txt
+1421_Interfata_routines.pas                      1421_Interfata_routines1.pas
+1422_mp3stream_surprise.txt                      maxbox_starter152_MP3_Sound_Engine.pdf
+1422_mp3stream_surprise1.txt                     1422_mp3stream_sternenhaufen.txt
+1415_weather_listview53.txt                      1422_mp3stream_sternenhaufen2.txt
+1423_docproc_Utils.pas                           1423_docproc_Utils1.pas
+170_4gewinnt_main3_2025.txt                      170_4gewinnt_main3_2025.htm
+170_4gewinntScreenshot2025-07-30_102741.png      1397_Geolocation_distance13_uc_py.txt
+1419_uMainsweeper1form2.pas                      1084_SeAES256_explain64.pas
+1100_U_Compass2_64.pas                           1219_pydemo52_GUIAutomation314.txt
+1214_java_process_run22_jvcreateprocess64.txt    1324_weatherbox_regex_64_1.txt
+756_shellscripthell_javascript2video64.txt       1424_TProcess3demo_64.txt
+1424_TProcess3demo_64_1.txt                      1424_ConsoleExampleMainFormU.pas
+1707_bigeuler_bfh1_64.txt                        1425_LastModifyReplUtil.pas
+1425_JvHTMLParserMainFormU.pas                   1425_RunDll32MainFormU.pas
+1425_RunDll32MainFormUForm.pas                   1425_JvShFileOperationMainFormU.pas
+1425_tutor_154_2025-08-11090601.png              1425_tutor154copy2025-08-11092442.png
+1425_JvShFileOperationMainFormU1.pas             maxbox_starter154_File_Operators.pdf
+1425_RunDll32MainFormUForm1.pas                  1270_U_GameBoardsForm64.pas
+1270_U_GameBoardsForm64_1.pas                    1270_gameboardsScreenshot2025-08-12135804.png
+httpheader.py                                    gini_split.py
+1426_spawn_process_run.pas                       1426_spawn_process_run1.pas
+1075_primes30_performance5_64_3.txt              1300_wordwheel1_performance64.txt
+1415_weather_listview53.txt                      1415_weather_listview53.htm
+1415_mx52_screenshot_weatherapp53.jpg            weatherapp53.txt
+443_webserver_arduino_rgb_light4_64.txt          547_Win10_Develop_4_BASTA_EKON19_64.TXT
+336_digiclock5resources64_uc.txt                 1415_weather_listview54.txt
+1427_secure_browser_webview2.txt                 1415_weather_listview55.txt
+1415_forecastScreenshot2025-08-18180246.png      1415_satellite_Screenshot2025-08-18180207.png
+1324_weatherbox_regex_64_maincities.txt          1428_png_jpeg_imageconversion.txt
+1429_compare_listofstrings.txt                   1430_Jewels_and_stones.txt
+1431_5_python_mistakes.txt                       1432_longest_commonsubstring.txt
+1432_supermutation_minimisation_debruijn.txt     1432_De_Bruijn_sequence.png
+1432_De_Bruijn_sequence.png                      1433_charsplit.txt
+1433_charsplit_pas_py_fp.txt                     1433_mX5GuiScreenshot2025-08-27100346.png
+1433_charsplit_pas_py_fp_js.txt                  1433_charsplit_pas_py_fp_js_uc.txt
+1433_charsplit_pas_py_fp_js_uc_test.txt          1434_load_save_board.txt
+1435_5_games_showcase.txt                        1436_compiled_regex.pas
+1437_findallfiles2mp3_64.txt                     1437_findallfiles2mp3_64_py.txt
+maxbox_starter157_EKON29_Statistic_Packages_2sign.pdf
+412_Zeosutils_sha64_uc2japan.txt                 maxbox_starter158_Unicode_Enumerator.pdf
+1438_Stripchars.pas                              1438_Stripchars_py.pas
+1438_Stripchars_py_js.pas                        1439_chinesezodiacs.txt
+1439_chinesezodiacs1.txt                         1439_chineszodiacs_js.js
+1439_chinesezodiacs2js.txt                       1440_JaroSim_Gui_mX5Screenshot2025-10-13_172253.png
+1440_Jaro_distance.txt                           1440_Jaro_mX5Screenshot2025-10-13_175026.png
+1440_Jaro_distance1.txt                          1440_7_python_hidden_features.txt  
+1441_Price_fraction.txt                          1442_Statistics_unittest.pas
+1442_RandomGenMersenne_mX52.pas                  1442_GUI_DarkScreenshot_2025-10-21_192522.png
+1443_UVis_arduino_teechart.pas                   1443_UVis_arduino_teechart1.pas
+1415_weather_listview56.txt                      1444_OpenRailMap_Geolocation_distance12_uc_py.txt
+1444_OpenRailMap_Geolocation_distance14_uc_py.txt maxbox_starter160_Open_Railway_Map_API.pdf 
+1445_Trabb_Pardo_Knuth_algorithm.txt             1446_countries.mdb
+1446_ADO_ODBC_Connect64_uc2unicode1.txt          1446_sqlworkbench_Screenshot2025-11-06110738.png
+1446_listScreenshot2025-11-06110425.png          1446_connectScreenshot2025-11-06110452.png
+1446_Screenshot2025-11-06_110358.png             1446_countries64japan.mdb
+1446_ADO_ODBC_Connect64_uc2unicode12.txt         1446_ADO_ODBC_Connect64_uc2unicode13.txt
+1447_Screenshot2025-11-15175828.png              1447_sparkline_unicode.txt
+1447_sparkline_unicode_py.txt                    1447_pyScreenshot2025-11-15211246.png
+1448_Van_der_Corput_sequence.txt                 1448_Van_der_Corput_sequence_pascal.txt
+1324_weatherbox_regex_64_122.txt                 1324_weatherbox_regex_64_125.txt  
+1449_SpinningRod.pas                             1449_SpinningRod_Py.pas
+1450_Write_float_arrays_to_a_text_file.pas       1450_Write_float_arrays_to_a_text_file1.pas
+1450_Write_float_arrays_to_a_text_file2python.pas 1451_statsmodeslfile2python.pas
+1452_machinelearningsteps2python.pas             1452_machinelearningsteps2python1.pas
+1452_machinelearningsteps2python12.pas           1452_machinelearningsteps2python12.htm
+1452_tutor164_machinelearningsteps.py            1452_tutor164_machinelearningsteps.ipynb
+1452_machinelearningsteps2python12plotdataset.pas 1452_iris_rf.py
+1453_timesync_py.txt                             1453_timesync_py_pas.txt
+1454_square4.pas                                 1454_square4_1.pas
+1454_square4_1_py.pas                            1455_Abelian_sandpile_model.pas
+1455_Abelian_sandpile_model1.pas                 1455_Abelian_sandpile_model1_py.pas
+1456_forecasting2python2_64.txt                  1456_ParallelPython.pas
+1456_ParallelPython2.pas                         1371_soulrain_G9_uc.txt
+1371_soulrain_G9_uc1midi.txt                     1457_stringlist_text_file2primer.pas
+1458_IFS_Test.pas                                1459_Pells_equation.pas
+1459_Pells_equation1.pas                         1458_FTP_Anonymous.pas
+1460_Superelipse.pas                             1460_GUI_Screenshot2026-01-11_160856.png
+1460_Elipse_Screenshot2026-01-11154739.png       1461_midi2freq.pas
+1461_midi2freq_solfeggio.pas                     1462_APILayer_Postdemo.txt
+1462_APILayer_Postdemo1.txt                      1462_APILayer_Jsonbuilder.txt
+1462_APILayer_Jsonbuilder1.txt                   1463_SteadySquares.txt
+1463_SteadySquares_py.txt                        1463_SteadySquares_py1.txt
+1415_weather_listview57.txt                      1464_Py_solutions.pas
+1465_GoogleTranslate_API.txt                     1465_GoogleTranslate_API1.txt
+1465_GoogleTranslate_API1_2.txt                  1465_GoogleTranslate_API1_3.txt
+1465_mX5Screenshot2026-02-06123251.png           1465_Screenshot2026-02-06122520.png
+1465_ScreenshotGoogle2026-02-06122659.png        1465_GoogleTranslate_API1_4.txt
+1464_Py_solutions1.pas                           1465_GoogleTranslate_API1_5.txt
+1466_Chess_Grains_5test.txt                      1467_cyclop_numbers.txt
+1467_cyclop_numbers_pascal.txt                   1468_damm_algol.txt
+1469_cut_a_rectangle.txt                         1469_cut_a_rectangle1.txt
+1415_weatherboxScreenshot2026-02-20173257.png    1415_weatherboxScreenshot2026-02-20173151.png
+1415_weatherbox2026-02-20172854.png              1415_weatherbox2026-02-20172802.png
+1415_weather_listview58.txt                      maxbox_cheatsheet.html
+maxbox_mindmap.html                              1470_cCubicSpecialPrimes.txt
+1471_BarcodeGenerator_API1.txt                   1471_BarcodeGenerator_API12.txt
+1471_Screenshot2026-03-06190349.png              1471_BarcodeGenerator_API12form.txt
+1471_BarcodeGenerator_API12form_simple.txt       1471_BarcodeAPIScreenshot2026-03-07111015.png   
+1472_GEOMap_Routines.txt                         1472_city_bern_polygon_wide.geojson
+1472_GEOMap_Routines1.txt                        1472_API_GeoJSON64_5_javascript_maps2edge.txt
+1472_API_GeoJSON64_5_OSM_maps2edge.txt           1472_osm_geojson_complete.htm
+1472_API_GeoJSON64_5_OSM_maps2edge3.txt                                                                          
+
+https://teetrains.wordpress.com/2026/03/17/geojson-in-osm/                                       
+https://github.com/maxkleiner/BarcodeApiCreator
+https://maxbox6.wordpress.com/2025/11/30/starter165_addons/
+https://maxbox6.wordpress.com/2025/11/25/machinelearning-steps/
+https://maxbox6.wordpress.com/2025/11/21/statsmodels-for-python-and-delphi/
+https://medium.com/@maxkleiner1/statsmodels-for-python-and-delphi-8fcc890f78c2
+http://www.softwareschule.ch/download/maxbox_starter160.pdf
+http://www.softwareschule.ch/examples/maxbox_starter159.pdf                    
 https://dev.to/max_kleiner_9d12e786b3ecc/multi-pascal-solver-4nbo
 https://medium.com/@maxkleiner1/multi-pascal-solver-aa94a2b1f9da
 https://maxbox4.blogspot.com/20251392_untouchable_numbers_uc.txt/04/multi-pascal-solver.html
@@ -42086,6 +42716,7 @@ https://maxbox5.wordpress.com/2024/07/22/ekon-28/
 https://softwareschule.code.blog/2024/04/27/object-detection-api/
 https://github.com/maxkleiner/mrai_mx5/tree/master/TestApp
 https://en.wikipedia.org/wiki/Prelude_and_Fugue_in_C_major,_BWV_846
+https://softwareschule.code.blog/2025/07/25/mp3-stream-shell/
 
 maXbox links:
 
@@ -42569,6 +43200,7 @@ C:\maxbox\maxbox51\examples\pydemo66.tx
 http://www.softwareschule.ch/examples/directions5.htm
 http://www.softwareschule.ch/examples/javascriptedge.txt
 http://www.softwareschule.ch/examples/edgeview2.htm
+http://www.softwareschule.ch/examples/edgeview3.htm
 http://www.softwareschule.ch/examples/detectors.htm
 http://www.softwareschule.ch/examples/detectors.txt
 http://www.softwareschule.ch/examples/fractalsound.txt
@@ -42610,6 +43242,20 @@ http://www.softwareschule.ch/examples/lychrel.txt
 http://www.softwareschule.ch/examples/maze.txt
 http://www.softwareschule.ch/examples/maze2.txt
 http://www.softwareschule.ch/examples/weatherapp52.txt
+http://www.softwareschule.ch/examples/weatherapp53.txt
+//C:\maxbox\maxbox51\examples\4gewinnt2025.txt
+http://www.softwareschule.ch/examples/4gewinnt2025.txt
+http://www.softwareschule.ch/examples/gameboards.txt
+http://www.softwareschule.ch/examples/fileoperators.txt
+http://www.softwareschule.ch/examples/weatherapp54.txt
+http://www.softwareschule.ch/examples/pydemo104.txt
+http://www.softwareschule.ch/examples/pydemo104.htm
+http://www.softwareschule.ch/examples/weatherapp55.txt
+http://www.softwareschule.ch/examples/weatherapp55.htm
+http://www.softwareschule.ch/examples/pydemo112_1.htm
+http://www.softwareschule.ch/examples/pydemo112.htm
+http://www.softwareschule.ch/examples/pydemo112.txt
+http://www.softwareschule.ch/examples/translatorapi.txt
 
 https://dev.to/breitsch_breitsch_a34d774/time-space-matrix-i4f
 https://dev.to/max_kleiner_9d12e786b3ecc/lychrel-number-4ic9
@@ -43836,6 +44482,18 @@ midas.dll     42 [++]midas.dll
 [+] shell32.dll     [+] shlwapi.dll   [+] user32.dll     [+] usp10.dll
 [+] version.dll     [+] winhttp.dll   [+] wininet.dll    [+] winmm.dll [+] midas.dll
 [+] winspool.drv    [+] ws2_32.dll    [+] wsock32.dll    [+] dmath.dll [+] fannfloat.dll
+ 
+Imports V5.2.9.196                                                                                         
+shlwapi.dll        opengl32.dll       ws2_32.dll         version.dll
+user32.dll         oledlg.dll         oleaut32.dll       netapi32.dll
+MSVCRT.DLL         advapi32.dll       WTSAPI32.DLL       winhttp.dll
+kernel32.dll       MSVFW32.DLL        SHFolder.dll       wsock32.dll
+quartz.dll         glu32.dll          HHCTRL.OCX         gdi32.dll
+usp10.dll          mpr.dll            winmm.dll          oleacc.dll
+wininet.dll        winspool.drv       comdlg32.dll       comctl32.dll
+shell32.dll        AVICAP32.dll       URLMON.DLL         IMAGEHLP.DLL
+ole32.dll          msacm32.dll        iphlpapi.dll       *invalid*
+api-ms-win-crt-string-l1-1-0.dll
 
 Exports   CreateIncome      ExePath         GetASCII                GetBiosVendor
           GetMemoryInfo     GetOSName       GetProcessorName        GetScriptName2
@@ -44839,6 +45497,935 @@ maXbox5 beta  version 5.2.8.160 XIV WebUtil3 Ocean1100  04/06/2025 🐞
 maXbox5 beta  version 5.2.8.160 XVI WebUtil3 Ocean1120  08/06/2025 🐞
 maXbox5 beta  version 5.2.9.160 XVII WebUtil4 Ocean1130  15/06/2025 🐞
 maXbox5 beta  version 5.2.9.185 XX WebUtil5 Ocean1160  16/07/2025 🐞
+maXbox5 beta  version 5.2.9.190 XXI WebUtil5 Ocean1180  22/07/2025 🐞
+maXbox5 beta  version 5.2.9.195 XXII WebUtil5 Ocean1190  28/07/2025 🐞
+maXbox5 beta  version 5.2.9.196 XXIII WebUtil5 Ocean1200  05/08/2025 🐞
+maXbox5 beta  version 5.2.9.198 XXV WebUtil5 Ocean1210  03/09/2025 🐞
+
+*****************************************************************
+Release Notes maXbox 5.2.9.198 September 2025 mX529 beta64-bit🐞
+*****************************************************************
+SynEdit upgrade, DisplayFlowControl, Structural Highlighting
+GeoMap View3 upgrade, Tutorial3 Modular upgrade folding
+SynEdit highlighter updates: JScript, Python, Pascal, C++
+WebView2 loader upgrade getScriptresult() of JavaScript
+Print & Export Rededesign - menu/File/Print Studio5
+maxform1.SystemInfo1Click - menu/Debug/System Info
+
+Contains ModulesCountEnd_: 3860
+03.09.2025 16:25
+Release Notes maXbox 5.2.9.196 September 2025 
+SHA1: 5.2.9.198 maXbox5.exe 5a51dfe26c9f57e6c51f47bc9e72625a79646b51
+
+*****************************************************************
+Release Notes maXbox 5.2.9.196 August 2025 mX529 beta64-bit🐞
+*****************************************************************
+- TProcess3 class with TInput/TOutputPipeStream3 
+- graphics32/blob/master/DocProcessor /Help/Pas2Doc Processor Demo
+- dll64 import info routines uPSC_dll.pas, GR32_System, GR32_Math
+- mp3 stream collector: examples/Sternenhaufen_Max_SunoAI.mp3
+- update compatible for Python3.13 and Python3.14 P4D export
+- Modules Count_: 3845 Units maXbox5_29beta190.xml
+
+05.08.2025 17:25
+Release Notes maXbox 5.2.9.196 August 2025 
+SHA1: 5.2.9.196 maXbox5.exe e4bcc187fa0fd6007be376b20f9f55b8df020acb
+SHA1: ZIP maxbox52.zip 291467F21298C6EB123052236C457455819AB688 
+https://metadefender.com/results/file/bzI1MDgwNU40dWpXQVFEb2Z5WkhHeER2LUc_mdaas
+https://www.virustotal.com/gui/file/e80d61bab6ee0a6e0df30cd96d5f70a07e49e25a613b4f54b6f69925806cf3c5/detection
+https://hybrid-analysis.com/sample/e80d61bab6ee0a6e0df30cd96d5f70a07e49e25a613b4f54b6f69925806cf3c5
+
+Header V5.2.9.196
+Target Machine x64 
+Compilation Timestamp 2025-08-05 14:02:40 UTC 
+SHA1: 5.2.9.196 maXbox5.exe e4bcc187fa0fd6007be376b20f9f55b8df020acb
+Entry Point 53860304 
+Contained Sections 11
+File Size 77.27 MB (81026216 bytes) (81,026,216 bytes)
+
+maxkleiner
+05.08.2025 17:53
+Release Notes maXbox 5.2.9.196 August 2025 mX529 64-bit🐞
+SHA1: 5.2.9.196 maXbox5.exe e4bcc187fa0fd6007be376b20f9f55b8df020acb
+SHA1: ZIP maxbox52.zip 291467F21298C6EB123052236C457455819AB688
+
+
+*****************************************************************
+Release Notes maXbox 5.2.9.195 July 2025 mX529 beta64-bit🐞
+*****************************************************************
+- ConvertPngToJpeg-ConvertJpegToPng - image.picture.loadfromstream
+- graphics32/blob/master/DocProcessor /Help/Pas2Doc Processor Demo
+- add examples on https://sourceforge.net/projects/maxbox5/files/
+- mp3 stream collector: examples/Sternenhaufen_Max_SunoAI.mp3
+- unit SimpleDOM; Library base uPSI_SimpleDOM
+- update compatible for Python3.13 and Python3.14 P4D export
+- ChessBoard migrate fix 64bit https://github.com/maxkleiner/Pascal-Chess
+- Modules Count_: 3836 Units maXbox5_29beta190.xml
+
+28.07.2025 19:25
+Release Notes maXbox 5.2.9.195 July 2025 
+SHA1: 5.2.9.195 maXbox5.exe 8deebcd7dca09202c38d201af0769e8bcade68be
+SHA1: ZIP maxbox52.zip 2C5613F69929105F75B0C9729D7D51056924FB0B 
+https://metadefender.com/results/file/bzI1MDcyODM4eHRSb3FMaHNaQ3l6clVabndv_mdaas
+https://www.virustotal.com/gui/file/8102f4cf17b4ae8ee0038f86502e1148c3efd2bd263bb2b39d3c01181b23710a/detection
+https://hybrid-analysis.com/sample/8102f4cf17b4ae8ee0038f86502e1148c3efd2bd263bb2b39d3c01181b23710a
+
+Comparing files units1.txt and UNITS2.TXT to V5.2.9.195 to V5.2.9.196
+
+GR32_Bindings
+GR32_LowLevel
+GR32_Math
+GR32_System
+IdNNTPServer
+uPSI_dprocess3
+uPSI_GR32_LowLevel
+uPSI_GR32_Math
+uPSI_GR32_System
+uPSI_IdNNTPServer
+
+Delphi_Arduino_Unit1, SynAccessibility2, DPageSetup, DTestPrintPreview, MTestPP 
+DelphiParse, DelphiStream, docprocMainUnit, DocStructure, FixRecordFormat, HTML_Tags
+HttpClasses, Pas2Html, Pas2jsFileUtils, Pas2JSUtils, pas2Utils, simplecomport
+SimpleDOM, SimpleDS, uPSI_ParserUtils, uPSI_Pas2Html, uPSI_Pas2jsFileUtils
+uPSI_simplecomport, uPSI_SimpleDS, uPSI_SimpleDOM, uPSI_SimpleDS, UThread
+Utils, UtilsMax4, Vcl.Edge, Vcl.Direct2D, Vcl.StdStyleActnCtrls, Vcl.StyleAPI
+Vcl.StyleBitmap,Vcl.Styles,Vcl.SvcMgr,Vcl.SysStyles,Vcl.WinXPickers,Vcl.XPActnCtrls
+GR32_Bindings, GR32_LowLevel, GR32_Math, GR32_System, uPSI_IdNNTPServer
+IdNNTPServer, uPSI_dprocess3, uPSI_GR32_LowLevel, uPSI_GR32_Math, uPSI_GR32_System
+cPySupportTypes, foldingdemoUnit1,JclNotify, maXbox5_29beta198, PythonVersions
+SynAccessibility, SynDWrite2, SynEditPythonBehaviour, uCommonFunctions2
+uPSI_uCommonFunctions2, Vcl.ActnPopup, Vcl.AppEvnts, FmDemo, PJSysInfo
+
+procedure SIRegister_uCommonFunctions2(CL: TPSPascalCompiler);
+begin
+ //CL.AddConstantN('SFileExpr','String').SetString( '((?:[a-zA-Z]:)?[^:*?"<>|]+)');
+ //CL.AddConstantN('WideLF','Char').SetString( #$000A);
+ //CL.AddConstantN('WideNull','Char').SetString( #$0000);
+ //CL.AddConstantN('WordBreakString','String').SetString( ',.;:"´`°^!?&$@§%#~[](){}<>-=+*/\| ');
+ //CL.AddDelphiFunction('Function GetIconIndexFromFile( const AFileName : string; const ASmall : Boolean) : Integer');
+ Function pyGetLongFileName( const APath : string) : string');
+ Function pyStrIsLeft( AText, ALeft : PChar) : Boolean');
+ Function pyStrGetToken( var Str : PChar; Separators, WhiteSpace, QuoteChars : TSysCharSet) : string');
+ Function pyStrUnQuote( const AText : string) : string');
+ Function pyLightenColor( Color : TColor; Percentage : Integer) : TColor');
+ Function pyDarkenColor( Color : TColor; Percentage : Integer) : TColor');
+ Function pyApplicationVersion : string');
+ Function pyConnectedToInternet : Boolean');
+ Function pyGetNthLine( const Str : string; LineNo : Integer) : string');
+ Function pyGetLineRange( const Str : string; StartLine, EndLine : Integer; HtmlBreaks : Boolean) : string');
+ Function pyGetWordAtPos( const LineText : string; Start : Integer; AllowDot : Boolean; ScanBackwards : Boolean; ScanForward : Boolean; HandleBrackets : Boolean) : string');
+ Function pyFormatDocString( const DocString : string) : string');
+ Function pyDirIsPythonPackage( Dir : string) : Boolean');
+ Function pyFileIsPythonPackage( FileName : string) : Boolean');
+ Function pyGetPackageRootDir( const Dir : string) : string');
+ Function pyFileNameToModuleName( const FileName : string) : string');
+ Function pyHTMLSafe( const Str : string) : string');
+ Function pyGetParamStr( P : PChar; var Param : string) : PChar');
+ Function pyParsePySourceEncoding( TextLine : string) : string');
+ Function pySyncWideInputQuery( const ACaption, APrompt : string; var Value : string) : Boolean');
+ Function pyCleanEOLs( Str : AnsiString) : AnsiString;');
+ Function pyCleanEOLs1( Str : string) : string;');
+ Function pySortedIdentToInt( const Ident : string; var Int : LongInt; const SortedMap : array of TIdentMapEntry; CaseSensitive : Boolean) : Boolean');
+ Function pyComparePythonIdents( const Ident1, Ident2 : string) : Integer;');
+ Function pyComparePythonIdents2( List : TStringList; Index1, Index2 : Integer) : Integer;');
+ Function pyDefaultCodeFontName : string');
+ Procedure pySetDefaultUIFont( const AFont : TFont)');
+ Procedure pySetContentFont( const AFont : TFont)');
+ Function pyGetBlockText( Strings : TStrings; BlockBegin, BlockEnd : TBufferCoord) : string');
+ Function pyWideStringsToEncodedText( const AFileName : string; Lines : TStrings; var EncodedText : AnsiString; InformationLossWarning : Boolean; IsPython : Boolean) : Boolean');
+ Function pyLoadFileIntoWideStrings( const AFileName : string; Lines : TStrings) : Boolean');
+ Function pySaveWideStringsToFile( const AFileName : string; Lines : TStrings; DoBackup : Boolean) : Boolean');
+ Function pyCopyRemoteFileToTemp( const AFileName, Server : string) : string');
+ Function pyFileToEncodedStr( const AFileName : string) : AnsiString');
+ Function pyFileToStr( const AFileName : string) : string');
+ Function pyGetNthSourceLine( const AFileName : string; LineNo : Integer) : string');
+ ('Procedure WalkThroughDirectories( const Paths, Masks : string; const PreCallback : TDirectoryWalkProc; const Recursive : Boolean)');
+ Procedure pyGetFilesInPaths( Paths, Masks : string; FileList : TStrings; Recursive : Boolean)');
+ Procedure pyGetDirectoriesInPaths( Paths, Masks : string; DirList : TStrings; Recursive : Boolean)');
+ Function pyStrToken( var Str : string; Separator : Char) : string');
+ Function pyStrStripChar( const Str : string; const AChar : Char) : string');
+ Function pyCanActuallyFocus( WinControl : TWinControl) : Boolean');
+ Function CompiledRegEx( Expr : string; Options : TRegExOptions; UCP : Boolean) : TRegEx');
+function CompiledRegEx5(Expr: string; Options: TRegExOptions; { = [roNotEmpty]}
+                 aUCP: Boolean {= True}): TRegEx;    //overload;
+begin
+  try
+    Result := TRegEx.Create(Expr, Options);
+    if aUCP then
+      Result.AddRawOptions(PCRE_UCP);
+    Result.Study([preJIT]);
+  except
+    on E: ERegularExpressionError do
+      begin
+        StyledMessageDlg('SInvalidRegularExpression'+ E.Message,
+                                  mtError, [mbOK], 0);
+        Abort;
+      end;
+    else
+      raise;
+  end;
+end;
+ Function pyIsDigits( Str : string) : Boolean');
+ Function pyDedent( const Str : string) : string');
+ Function pyIsColorDark( AColor : TColor) : Boolean');
+ Function pyIsStyledWindowsColorDark : Boolean');
+ Procedure pyStyledBorderColors( out BorderNormal, BorderHighlight : TColor)');
+ Procedure pyAddFormatText( RE : TRichEdit; const Str : string; FontStyle : TFontStyles; const FontColor : TColor; FontSize : Integer)');
+ Function pyMonitorProfile : string');
+ Function pyDownloadUrlToFile( const URL, Filename : string) : Boolean');
+ ('Procedure RedirectFunction( OrgProc, NewProc : Pointer)');
+ Function pyStyledMessageDlg( const Msg : string; DlgType : TMsgDlgType; Buttons : TMsgDlgButtons; HelpCtx : LongInt) : Integer;');
+ Function pyStyledMessageDlg1( const Msg : string; DlgType : TMsgDlgType; Buttons : TMsgDlgButtons; HelpCtx : LongInt; DefaultButton : TMsgDlgBtn) : Integer;');
+ Function pySvgFixedColor( Color : TColor) : TColor');
+ //CL.AddDelphiFunction('Procedure FreeAndNilEncoding( var Encoding : TEncoding)');
+ Function pyFilePathToURI( FilePath : string) : string');
+ Function pyURIToFilePath( URI : string) : string');
+ Function pyRegisterApplicationRestart( Flags : DWORD) : Boolean');
+ Procedure pyUnregisterApplicationRestart');
+ Function pyIsFileBlocked( const FileName : string) : Boolean');
+ Procedure pyUnblockFile( const FileName : string)');
+ Function pyHTMLEncode( const Str : string) : string');   //}
+ function FixedInputQuery(const ACaption: string; const APrompts: array of string; var AValues: array of string; CloseQueryFunc: TInputCloseQueryFunc): Boolean;');
+function Detour_InputQuery2(const ACaption: string; const APrompts: array of string; var AValues: array of string; CloseQueryFunc: TInputCloseQueryFunc): Boolean;
+procedure AddMRUString(Text: string; List: TStrings; DeleteTrailingDelimiter: Boolean);
+procedure SetComCtlStyle(Ctl: TWinControl; Value: Integer; UseStyle: Boolean);
+procedure JvScaleImageList(const ImgList: TCustomImageList; M, D: Integer);
+ procedure JvDrawTextWithMiddleEllipsis(Canvas: TCanvas; Text: string; DrawRect: TRect; Flags: Integer);
+ procedure JvDockLockWindow(Control: TWinControl);
+  procedure JvDockUnLockWindow;
+function getpythonfiletemplate: string;
+function getjupyterfiletemplate: string;
+function gethtmlfiletemplate: string;
+function getxmlfiletemplate: string;
+
+maxform1.SystemInfo1Click
+https://github.com/ddablib/sysinfo/blob/develop/Demos/VCL/FmDemo.pas
+
+https://stackoverflow.com/questions/65549969/delphi-mapping-for-wine-function-wine-nt-to-unix-file-name
+https://forum.winehq.org/viewtopic.php?t=19163
+ SIRegister_TXStringList(CL);
+ SIRegister_ITimer(CL);
+ CL.AddDelphiFunction('Function NewTimer( Interval : Cardinal) : ITimer');
+end;
+  CL.AddTypeS('TRegExStudyOption', '( preJIT, preJITPartialHard,  preJITPartialSoft)');
+  CL.AddTypeS('TRegExStudyOptions','set of TRegExStudyOption');
+ 
+ref: https://www.codeweavers.com/blog/aeikum/2022/6/3/debugging-wine-with-x86-hardware-debug-registers
+ { Options = [eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoScrollPastEol, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces, eoShowLigatures] }
+   {SelectedColor.Alpha = 0.400000005960464500}  
+   
+   Options = [eoAltSetsColumnMode, eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabIndent, eoTabsToSpaces, eoTrimTrailingSpaces]
+    
+   https://github.com/pyscripter/SynEdit/issues/102
+   https://github.com/pyscripter/SynEdit/issues/104
+   https://github.com/pyscripter/SynEdit/issues/105
+   https://github.com/SynEdit/SynEdit/blob/master/Source/SynEdit.pas
+   https://docwiki.embarcadero.com/RADStudio/Athens/en/12_Athens_-_Release_2#Editor_Scrollbar_Annotations
+   
+   on mX5 as  help/tutorials/starter3 modular
+   
+    FlowControlChars: array[TSynFlowControl] of Char =
+    (WideNull, #$2BAD, #$2BAF, #$27A5);
+    
+______takeaways:
+Alt + Mouse click:  Adds new caret
+Alt + Mouse move: Adds new selection
+Alt + Shift + Mouse click/move: Selects column mode   
+
+https://pyscripter.blogspot.com/2024/10/teaser-multi-caret-editing-is-coming-to.html
+
+hese commands increase/decrease/reset the font size of the editor and the gutter.
+
+Three new commands to be implement.
+
+ecZoomIn (Alt+Num +)
+ecZoomOut (Alt+Num -)
+ecZoomReset (Alt+Num 0)
+Ctrl+MouseWheel Up/Down also acts as Zoom In/Out
+
+MouseWheel operations
+
+Ctrl+MouseWheel Up/Down -> Zoom In/Out
+MouseWheel Up/Down -> Scroll vertically
+Ctrl +Shift+MouseWheel Up/Down -> Scroll vertically by half page
+Shift + MouseWheel Up/Down -> Scroll horizontally
+MouseWheel Left/Right -> Scroll horizontally
+Ctrl+Shift+MouseWheel Left/Right -> Scroll horizontally by half page
+
+add text
+SynEdit1.InsertBlock(SynEdit1.CaretXY, SynEdit1.CaretXY, 'test', true);
+
+Visual Features  ScrollbarAnnotations   Scrollbar Annotations
+The scrollbar annotations show:  dfM:compiedrr
+ScrollbarAnnotations = <>
+ScrollbarAnnotations = <
+            item
+              AnnType = sbaCarets
+              AnnPos = sbpFullWidth
+              FullRow = False
+            end
+            item
+              AnnType = sbaBookmark
+              AnnPos = sbpLeft
+              FullRow = True
+            end
+            item
+              AnnType = sbaTrackChanges
+              AnnPos = sbpRight
+              FullRow = True
+            end>
+
+Multiple caret positions (blue lines)
+Error lines (red lines)
+Bookmarks (mini blue marks)
+Line modification info
+
+If annotations do not appear automatically, check for any additional configuration options or properties 
+exposed in the multicaret branch. New features might require enabling properties like 
+ShowAnnotations or similar in the SynEdit control, so consult the multicaret branch
+
+maXbox5_29beta180/190/195/196/198 notes and addons August 2025
+(*-----------------------------------------------------------------*)
+column mode
+______takeaways:
+Alt + Mouse click:  Adds new caret
+Alt + Mouse move: Adds new selection
+Alt + Shift + Mouse click/move: Selects column mode   
+
+   https://github.com/pyscripter/SynEdit/issues/102
+   https://github.com/pyscripter/SynEdit/issues/104
+   https://github.com/pyscripter/SynEdit/issues/105
+   
+Verifying: maXbox52.exe
+
+Signature Index: 0 (Primary Signature)
+Hash of file (sha256): 78703B050D731B563157ED31F618932D5047E7D59ED78ABB644ADEBFF540C4F7
+
+Signing Certificate Chain:
+    Issued to: maXboxCertAuth
+    Issued by: maXboxCertAuth
+    Expires:   Sun Jan 01 01:59:59 2040
+    SHA1 hash: 6F83207B500DCC0E32A719599CBC6BD7E6B2A04D
+
+        Issued to: maXbox4signer
+        Issued by: maXboxCertAuth
+        Expires:   Sun Jan 01 01:59:59 2040
+        SHA1 hash: 6A89501B76D47C189A60BF1070BAA2FBFD38D7D7
+
+            Issued to: maXbox4exe
+            Issued by: maXbox4signer
+            Expires:   Sun Jan 01 01:59:59 2040
+            SHA1 hash: F0EB0CA218C5707FAC78921F81092CECA12AD0E9
+
+The signature is timestamped: Wed Sep 03 15:51:24 2025
+Timestamp Verified by:
+    Issued to: GlobalSign
+    Issued by: GlobalSign
+    Expires:   Sun Dec 10 02:00:00 2034
+    SHA1 hash: 8094640EB5A7A1CA119C1FDDD59F810263A7FBD1
+
+        Issued to: GlobalSign Timestamping CA - SHA384 - G4
+        Issued by: GlobalSign
+        Expires:   Sun Dec 10 02:00:00 2034
+        SHA1 hash: F585500925786F88E721D235240A2452AE3D23F9
+
+            Issued to: Globalsign TSA for CodeSign1 - R6
+            Issued by: GlobalSign Timestamping CA - SHA384 - G4
+            Expires:   Sun Dec 10 02:00:00 2034
+            SHA1 hash: C625B554BF13E9CB8A5C099BC37BF58485D890E5
+
+
+Successfully verified: maXbox52.exe
+
+Number of files successfully Verified: 1
+Number of warnings: 0
+Number of errors: 0
+
+DLL Handling:
+https://jrsoftware.org/is6help/index.php?topic=scriptdll
+ cl.AddFunction('procedure PSUnloadDll(S: string)');
+ cl.AddFunction('function PSDllGetLastError: LongInt)');
+ //cl.OnExternalProc := DllExternalProc;
+ cl.AddFunction('function psrpos(ch: tbtchar; const s: tbtstring): Longint;');
+ cl.AddFunction('function psRemoveQuotes(s: tbtstring): tbtstring;');
+
+ ('clBlack32','LongWord').SetUInt( TColor32 ( $FF000000 ));
+ ('clDimGray32','LongWord').SetUInt( TColor32 ( $FF3F3F3F ));
+ ('clGray32','LongWord').SetUInt( TColor32 ( $FF7F7F7F ));
+ ('clLightGray32','LongWord').SetUInt( TColor32 ( $FFBFBFBF ));
+ ('clWhite32','LongWord').SetUInt( TColor32 ( $FFFFFFFF ));
+ ('clMaroon32','LongWord').SetUInt( TColor32 ( $FF7F0000 ));
+ ('clGreen32','LongWord').SetUInt( TColor32 ( $FF007F00 ));
+ ('clOlive32','LongWord').SetUInt( TColor32 ( $FF7F7F00 ));
+ ('clNavy32','LongWord').SetUInt( TColor32 ( $FF00007F ));
+ ('clPurple32','LongWord').SetUInt( TColor32 ( $FF7F007F ));
+ ('clTeal32','LongWord').SetUInt( TColor32 ( $FF007F7F ));
+ ('clRed32','LongWord').SetUInt( TColor32 ( $FFFF0000 ));
+ ('clLime32','LongWord').SetUInt( TColor32 ( $FF00FF00 ));
+ ('clYellow32','LongWord').SetUInt( TColor32 ( $FFFFFF00 ));
+ ('clBlue32','LongWord').SetUInt( TColor32 ( $FF0000FF ));
+ ('clFuchsia32','LongWord').SetUInt( TColor32 ( $FFFF00FF ));
+ ('clAqua32','LongWord').SetUInt( TColor32 ( $FF00FFFF ));
+ ('clAliceBlue32','LongWord').SetUInt( TColor32 ( $FFF0F8FF ));
+ ('clAntiqueWhite32','LongWord').SetUInt( TColor32 ( $FFFAEBD7 ));
+ ('clAquamarine32','LongWord').SetUInt( TColor32 ( $FF7FFFD4 ));
+ ('clAzure32','LongWord').SetUInt( TColor32 ( $FFF0FFFF ));
+ ('clBeige32','LongWord').SetUInt( TColor32 ( $FFF5F5DC ));
+ ('clBisque32','LongWord').SetUInt( TColor32 ( $FFFFE4C4 ));
+ ('clBlancheDalmond32','LongWord').SetUInt( TColor32 ( $FFFFEBCD ));
+ ('clBlueViolet32','LongWord').SetUInt( TColor32 ( $FF8A2BE2 ));
+ ('clBrown32','LongWord').SetUInt( TColor32 ( $FFA52A2A ));
+ ('clBurlyWood32','LongWord').SetUInt( TColor32 ( $FFDEB887 ));
+ ('clCadetblue32','LongWord').SetUInt( TColor32 ( $FF5F9EA0 ));
+ ('clChartReuse32','LongWord').SetUInt( TColor32 ( $FF7FFF00 ));
+ ('clChocolate32','LongWord').SetUInt( TColor32 ( $FFD2691E ));
+ ('clCoral32','LongWord').SetUInt( TColor32 ( $FFFF7F50 ));
+ ('clCornFlowerBlue32','LongWord').SetUInt( TColor32 ( $FF6495ED ));
+ ('clCornSilk32','LongWord').SetUInt( TColor32 ( $FFFFF8DC ));
+ ('clCrimson32','LongWord').SetUInt( TColor32 ( $FFDC143C ));
+ ('clDarkBlue32','LongWord').SetUInt( TColor32 ( $FF00008B ));
+ ('clDarkCyan32','LongWord').SetUInt( TColor32 ( $FF008B8B ));
+ ('clDarkGoldenRod32','LongWord').SetUInt( TColor32 ( $FFB8860B ));
+ ('clDarkGray32','LongWord').SetUInt( TColor32 ( $FFA9A9A9 ));
+ ('clDarkGreen32','LongWord').SetUInt( TColor32 ( $FF006400 ));
+ ('clDarkGrey32','LongWord').SetUInt( TColor32 ( $FFA9A9A9 ));
+ ('clDarkKhaki32','LongWord').SetUInt( TColor32 ( $FFBDB76B ));
+ ('clDarkMagenta32','LongWord').SetUInt( TColor32 ( $FF8B008B ));
+ ('clDarkOliveGreen32','LongWord').SetUInt( TColor32 ( $FF556B2F ));
+ ('clDarkOrange32','LongWord').SetUInt( TColor32 ( $FFFF8C00 ));
+ ('clDarkOrchid32','LongWord').SetUInt( TColor32 ( $FF9932CC ));
+ ('clDarkRed32','LongWord').SetUInt( TColor32 ( $FF8B0000 ));
+ ('clDarkSalmon32','LongWord').SetUInt( TColor32 ( $FFE9967A ));
+ ('clDarkSeaGreen32','LongWord').SetUInt( TColor32 ( $FF8FBC8F ));
+ ('clDarkSlateBlue32','LongWord').SetUInt( TColor32 ( $FF483D8B ));
+ ('clDarkSlateGray32','LongWord').SetUInt( TColor32 ( $FF2F4F4F ));
+ ('clDarkSlateGrey32','LongWord').SetUInt( TColor32 ( $FF2F4F4F ));
+ ('clDarkTurquoise32','LongWord').SetUInt( TColor32 ( $FF00CED1 ));
+ ('clDarkViolet32','LongWord').SetUInt( TColor32 ( $FF9400D3 ));
+ ('clDeepPink32','LongWord').SetUInt( TColor32 ( $FFFF1493 ));
+ ('clDeepSkyBlue32','LongWord').SetUInt( TColor32 ( $FF00BFFF ));
+ ('clDodgerBlue32','LongWord').SetUInt( TColor32 ( $FF1E90FF ));
+ ('clFireBrick32','LongWord').SetUInt( TColor32 ( $FFB22222 ));
+ ('clFloralWhite32','LongWord').SetUInt( TColor32 ( $FFFFFAF0 ));
+ ('clGainsBoro32','LongWord').SetUInt( TColor32 ( $FFDCDCDC ));
+ ('clGhostWhite32','LongWord').SetUInt( TColor32 ( $FFF8F8FF ));
+ ('clGold32','LongWord').SetUInt( TColor32 ( $FFFFD700 ));
+ ('clGoldenRod32','LongWord').SetUInt( TColor32 ( $FFDAA520 ));
+ ('clGreenYellow32','LongWord').SetUInt( TColor32 ( $FFADFF2F ));
+ ('clGrey32','LongWord').SetUInt( TColor32 ( $FF808080 ));
+ ('clHoneyDew32','LongWord').SetUInt( TColor32 ( $FFF0FFF0 ));
+ ('clHotPink32','LongWord').SetUInt( TColor32 ( $FFFF69B4 ));
+ ('clIndianRed32','LongWord').SetUInt( TColor32 ( $FFCD5C5C ));
+ ('clIndigo32','LongWord').SetUInt( TColor32 ( $FF4B0082 ));
+ ('clIvory32','LongWord').SetUInt( TColor32 ( $FFFFFFF0 ));
+ ('clKhaki32','LongWord').SetUInt( TColor32 ( $FFF0E68C ));
+ ('clLavender32','LongWord').SetUInt( TColor32 ( $FFE6E6FA ));
+ ('clLavenderBlush32','LongWord').SetUInt( TColor32 ( $FFFFF0F5 ));
+ ('clLawnGreen32','LongWord').SetUInt( TColor32 ( $FF7CFC00 ));
+ ('clLemonChiffon32','LongWord').SetUInt( TColor32 ( $FFFFFACD ));
+ ('clLightBlue32','LongWord').SetUInt( TColor32 ( $FFADD8E6 ));
+ ('clLightCoral32','LongWord').SetUInt( TColor32 ( $FFF08080 ));
+ ('clLightCyan32','LongWord').SetUInt( TColor32 ( $FFE0FFFF ));
+ ('clLightGoldenRodYellow32','LongWord').SetUInt( TColor32 ( $FFFAFAD2 ));
+ ('clLightGreen32','LongWord').SetUInt( TColor32 ( $FF90EE90 ));
+ ('clLightGrey32','LongWord').SetUInt( TColor32 ( $FFD3D3D3 ));
+ ('clLightPink32','LongWord').SetUInt( TColor32 ( $FFFFB6C1 ));
+ ('clLightSalmon32','LongWord').SetUInt( TColor32 ( $FFFFA07A ));
+ ('clLightSeagreen32','LongWord').SetUInt( TColor32 ( $FF20B2AA ));
+ ('clLightSkyblue32','LongWord').SetUInt( TColor32 ( $FF87CEFA ));
+ ('clLightSlategray32','LongWord').SetUInt( TColor32 ( $FF778899 ));
+ ('clLightSlategrey32','LongWord').SetUInt( TColor32 ( $FF778899 ));
+ ('clLightSteelblue32','LongWord').SetUInt( TColor32 ( $FFB0C4DE ));
+ ('clLightYellow32','LongWord').SetUInt( TColor32 ( $FFFFFFE0 ));
+ ('clLtGray32','LongWord').SetUInt( TColor32 ( $FFC0C0C0 ));
+ ('clMedGray32','LongWord').SetUInt( TColor32 ( $FFA0A0A4 ));
+ ('clDkGray32','LongWord').SetUInt( TColor32 ( $FF808080 ));
+ ('clMoneyGreen32','LongWord').SetUInt( TColor32 ( $FFC0DCC0 ));
+ ('clLegacySkyBlue32','LongWord').SetUInt( TColor32 ( $FFA6CAF0 ));
+ ('clCream32','LongWord').SetUInt( TColor32 ( $FFFFFBF0 ));
+ ('clLimeGreen32','LongWord').SetUInt( TColor32 ( $FF32CD32 ));
+ ('clLinen32','LongWord').SetUInt( TColor32 ( $FFFAF0E6 ));
+ ('clMediumAquamarine32','LongWord').SetUInt( TColor32 ( $FF66CDAA ));
+ ('clMediumBlue32','LongWord').SetUInt( TColor32 ( $FF0000CD ));
+ ('clMediumOrchid32','LongWord').SetUInt( TColor32 ( $FFBA55D3 ));
+ ('clMediumPurple32','LongWord').SetUInt( TColor32 ( $FF9370DB ));
+ ('clMediumSeaGreen32','LongWord').SetUInt( TColor32 ( $FF3CB371 ));
+ ('clMediumSlateBlue32','LongWord').SetUInt( TColor32 ( $FF7B68EE ));
+ ('clMediumSpringGreen32','LongWord').SetUInt( TColor32 ( $FF00FA9A ));
+ ('clMediumTurquoise32','LongWord').SetUInt( TColor32 ( $FF48D1CC ));
+ ('clMediumVioletRed32','LongWord').SetUInt( TColor32 ( $FFC71585 ));
+ ('clMidnightBlue32','LongWord').SetUInt( TColor32 ( $FF191970 ));
+ ('clMintCream32','LongWord').SetUInt( TColor32 ( $FFF5FFFA ));
+ ('clMistyRose32','LongWord').SetUInt( TColor32 ( $FFFFE4E1 ));
+ ('clMoccasin32','LongWord').SetUInt( TColor32 ( $FFFFE4B5 ));
+ ('clNavajoWhite32','LongWord').SetUInt( TColor32 ( $FFFFDEAD ));
+ ('clOldLace32','LongWord').SetUInt( TColor32 ( $FFFDF5E6 ));
+ ('clOliveDrab32','LongWord').SetUInt( TColor32 ( $FF6B8E23 ));
+ ('clOrange32','LongWord').SetUInt( TColor32 ( $FFFFA500 ));
+ ('clOrangeRed32','LongWord').SetUInt( TColor32 ( $FFFF4500 ));
+ ('clOrchid32','LongWord').SetUInt( TColor32 ( $FFDA70D6 ));
+ ('clPaleGoldenRod32','LongWord').SetUInt( TColor32 ( $FFEEE8AA ));
+ ('clPaleGreen32','LongWord').SetUInt( TColor32 ( $FF98FB98 ));
+ ('clPaleTurquoise32','LongWord').SetUInt( TColor32 ( $FFAFEEEE ));
+ ('clPaleVioletred32','LongWord').SetUInt( TColor32 ( $FFDB7093 ));
+ ('clPapayaWhip32','LongWord').SetUInt( TColor32 ( $FFFFEFD5 ));
+ ('clPeachPuff32','LongWord').SetUInt( TColor32 ( $FFFFDAB9 ));
+ ('clPeru32','LongWord').SetUInt( TColor32 ( $FFCD853F ));
+ ('clPlum32','LongWord').SetUInt( TColor32 ( $FFDDA0DD ));
+ ('clPowderBlue32','LongWord').SetUInt( TColor32 ( $FFB0E0E6 ));
+ ('clRosyBrown32','LongWord').SetUInt( TColor32 ( $FFBC8F8F ));
+ ('clRoyalBlue32','LongWord').SetUInt( TColor32 ( $FF4169E1 ));
+ ('clSaddleBrown32','LongWord').SetUInt( TColor32 ( $FF8B4513 ));
+ ('clSalmon32','LongWord').SetUInt( TColor32 ( $FFFA8072 ));
+ ('clSandyBrown32','LongWord').SetUInt( TColor32 ( $FFF4A460 ));
+ ('clSeaGreen32','LongWord').SetUInt( TColor32 ( $FF2E8B57 ));
+ ('clSeaShell32','LongWord').SetUInt( TColor32 ( $FFFFF5EE ));
+ ('clSienna32','LongWord').SetUInt( TColor32 ( $FFA0522D ));
+ ('clSilver32','LongWord').SetUInt( TColor32 ( $FFC0C0C0 ));
+ ('clSkyblue32','LongWord').SetUInt( TColor32 ( $FF87CEEB ));
+ ('clSlateBlue32','LongWord').SetUInt( TColor32 ( $FF6A5ACD ));
+ ('clSlateGray32','LongWord').SetUInt( TColor32 ( $FF708090 ));
+ ('clSlateGrey32','LongWord').SetUInt( TColor32 ( $FF708090 ));
+ ('clSnow32','LongWord').SetUInt( TColor32 ( $FFFFFAFA ));
+ ('clSpringgreen32','LongWord').SetUInt( TColor32 ( $FF00FF7F ));
+ ('clSteelblue32','LongWord').SetUInt( TColor32 ( $FF4682B4 ));
+ ('clTan32','LongWord').SetUInt( TColor32 ( $FFD2B48C ));
+ ('clThistle32','LongWord').SetUInt( TColor32 ( $FFD8BFD8 ));
+ ('clTomato32','LongWord').SetUInt( TColor32 ( $FFFF6347 ));
+ ('clTurquoise32','LongWord').SetUInt( TColor32 ( $FF40E0D0 ));
+ ('clViolet32','LongWord').SetUInt( TColor32 ( $FFEE82EE ));
+ ('clWheat32','LongWord').SetUInt( TColor32 ( $FFF5DEB3 ));
+ ('clWhitesmoke32','LongWord').SetUInt( TColor32 ( $FFF5F5F5 ));
+ ('clYellowgreen32','LongWord').SetUInt( TColor32 ( $FF9ACD32 ));
+ ('clTrWhite32','LongWord').SetUInt( TColor32 ( $7FFFFFFF ));
+ ('clTrBlack32','LongWord').SetUInt( TColor32 ( $7F000000 ));
+ ('clTrRed32','LongWord').SetUInt( TColor32 ( $7FFF0000 ));
+ ('clTrGreen32','LongWord').SetUInt( TColor32 ( $7F00FF00 ));
+ ('clTrBlue32','LongWord').SetUInt( TColor32 ( $7F0000FF ));
+
+CL.AddDelphiFunction('
+function LoadImageListFromBitmap(ImgList: TCustomImageList; const Bitmap: TBitmap;  MaskBitmap: TBitmap): Integer;'); // overload;
+function LoadImageListFromBitmap(ImgList: TCustomImageList; const Bitmap: TBitmap;  MaskColor: TColor; AutoMaskColor: Boolean): Integer;'); // overload;
+function LoadUtf8File(const Filename: string): string;
+function LoadUtf8File2Ansi(const Filename: string): string;
+function FindComponent3(const AName: string; aowner: tcomponent): TComponent;
+function FindControl3(const AName: string; aowner: TComponent; aparent: TWinControl): TComponent;
+
+procedure SIRegister_GR32_System(CL: TPSPascalCompiler);
+begin
+  SIRegister_TPerfTimer(CL);
+ CL.AddDelphiFunction('Function grGetTickCount : Cardinal');
+ CL.AddDelphiFunction('Function grGetProcessorCount : Cardinal');
+  CL.AddTypeS('TCPUInstructionSet', '( ciMMX, ciEMMX, ciSSE, ciSSE2, ci3DNow, ci3DNowExt )');
+  //CL.AddTypeS('TCPUInstructionSet', '( ciDummy )');
+  //CL.AddTypeS('PCPUFeatures', '^TCPUFeatures // will not work');
+  CL.AddTypeS('TCPUFeatures', 'set of TCPUInstructionSet');
+ CL.AddDelphiFunction('Function grHasInstructionSet( const InstructionSet : TCPUInstructionSet) : Boolean');
+ CL.AddDelphiFunction('Function grCPUFeatures : TCPUFeatures');
+ //from CALWIN32 !
+ Function grNull2Blank( aString : String) : String');
+ Function grbooltoint( aBool : Boolean) : LongInt');
+ Function grinttobool( aInt : LongInt) : Boolean');
+ Function grIntTo3Str( Value : Longint; separator: string) : string');
+ function grIsReadOnly(const Filename: string): boolean;');
+ Procedure grBeepOk');
+ Procedure grBeepQuestion');
+ Procedure grBeepHand');
+ Procedure grBeepExclamation');
+ Procedure grBeepAsterisk');
+ Procedure grBeepInformation');
+ Procedure grCenterDlg( AForm : TForm; MForm : TForm)');
+ Procedure grCenterForm( AForm : TForm; MForm : TForm)');
+ Procedure grCenterFrm( AForm : TForm; MForm : TForm)');
+ Function grRemoveDF( aString : String) : String');
+ Function grRefStringlistCopy( aRefArray : TStringList) : TStringList');
+end;
+
+procedure SIRegister_GR32_LowLevel(CL: TPSPascalCompiler);
+begin
+
+//TWrapProc = function(Value, Max: Integer): Integer;
+//TWrapProcEx = function(Value, Min, Max: Integer): Integer;
+//TWrapMode = (wmClamp, wmRepeat, wmMirror);
+
+  CL.AddTypeS('TWrapProc', 'function(Value, Max: Integer): Integer;');
+  CL.AddTypeS('TWrapProcEx', 'function(Value, Min, Max: Integer): Integer;');
+  CL.AddTypeS('TWrapMode', '(wmClamp, wmRepeat, wmMirror)');
+  CL.AddTypeS('TColor32','TColor');   cl.addTypeS('TColor', 'integer');
+
+ Function Clamp( const Value : Integer) : Integer;');
+ Procedure GRFillWord( var X, Count : Cardinal; Value : Longword)');
+ Function StackAlloc( Size : Integer) : ___Pointer');
+ Procedure StackFree( P : ___Pointer)');
+ Procedure grSwap( var A, B : ___Pointer);');
+ Procedure Swap1( var A, B : Integer);');
+ Procedure Swap2( var A, B : TFixed);');
+ Procedure Swap3( var A, B : TColor32);');
+ Procedure TestSwap( var A, B : Integer);');
+ Procedure TestSwap1( var A, B : TFixed);');
+ Function TestClip( var A, B : Integer; const Size : Integer) : Boolean;');
+ Function TestClip1( var A, B : Integer; const Start, Stop : Integer) : Boolean;');
+ Function GRConstrain( const Value, Lo, Hi : Integer) : Integer;');
+ Function Constrain1( const Value, Lo, Hi : Single) : Single;');
+ Function SwapConstrain( const Value : Integer; Constrain1, Constrain2 : Integer) : Integer');
+ Function GRMin( const A, B, C : Integer) : Integer;');
+ Function GRMax( const A, B, C : Integer) : Integer;');
+ Function Clamp2( Value, Max : Integer) : Integer;');
+ Function Clamp1( Value, Min, Max : Integer) : Integer;');
+ Function Wrap( Value, Max : Integer) : Integer;');
+ Function Wrap1( Value, Min, Max : Integer) : Integer;');
+ Function Wrap3( Value, Max : Single) : Single;;');
+ Function WrapPow2( Value, Max : Integer) : Integer;');
+ Function WrapPow21( Value, Min, Max : Integer) : Integer;');
+ Function Mirror( Value, Max : Integer) : Integer;');
+ Function Mirror1( Value, Min, Max : Integer) : Integer;');
+ Function MirrorPow2( Value, Max : Integer) : Integer;');
+ Function MirrorPow21( Value, Min, Max : Integer) : Integer;');
+ Function GetOptimalWrap( Max : Integer) : TWrapProc;');
+ Function GetOptimalWrap1( Min, Max : Integer) : TWrapProcEx;');
+ Function GetOptimalMirror( Max : Integer) : TWrapProc;');
+ Function GetOptimalMirror1( Min, Max : Integer) : TWrapProcEx;');
+ Function GetWrapProc( WrapMode : TWrapMode) : TWrapProc;');
+ Function GetWrapProc1( WrapMode : TWrapMode; Max : Integer) : TWrapProc;');
+ Function GetWrapProcEx( WrapMode : TWrapMode) : TWrapProcEx;');
+ Function GetWrapProcEx1( WrapMode : TWrapMode; Min, Max : Integer) : TWrapProcEx;');
+ Function Div255( Value : Cardinal) : Cardinal');
+ Function SAR_4( Value : Integer) : Integer');
+ Function SAR_8( Value : Integer) : Integer');
+ Function SAR_9( Value : Integer) : Integer');
+ Function SAR_11( Value : Integer) : Integer');
+ Function SAR_12( Value : Integer) : Integer');
+ Function SAR_13( Value : Integer) : Integer');
+ Function SAR_14( Value : Integer) : Integer');
+ Function SAR_15( Value : Integer) : Integer');
+ Function SAR_16( Value : Integer) : Integer');
+ Function ColorSwap( WinColor : TColor) : TColor32');
+end;
+
+from FPC RTL/FCL
+https://github.com/z505/TProcess-Delphi/tree/master
+
+Procedure TProcess3.CreateStreams(InHandle,OutHandle,ErrHandle : Longint);
+
+begin
+  FreeStreams;
+  FInputStream:=TOutputPipeStream3.Create (InHandle);
+  FOutputStream:=TInputPipeStream3.Create (OutHandle);
+  if Not (poStderrToOutput in FProcessOptions) then
+    FStderrStream:=TInputPipeStream3.Create(ErrHandle);
+end;
+
+var
+  GWinSrvHandle: HMODULE;
+  GTriedLoadWinSrvDll: Boolean;
+const
+  WinSrvDllName = 'WINSRV.DLL';
+
+function WinSrvHandle: HMODULE;
+begin
+  if not GTriedLoadWinSrvDll then begin
+    GTriedLoadWinSrvDll := True;
+
+    GWinSrvHandle := SafeLoadLibrary(WinSrvDllName);
+    if GWinSrvHandle <> 0 then
+      FreeLibrary(GWinSrvHandle);
+  end;
+  Result := GWinSrvHandle;
+end;
+
+function IsConsoleWindow(AHandle: THandle): Boolean;
+begin
+  Result := THandle(GetWindowLongPtr(AHandle, GWLP_HINSTANCE)) = WinSrvHandle;
+end;
+
+ Function GetEnvironmentVar0( const Name : string; out Value : string) : Boolean;');
+ Function GetEnvironmentVar1( const Name : string; out Value : string; Expand : Boolean) : Boolean;');
+ Function GetEnvironmentVar( const Name : string; out Value : string; Expand : Boolean) : Boolean;');
+
+function UnifyNameValues(Param: array of const; NameValueSeparator: Char; Delimiter: String): String;
+const ccTrim = ' ''"'#13#10#9; // Caracterele eliminate din nume si valoare, daca se intalnesc la margine
+var L, S: TStringList;
+    T: TStrings;
+    i, j: integer;
+    buf: String;
+begin
+  Result := '';
+  if not Boolean(Length(param)) then Exit;
+  i := 0;
+  L := TStringList.Create;
+  S := TStringList.Create;
+  T := nil;
+  try
+    L.NameValueSeparator := NameValueSeparator;
+    S.NameValueSeparator := NameValueSeparator;
+    while i < Length(Param) do with Param[i] do begin
+      case VType of
+        vtChar:       buf := String(VChar);
+        vtWideChar:   buf := (VWideChar);
+        vtString:     buf := (VString^);
+        vtPChar:      buf := (VPChar);
+        vtPWideChar:  buf := (VPWideChar);
+        vtAnsiString: buf := String(PAnsiString(VAnsiString));
+        vtWideString: buf := String(PWideString(VWideString));
+        vtObject:    if VObject is TStrings then begin
+                         T := TStrings(VObject);
+                         buf := '';
+                     end;
+        else buf := '';
+      end;
+      inc(i);
+      if buf <> '' then begin
+        T := S;
+        Split2(Delimiter, buf, T, true);
+      end;
+      if Boolean(T) then begin
+        j := 0;
+        while j < T.Count do begin
+          buf := Trim(T.Names[j], ccTrim);
+          if buf <> '' then L.Values[buf] := Trim(T.ValueFromIndex[j], ccTrim);
+          inc(j);
+        end;
+        T := nil;
+      end;
+    end;
+    S.Clear;
+    if Delimiter <> '' then Delimiter := Delimiter[1];
+    Result := Join(Delimiter, L);
+  finally L.Free; S.Free; end;
+end;
+
+procedure InitSysPath;
+  var
+    _path : PPyObject;
+  const Script =
+    'import sys' + sLineBreak +
+    'sys.executable = r"%s"' + sLineBreak +
+    'path = sys.path' + sLineBreak +
+    'for i in range(len(path)-1, -1, -1):' + sLineBreak +
+    '    if path[i].find("site-packages") > 0:' + sLineBreak +
+    '        path.pop(i)' + sLineBreak +
+    'import site' + sLineBreak +
+    'site.main()' + sLineBreak +
+    'del sys, path, i, site';
+  begin
+     if Pythonexecutable {VenvPythonExe} <> '' then
+       ExecString(AnsiString(Format(Script, [Pythonexecutable])));
+    _path := PySys_GetObject('path');
+    if Assigned(FOnSysPathInit) then
+      FOnSysPathInit(Self, _path);
+  end;
+
+https://www.spiegel.de/kultur/gesellschaft/koelner-kunstskandal-beltracchi-faelschte-bilder-von-mehr-als-50-kuenstlern-a-819153.html
+
+
+Unit List 5.2.9.915
+
+Comparing files units1.txt and UNITS2.TXT to V5.2.9.180 to V5.2.9.195
+
+***** 34 UNITS2.TXT  new and updates
+delphi_arduino_Unit1
+DelphiParse
+DelphiStream
+docprocMainUnit
+DocStructure
+FixRecordFormat
+HTML_Tags
+HttpClasses
+Pas2Html
+Pas2jsFileUtils
+Pas2JSUtils
+pas2Utils
+simplecomport
+SimpleDOM
+SimpleDS
+uPSI_ParserUtils
+uPSI_Pas2Html
+uPSI_Pas2jsFileUtils
+uPSI_simplecomport
+uPSI_SimpleDS
+uPSI_SimpleDOM
+uPSI_SimpleDS
+UThread
+Utils
+UtilsMax4
+Vcl.Edge
+Vcl.Direct2D
+Vcl.StdStyleActnCtrls
+Vcl.StyleAPI
+Vcl.StyleBitmap
+Vcl.Styles
+Vcl.SvcMgr
+Vcl.SysStyles
+Vcl.WinXPickers
+Vcl.XPActnCtrls
+
+*****************************************************************
+Release Notes maXbox 5.2.9.190 July 2025 mX529 beta64-bit🐞
+*****************************************************************
+- fixed bigbug in debugger/preprocessor -see tutor_146 debugging
+- now 152 Tutorials last: Tutor 149 Statistic Package, July 2025
+- dmath64.dll renew functions data science package II
+- maxbox_starter_testsequence52.bat added listview events
+- new examples on https://sourceforge.net/projects/maxbox5/files/
+- ESC song available: examples/Sternenhaufen_Max_SunoAI.mp3
+- update compatible for Python3.13 and Python3.14 P4D export
+- https://github.com/maxkleiner/PythonEnvironments/tree/main
+- GO game menu/view/GoGame5 -TGoForm1-TGoBlock-TGoBoard-MinesweeperX5
+- 64bit migrate DA Checkers, DA Othello /Options/Add Ons/Reversi
+- ChessBoard migrate 64bit https://github.com/maxkleiner/Pascal-Chess
+- Modules Count_: 3819 Units maXbox5_29beta190.xml
+
+22.07.2025 09:25
+Release Notes maXbox 5.2.9.190 July 2025 
+SHA1: 5.2.9.190 maXbox5.exe c950a055083157f5f0834cf9496617ac041d333e
+SHA1: ZIP maxbox52.zip ED61B2EFA98E490D91A9E0216354697FC3EB4154 
+Comparing files units1.txt and UNITS2.TXT to V5.2.9.190
+
+***** units1.txt
+Diff
+DigiBox
+DIMime
+***** UNITS2.TXT
+Diff
+DIMime
+*****
+
+***** units1.txt
+IFSI_WinForm1puzzle_
+ImageAscii
+imageasciiMain
+ImageDLLLoader
+***** UNITS2.TXT
+IFSI_WinForm1puzzle_
+ImageDLLLoader
+*****
+
+***** units1.txt
+MathUtils
+maXbox5_29beta190
+MaxDOM
+***** UNITS2.TXT
+MathUtils
+maXbox5_29beta180
+MaxDOM
+*****
+
+***** units1.txt
+osFileUtil
+OthelloBoard
+othelloMain
+ovcbase
+***** UNITS2.TXT
+osFileUtil
+ovcbase
+*****
+
+***** units1.txt
+ulu
+uMainsweeper
+umarq
+***** UNITS2.TXT
+ulu
+umarq
+*****
+
+***** units1.txt
+uPSI_Diff
+uPSI_DigiBox
+uPSI_DirOutln
+***** UNITS2.TXT
+uPSI_Diff
+uPSI_DirOutln
+*****
+
+***** units1.txt
+uPSI_osFileUtil
+uPSI_OthelloBoard
+uPSI_othelloMain
+uPSI_Outline
+***** UNITS2.TXT
+uPSI_osFileUtil
+uPSI_Outline
+*****
+
+***** units1.txt
+uPSI_ulogifit
+uPSI_uMainsweeper
+uPSI_umath
+***** UNITS2.TXT
+uPSI_ulogifit
+uPSI_umath
+*****
+
+Comparing files units1.txt and UNITS2.TXT
+***** units1.txt
+JclSysUtils_max
+JclTask
+JclTD32
+***** UNITS2.TXT
+JclSysUtils_max
+JclTD32
+*****
+
+***** units1.txt
+MathUtils
+maXbox5_29beta180
+MaxDOM
+***** UNITS2.TXT
+MathUtils
+maXbox5_28beta160
+MaxDOM
+*****
+
+***** units1.txt
+mimepart
+Minesweeper.Game
+Minesweeper.VclUI.Dialogs
+Minesweeper.VclUI.Dialogs.CustomSettingsForm
+Minesweeper.VclUI.Forms.GameForm
+Minesweeper.VclUI.Resources
+ModbusConsts
+***** UNITS2.TXT
+mimepart
+ModbusConsts
+*****
+
+***** units1.txt
+MSHTML
+MSTask
+MSXML_TLB
+***** UNITS2.TXT
+MSHTML
+MSXML_TLB
+*****
+
+***** units1.txt
+System.AnsiStrings
+System.Bindings.Consts
+System.Bindings.CustomScope
+System.Bindings.CustomWrapper
+System.Bindings.EvalProtocol
+System.Bindings.EvalSys
+System.Bindings.Evaluator
+System.Bindings.Expression
+System.Bindings.ExpressionDefaults
+System.Bindings.Factories
+System.Bindings.Graph
+System.Bindings.Helper
+System.Bindings.Manager
+System.Bindings.ManagerDefaults
+System.Bindings.NotifierContracts
+System.Bindings.NotifierDefaults
+System.Bindings.ObjEval
+System.Bindings.Outputs
+System.Bindings.Search
+System.Character
+***** UNITS2.TXT
+System.AnsiStrings
+System.Character
+*****
+
+
 
 *****************************************************************
 Release Notes maXbox 5.2.9.185 July 2025 mX529 beta64-bit🐞
@@ -44979,6 +46566,413 @@ SHA1: ZIP maxbox52.zip BCE928E396A449B67CE59E2A079EC030DA96918D
 https://metadefender.com/results/file/bzI1MDUyN3FKakVsdVBpOWVTOXpmdGcyTkU_mdaas
 https://www.virustotal.com/gui/file/c41af4476bbb87fbde377c8490785f72fd29c604663144b450168b0153a64d90/detection
 https://www.hybrid-analysis.com/sample/c41af4476bbb87fbde377c8490785f72fd29c604663144b450168b0153a64d90
+
+maXbox5_29beta180/190/195 notes and addons
+(*-----------------------------------------------------------------*)
+
+procedure InitSysPath;
+  var
+    _path : PPyObject;
+  const Script =
+    'import sys' + sLineBreak +
+    'sys.executable = r"%s"' + sLineBreak +
+    'path = sys.path' + sLineBreak +
+    'for i in range(len(path)-1, -1, -1):' + sLineBreak +
+    '    if path[i].find("site-packages") > 0:' + sLineBreak +
+    '        path.pop(i)' + sLineBreak +
+    'import site' + sLineBreak +
+    'site.main()' + sLineBreak +
+    'del sys, path, i, site';
+  begin
+     if Pythonexecutable {VenvPythonExe} <> '' then
+       ExecString(AnsiString(Format(Script, [Pythonexecutable])));
+    _path := PySys_GetObject('path');
+    if Assigned(FOnSysPathInit) then
+      FOnSysPathInit(Self, _path);
+  end;
+
+https://www.spiegel.de/kultur/gesellschaft/koelner-kunstskandal-beltracchi-faelschte-bilder-von-mehr-als-50-kuenstlern-a-819153.html
+
+procedure SIRegister_SimpleDOM(CL: TPSPascalCompiler);
+begin
+  CL.AddClassN(CL.FindClass('TOBJECT'),'ESDomError');
+  SIRegister_TSDAttribute(CL);
+  SIRegister_TSDAttributeList(CL);
+  CL.AddClassN(CL.FindClass('TOBJECT'),'TSDomNode');
+  SIRegister_TSDomNodeList(CL);
+  CL.AddTypeS('TDomNodeType', '( sdntText, sdntTag, sdntComment, sdntPI, sdntCData )');
+  SIRegister_TSDomNode(CL);
+  SIRegister_TSDomDocument(CL);
+  SIRegister_TSDomParser(CL);
+end;
+
+Ex.: with tsdomnode.create(nil) do begin
+     writ(add('tsdom.create(nil)').asstring)
+     free
+   end; //} 
+<tsdom.create(nil)></tsdom.create(nil)>   
+
+procedure RunCommandInMemo(const Command: string; AMemo: TMemo);
+function GetMetaDOM(const FileName: string; const Name: string): string;
+function GetLinkName(const Target: string): string;');
+function ShellFileOperation(fromFile: string; toFile: string; Flag: Integer): Boolean;
+////Flag: FO_MOVE, FO_COPY, FO_DELETE or FO_RENAME
+
+function ShellFileOperation(fromFile: string; toFile: string; Flag: Integer): Boolean;
+
+    writ(botostr(ShellFileOperation(exepath+'examples\dragon5114.png',
+                          exepath+'examples\dragon5114rename.png',FO_RENAME)))
+
+function DeleteDirectoryTree(Dir: string): Boolean;
+function DeleteDirectoryTree(Dir: string): Boolean;
+var
+  CharCount: Integer;
+  FileOpt : TSHFileOpStruct;
+begin
+  Result := False;
+  CharCount := Length(Dir);
+  if (CharCount > 0) and (Dir[CharCount] = '\') then Dir[CharCount] := #0;
+  if not {$IFDEF COMPILERXE2_UP}SysUtils.{$ENDIF}DirectoryExists(Dir) then Exit;
+  FillChar(FileOpt, SizeOf(FileOpt), 0);
+  FileOpt.Wnd := 0;
+  FileOpt.wFunc := FO_DELETE;
+  FileOpt.pFrom := PChar(Dir);
+  FileOpt.fFlags := FOF_ALLOWUNDO or FOF_NOCONFIRMATION or FOF_SILENT;
+  Result := SHFileOperation(FileOpt) = 0;
+end;
+ 
+https://github.com/graphics32/graphics32/blob/master/DocProcessor/Utils.pas  rename pas2utils
+
+initialization
+  Default:=TPNGLoader.Create;
+  LinarBitmap.AddLoader(Default);
+  //TPicture.RegisterFileFormat('PNG',rsPNGImageFile,TPNGGraphic);  !!!
+  TPicture.RegisterFileFormat('MNG',rsMNGImageFile,TMNGGraphic);
+finalization
+  TPicture.UnregisterGraphicClass(TPNGGraphic);
+  TPicture.UnregisterGraphicClass(TMNGGraphic);
+  Default.Free;
+end.
+
+procedure SIRegister_Pas2Html(CL: TPSPascalCompiler);
+begin
+ CL.AddDelphiFunction('Function BuildNewUnit( const PasFilename, DestUnitFolder, ProjectFolder : TFileName) : Integer');
+ CL.AddDelphiFunction('Function DeleteFolder( const FolderName : TFileName) : Boolean');
+end;
+BuildNewUnitDoc(exepath+'examples\digibox.pas',
+                   exepath+'examples\pas2htmdocbox',exepath+'examples\pas2htmdocbox')
+          //}
+      maxform1.Pas2DocProcessor1Click(self);
+
+https://github.com/graphics32/graphics32/blob/master/DocProcessor/README.txt
+
+(*----------------------------------------------------------------------------*)
+procedure SIRegister_Pas2Html(CL: TPSPascalCompiler);
+begin
+ CL.AddDelphiFunction('Function BuildNewUnit( const PasFilename, DestUnitFolder, ProjectFolder : TFileName) : Integer');
+ CL.AddDelphiFunction('Function BuildNewUnitDoc( const PasFilename, DestUnitFolder, ProjectFolder : TFileName) : Integer');
+ CL.AddDelphiFunction('Function DeleteFolder( const FolderName : TFileName) : Boolean');
+end;
+CL.AddDelphiFunction( function PutRecordInTable(const str: string): string;
+   
+https://github.com/Alexssander-Gabriel/ConverterPicture_Delphi/blob/master/uConversor.pas
+procedure ConvertPngToBmp(arquivo, destino, nomeAux: string; deletar,
+                      geraNovo, aplicaFundo: Boolean; corFundo : TColor);
+ConvertPngToJpeg
+procedure ConvertPngToJpeg(arquivo : String; destino, nomeAux : string;
+deletar, geraNovo, aplicaFundo : Boolean; corFundo : TColor);
+procedure ConvertJpegToPng(arquivo, destino, nomeAux: string; deletar,
+  geraNovo: Boolean);
+   ConvertJpegToPng (exepath+'\examples\dragon511.jpg', exepath+'\examples\dragon5114.png',
+                                                 '',false,false)
+  
+     ConvertImage(Exepath+'examples\citymax.bmp',Exepath+'mypng111cotomax.png')  
+    try                                          
+    ConvertPngToJpeg(exepath+'\examples\dragon5114.png',
+                            exepath+'\examples\dragon51145.jpg',
+                             '',false,false,false,clblack); //}
+    except end; //*)   
+
+function UnifyNameValues(Param: array of const; NameValueSeparator: Char; Delimiter: String): String;
+const ccTrim = ' ''"'#13#10#9; // Caracterele eliminate din nume si valoare, daca se intalnesc la margine
+var L, S: TStringList;
+    T: TStrings;
+    i, j: integer;
+    buf: String;
+begin
+  Result := '';
+  if not Boolean(Length(param)) then Exit;
+  i := 0;
+  L := TStringList.Create;
+  S := TStringList.Create;
+  T := nil;
+  try
+    L.NameValueSeparator := NameValueSeparator;
+    S.NameValueSeparator := NameValueSeparator;
+    while i < Length(Param) do with Param[i] do begin
+      case VType of
+        vtChar:       buf := String(VChar);
+        vtWideChar:   buf := (VWideChar);
+        vtString:     buf := (VString^);
+        vtPChar:      buf := (VPChar);
+        vtPWideChar:  buf := (VPWideChar);
+        vtAnsiString: buf := String(PAnsiString(VAnsiString));
+        vtWideString: buf := String(PWideString(VWideString));
+        vtObject:    if VObject is TStrings then begin
+                         T := TStrings(VObject);
+                         buf := '';
+                     end;
+        else buf := '';
+      end;
+      inc(i);
+      if buf <> '' then begin
+        T := S;
+        Split2(Delimiter, buf, T, true);
+      end;
+      if Boolean(T) then begin
+        j := 0;
+        while j < T.Count do begin
+          buf := Trim(T.Names[j], ccTrim);
+          if buf <> '' then L.Values[buf] := Trim(T.ValueFromIndex[j], ccTrim);
+          inc(j);
+        end;
+        T := nil;
+      end;
+    end;
+    S.Clear;
+    if Delimiter <> '' then Delimiter := Delimiter[1];
+    Result := Join(Delimiter, L);
+  finally L.Free; S.Free; end;
+end;
+
+
+procedure SIRegister_ImageAscii(CL: TPSPascalCompiler);
+begin
+  CL.AddTypeS('TConvertMode', '( cmColor, cmGrayscale, cmMono )');
+ CL.AddDelphiFunction('Procedure ImageToHTML( const FileName : String; out HTML : String; const Map : String; Mode : TConvertMode; MaxRowWidth : Integer; Font : TFont; const Head : String; const Tail : String)');
+ CL.AddDelphiFunction('Procedure GraphicToHTML( G : TGraphic; out HTML : String; const Map : String; Mode : TConvertMode; MaxRowWidth : Integer; Font : TFont; const Head : String; const Tail : String)');
+end;
+
+Function ImageToHex(Image:Timage; LineLen:integer):Tstringlist;
+var ms:TmemoryStream; s:String; t:Ansistring;
+begin
+  ms:=tmemorystream.Create;
+  try
+    image.Picture.SaveToStream(ms);
+    setlength(t,ms.Size*2);
+    BinToHex(ms.Memory^,Pansichar(t),ms.Size);
+    Result:=Tstringlist.create;
+    repeat
+      s:=copy(t,1,LineLen);
+      Result.Add(s);
+      delete(t,1,LineLen);
+    until t='';
+  finally
+    ms.free
+  end;
+end;
+
+procedure HexToImage(HexData:TstringList; var Image:Timage);
+var ms:TmemoryStream; s:String;
+begin
+  ms:=TmemoryStream.Create;
+  s:=HexData.Text;
+  try
+    ms.Size := Length(s) div 2;
+    HexToBin(PChar(s), ms.Memory^, ms.Size);
+    Image.Picture.LoadFromStream(ms);
+  finally
+    ms.free
+  end;
+end;
+
+CL.AddDelphiFunction('Function StrBinToStrHex( const sIn : string) : string');
+ CL.AddDelphiFunction('Function StrHexToStrBin( const sIn : string) : string');
+ CL.AddDelphiFunction('Function StreamBinToStrHex( Stream : TStream) : string');
+ CL.AddDelphiFunction('Procedure StrHexToStreamBin( const sIn : string; sOut : TStream)');
+  playreswavmp3('CODEDOC','MP3');  
+  playresmp3('Codedoc2','mp3');
+  playreswavmp3('MSONAR','MP3');
+    playresmp3('codedoc2','mp3');
+    
+procedure PlayMp3FromStream(Stream: TStream);
+
+procedure PlayMp3FromStream(Stream: TStream);
+var
+  TempFile: string;
+  FileStream: TFileStream;
+  Player: TMediaPlayer;   afrm: TForm;
+begin
+  TempFile:= TPath.GetTempFileName + '.mp3';
+  FileStream:= TFileStream.Create(TempFile, fmCreate);
+  try
+    Stream.Position := 0;
+    FileStream.CopyFrom(Stream, Stream.Size);
+  finally
+    FileStream.Free;
+  end;
+  Player:= TMediaPlayer.Create(nil);
+  afrm:= TForm.create(nil);
+  afrm.Hide;
+  player.parent:= afrm;
+  Player.FileName:= TempFile;
+  player.open;
+  Player.Play;
+  //afrm.free;
+end;
+
+
+function StrBinToStrHex( const sIn: string ): string;
+begin
+   SetString( Result, nil, ( Length( sIn ) * 2 ) );
+   if CheckStr( sIn ) then
+      BinToHex( PChar( sIn ), PChar( Result ), Length( sIn ) );
+end;
+
+function StrHexToStrBin( const sIn: string ): string;
+begin
+   if ( CheckStr( sIn ) and ( not Odd( Length( sIn ) ) ) ) then
+   begin
+      SetString( Result, nil, ( Length( sIn ) div 2 ) );
+      SetLength( Result, HexToBin( PChar( sIn ), PChar( Result ), Length( Result ) ) );
+   end
+   else
+      Result := '';
+end;
+
+function StreamBinToStrHex( Stream: TStream ): string;
+const
+   STREAMBIN_TO_STRHEX_BUFFSIZE = ( 4 * KB );
+var
+   iRead: Integer;
+   cBufIn: array[0..STREAMBIN_TO_STRHEX_BUFFSIZE - 1] of Char;
+begin
+   ForceObject( Stream );
+   Result := '';
+   if ( Stream.Size <> 0 ) then
+   begin
+      Stream.Position := 0;
+      SetString( Result, nil, ( Stream.Size * 2 ) );
+      while ( Stream.Position <> Stream.Size ) do
+      begin
+         iRead := Stream.Read( cBufIn, STREAMBIN_TO_STRHEX_BUFFSIZE );
+         BinToHex( @cBufIn, PChar( PChar( Result ) + ( ( Stream.Position - iRead ) * 2 ) ), iRead );
+      end;
+   end;
+end;
+
+procedure StrHexToStreamBin( const sIn: string; sOut: TStream );
+var
+   i: Integer;
+   pBuffer: PChar;
+begin
+   if ( CheckStr( sIn ) and ( not Odd( Length( sIn ) ) ) ) then
+   begin
+      ForceObject( sOut );
+      sOut.Size := 0;
+      sOut.Size := ( Length( sIn ) div 2 );
+      ForceStream( sOut );
+      sOut.Position := 0;
+      pBuffer := StrAlloc( sOut.Size + 1 );
+      try
+         i := HexToBin( PChar( sIn ), pBuffer, sOut.Size );
+         sOut.WriteBuffer( pBuffer^, i );
+      finally
+         StrDispose( pBuffer );
+      end;
+   end;   
+end;
+
+procedure SIRegister_TDigiBox(CL: TPSPascalCompiler);
+begin
+  //with RegClassS(CL,'TImage', 'TDigiBox') do
+  with CL.AddClassN(CL.FindClass('TImage'),'TDigiBox') do
+  begin
+    RegisterMethod('Procedure Drow');
+    RegisterMethod('Procedure Paint');
+    RegisterProperty('DigiInt', 'Integer', iptrw);
+    RegisterMethod('Function HTML( Attr : string) : String');
+    RegisterMethod('Procedure SetAspect( ASpace : Word; AShape : TShapeType; ATextColor : TColor; ABkColor : TColor; ABrColor : TColor);');
+    RegisterMethod('Procedure SetAspect1( ADigiBox : TDigiBox);');
+    RegisterMethod('Procedure SetColors( ATextColor, ABkColor, ABrColor : TColor);');
+    RegisterMethod('Procedure SetColors1( ADigiBox : TDigiBox);');
+    RegisterMethod('Procedure Assign( Source : TPersistent)');
+    RegisterMethod('Function Comp( s : Extended) : ShortInt;');
+    RegisterMethod('Function Comp1( s : String) : ShortInt;');
+    RegisterMethod('Function Comp2( s : TDigiBox) : ShortInt;');
+    RegisterMethod('Function CompStr( s : String) : ShortInt;');
+    RegisterMethod('Function CompStr1( s : Extended) : ShortInt;');
+    RegisterMethod('Function CompStr2( s : TDigiBox) : ShortInt;');
+    RegisterMethod('Constructor Create( AOwner : TComponent)');
+    RegisterMethod('Constructor Create0( AOwner : TComponent; ADigitStr : String);');
+    RegisterMethod('Constructor Create1( AOwner : TComponent; ADigit : Extended);');
+    RegisterMethod('Constructor Create2( ADigiBox : TDigiBox);');
+    RegisterMethod('Constructor Create3( AOwner : TComponent; AList : TStrings; AIndex : Integer);');
+    RegisterMethod('Constructor CreateParented( ParentWindow : TWinControl; ADigitStr : String)');
+    RegisterMethod('Procedure Lock');
+    RegisterMethod('Procedure UnLock');
+    RegisterMethod('Procedure FreeMe');
+    RegisterProperty('Selected', 'Boolean', iptrw);
+    RegisterProperty('AutoResize', 'Boolean', iptrw);
+    RegisterProperty('List', 'TStrings', iptrw);
+    RegisterProperty('Index', 'Integer', iptrw);
+    RegisterProperty('Bitmap', 'TBitmap', iptrw);
+    RegisterProperty('Font', 'TFont', iptr);
+    RegisterProperty('Text', 'String', iptrw);
+    RegisterProperty('Value', 'Extended', iptrw);
+    RegisterProperty('Shape', 'TShapeType', iptrw);
+    RegisterProperty('Space', 'integer', iptrw);
+    RegisterProperty('TextColor', 'TColor', iptrw);
+    RegisterProperty('BkColor', 'TColor', iptrw);
+    RegisterProperty('BrColor', 'TColor', iptrw);
+    RegisterProperty('TransparentColor', 'TColor', iptrw);
+    RegisterProperty('OnSelect', 'TNotifyEvent', iptrw);
+    RegisterProperty('OnDeselect', 'TNotifyEvent', iptrw);
+  end;
+end;
+
+(*----------------------------------------------------------------------------*)
+procedure SIRegister_DigiBox(CL: TPSPascalCompiler);
+begin
+  CL.AddTypeS('DigiBoxConst', '( dbcChanged, dbcSelectedState, dbcSelected, dbc'
+   +'AutoResize )');
+  SIRegister_TDigiBox(CL);
+  CL.AddTypeS('TDigiBoxList', 'array of TDigiBox');
+ CL.AddDelphiFunction('Function dbFindDigi( d : TDigiBox; var List : TDigiBoxList) : integer');
+ CL.AddDelphiFunction('Function dbAddDigi( d : TDigiBox; var List : TDigiBoxList) : integer');
+ CL.AddDelphiFunction('Function dbAddUniqueDigi( d : TDigiBox; var List : TDigiBoxList) : integer');
+ CL.AddDelphiFunction('Function dbDeleteDigi( d : TDigiBox; var List : TDigiBoxList) : integer');
+ CL.AddDelphiFunction('Function dbComp( a, b : TDigiBox) : Integer');
+ CL.AddDelphiFunction('Function dbCompI( a, b : TDigiBox) : Integer');
+ CL.AddDelphiFunction('Procedure Register');
+end;
+
+procedure SIRegister_PyCore(CL: TPSPascalCompiler);
+begin
+  CL.AddTypeS('TPyModuleName', 'string');
+  CL.AddTypeS('TPyPackageName', 'string');
+  CL.AddTypeS('TPyPyPIPackageName', 'string');
+  CL.AddTypeS('TPyExecCmdResultCode', 'integer');
+end;
+
+
+
+function GetFormFromComponent(const AWinControl: TWinControl): TForm;
+var
+  LParent: TComponent;
+begin
+  Result := nil;
+  try
+    LParent := TWinControl(AWinControl).Parent;
+    while(LParent <> nil)and(not(LParent is TForm)) do
+      LParent := TWinControl(LParent).Parent;
+
+    if LParent is TForm then
+      Result := TForm(LParent);
+  except
+  end;
+end;
+
 
 maXbox5_28beta120/140/180 notes and addons
 CL.AddDelphiFunction('procedure TakeScreenshotJPG(fname: string);');
@@ -47558,6 +49552,8 @@ begin
 end;
 
 https://github.com/marcieldeg/HttpComponent/blob/main/README.md
+HttpComponent /HttpClasses.pas
+
 
 procedure SIRegister_THttpRequestC(CL: TPSPascalCompiler);
 begin
@@ -47632,7 +49628,71 @@ end;
     function GetAll(AName: String): TStrings;
     function GetFirst(AName: String): String;
     function ToString: String; override;
-  end; 
+  end;                     
+ $(*----------------------------------------------------------------------------*)
+procedure SIRegister_TPart(CL: TPSPascalCompiler);
+begin
+  //with RegClassS(CL,'TOBJECT', 'TPart') do
+  with CL.AddClassN(CL.FindClass('TOBJECT'),'TPart') do
+  begin
+    RegisterMethod('Constructor Create( AName : String; AData : TBytes; AContentType : String)');
+    RegisterMethod('Constructor CreateFromFile( AName, AFileName : String)');
+    RegisterProperty('Name', 'String', iptr);
+    RegisterProperty('Filename', 'String', iptr);
+    RegisterProperty('Data', 'TBytes', iptr);
+    RegisterProperty('ContentType', 'String', iptr);
+  end;
+end;
+
+(*----------------------------------------------------------------------------*)
+procedure SIRegister_TUrlEncodedFormBody(CL: TPSPascalCompiler);
+begin
+  //with RegClassS(CL,'TBody', 'TUrlEncodedFormBody') do
+  with CL.AddClassN(CL.FindClass('TBody'),'TUrlEncodedFormBody') do
+  begin
+    RegisterMethod('Constructor Create');
+      RegisterMethod('Procedure Free');
+    RegisterMethod('Procedure Add( AName, AValue : String)');
+  end;
+end;
+
+(*----------------------------------------------------------------------------*)
+procedure SIRegister_TStringBody(CL: TPSPascalCompiler);
+begin
+  //with RegClassS(CL,'TBytesBody', 'TStringBody') do
+  with CL.AddClassN(CL.FindClass('TBytesBody'),'TStringBody') do
+  begin
+    RegisterMethod('Constructor Create( AData : String; AContentType : String);');
+    RegisterMethod('Constructor Create1( AData : UTF8String; AContentType : String);');
+  end;
+end;
+
+(*----------------------------------------------------------------------------*)
+procedure SIRegister_TBytesBody(CL: TPSPascalCompiler);
+begin
+  //with RegClassS(CL,'TBody', 'TBytesBody') do
+  with CL.AddClassN(CL.FindClass('TBody'),'TBytesBody') do
+  begin
+    RegisterMethod('Constructor Create( AData : TBytes);');
+    RegisterMethod('Constructor Create1( AData : TBytes; AContentType : String);');
+    RegisterMethod('Constructor Create2( AFileName : String);');
+  end;
+end;
+
+(*----------------------------------------------------------------------------*)
+procedure SIRegister_TBody(CL: TPSPascalCompiler);
+begin
+  //with RegClassS(CL,'TOBJECT', 'TBody') do
+  with CL.AddClassN(CL.FindClass('TOBJECT'),'TBody') do
+  begin
+    RegisterMethod('Constructor Create( AContentType : String; ANeedLength : Boolean)');
+    RegisterMethod('Function ToString : String');
+    RegisterProperty('ContentType', 'String', iptr);
+    RegisterProperty('Stream', 'TMemoryStream', iptr);
+    RegisterProperty('ReleaseAfterSend', 'Boolean', iptrw);
+  end;
+end;
+  
 
 function TAddressGeoCodeOSM8(AURL, location, aApikey: string): tlatlong;
 var Httpreq: THttpRequestC; httpres: string;
@@ -49841,8 +51901,26 @@ https://soundcloud.com/max-kleiner-481715070/sternenhaufen
 https://medium.com/nerd-for-tech/geocoding-distance-32a47f57023d
 http://www.delphiforfun.org.ws034.alentus.com/Programs/Go.htm
 https://home.openweathermap.org/api_keys
+https://github.com/maxkleiner/OpenRailwayMap-api/tree/master/tests
 https://github.com/maxkleiner/PythonEnvironments
 https://github.com/maxkleiner/Pascal-Chess
 https://github.com/maxkleiner/P4D-Data-Sciences
+https://github.com/graphics32/graphics32/blob/master/DocProcessor/SimpleDOM.pas
 https://www.virustotal.com/gui/file/105a06ced5173a3c2c2a4a0139c65a96c5057e95eb539c270c6c53e19fc3181f/details
 https://github.com/maxkleiner/maXbox5
+https://dev.to/max_kleiner_9d12e786b3ecc/mp3-stream-shell-1cod
+https://dev.to/max_kleiner_9d12e786b3ecc/javascript-loader-5f24
+https://de.scribd.com/document/941916801/Maxbox-Starter160-Open-Railway-Map-API
+https://soundcloud.com/max-kleiner-481715070/g9_7_zeitraum_remix_waysofthel
+https://dev.to/max_kleiner_9d12e786b3ecc/the-open-railway-map-api-13fg
+https://breitschbreitsch.wordpress.com/2021/02/16/train-a-logic-classifier/
+https://maxbox6.wordpress.com/2025/11/25/machinelearning-steps/
+https://maxbox6.wordpress.com/2025/11/21/statistics-with-statsmodels/
+https://teetrain2.wordpress.com/
+https://maxbox6.wordpress.com/tee/
+https://maxbox6.wordpress.com/maxbox/
+https://maxbox6.wordpress.com/rockchain/
+http://www.kleiner.ch/kleiner/maxbox_cheatsheet.html
+http://www.kleiner.ch/kleiner/maxbox_mindmap.html   
+https://github.com/maxkleiner/BarcodeApiCreator
+https://github.com/maxkleiner/Delphi-GeoMap-Component
