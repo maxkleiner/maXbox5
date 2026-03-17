@@ -204,9 +204,13 @@ All maXbox Tutorials Table 2016/2017/2018/2019/2020/2021/2022/2023/2024/2025
     Tutor 169 Rosetta Code Site, February 2026
     Tutor 170 Locoduino API, March 2026
     Tutor 171 Barcode API, March 2026
-    Tutor 170 GeoJSON View, March 2026
+    Tutor 172 GeoJSON View, March 2026
+    Tutor 173 GeoJSON in Google Maps, March 2026
+    Tutor 174 GeoJSON in OpenStreetMaps, March 2026
+    Tutor 175 Geo Intelligence, Apri 2026
 
 
+https://teetrains.wordpress.com/2026/03/17/geojson-in-osm/
 https://teetrains.wordpress.com/2026/03/11/barcode-api/
 https://teetrains.wordpress.com/2026/03/14/geojson/
 https://maxbox6.wordpress.com/2026/02/11/free-google-translator-api-ii/
