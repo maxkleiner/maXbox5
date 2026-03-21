@@ -1,0 +1,1106 @@
+program APILayer_GoogleTranslateJP_1_4_GEO_Intelligence;
+
+//{$IFDEF Lazarus}     note: API Keys external in inc file!
+//  {$APPTYPE CONSOLE}  ☮ ✞ π 📌  JSON Lang Detect & Translate Example   📥 ⚙️ 🖥️ 🌐 🧠 📦  🎯
+//{/$ENDIF}            prep for Tutorial 175
+//https://apilayer.com/marketplace/image_to_text-api?txn=free&e=Sign%20Up&l=Success&live_demo=show
+//https://apilayer.com/marketplace/geo-api?live_demo=show
+//https://blogs.doctranslate.io/2025/05/13/ja/google-translation-api-key-explained-simply-with-examples/
+//https://www.springcloud.io/post/2022-04/httpclient-multipart/#gsc.tab=0
+//https://simplelocalize.io/blog/posts/best-free-translation-tools-for-developers/
+//https://www.autoitscript.com/forum/topic/153314-multipart-file-uploading-using-winhttpwinhttprequest51/
+//https://www.edenai.co/post/top-free-translation-tools-apis-and-open-source-models
+
+const
+  SUSERAgent = 'Mozilla/5.001 (windows; U; NT4.0; en-US; rv:1.0) Gecko/25250101';
+  USERAGENT5 = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)'+
+                   ' Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0 '; 
+ 
+  URL_APILAY = 'https://api.apilayer.com/image_to_text/url?url=%s'; 
+  URL_APILAY_GEO = 'https://api.apilayer.com/geo/country/capital/%s';  
+  URL_APILAY_EMO = 'https://api.api-ninjas.com/v1/emoji?name=%s';
+  URL_APILAY_IMG = 'https://api.api-ninjas.com/v1/randomimage?category=%s';
+  URL_APILAY_IMG2 = 'https://api.api-ninjas.com/v1/randomimage';
+  URL_APILAY_DETECT = 'https://api.api-ninjas.com/v1/objectdetection/';
+  URL_APILAY_TEXTSIM = 'https://api.api-ninjas.com/v1/textsimilarity/';
+  URL_APILAY_FACTS_PREMIUM = 'https://api.api-ninjas.com/v1/facts?limit=%s';
+  URL_APILAY_FACTS = 'https://api.api-ninjas.com/v1/facts';
+  URL_APILAY_GEOCOUNTRY = 'https://api.api-ninjas.com/v1/country?name=%s';
+  
+  //{$I .\OWMAPIKEY.INC}
+  {$I .\NINJAAPIKEY2.INC}
+  
+  NINJA_APIKEY2 =  'gwM+25ePKByour___________________ own key';
+
+  //'our own api key in NINJAAPIKEY.INC';      //change of release to .inc
+  
+  URLIMAGEPATH = 'http://www.kleiner.ch/kleiner/images/uml_buch.jpg';
+  URLIMAGEPATH2 = 'http://www.kleiner.ch/kleiner/patterns_klein.gif';
+  URLIMAGEPATH3 = 'https://breitschtv.wordpress.com/wp-content/uploads/2024/04/scripttest_latin_20240316_133552.jpg?w=768';
+  URLIMAGEPATH4 = 'https://softwareschule.code.blog/wp-content/uploads/2023/12/lima-309157-db-ard4um-tee-barwagen.jpg';
+
+  TESTURL = 'https://graphical.weather.gov/xml/DWMLgen/schema/latest_DWML.txt';
+  TESTURL2 = 'https://maxbox4.wordpress.com/2024/03/06/geocoding-iv/';
+  
+const
+  TBASE_URL = 'https://translate.googleapis.com/translate_a/single' +
+             '?client=gtx&dt=t&sl=%s&tl=%s&q=%s';
+  TBASE_URLS = 'https://clients5.google.com/translate_a/t?client=dict-chrome-ex&sl=%s&tl=%s&q=%s';   
+  TBASE_URL6 = 'https://libretranslate.com/translate';
+  TBASE_URL7 = 'https://translate.argosopentech.com/translate';
+  TBASE_URL8 = 'https://de.libretranslate.com/';
+  
+  TESTSTRING = 'https://clients5.google.com/translate_a/t?client=dict-chrome-ex&sl=auto&tl=ja&q=bonjour';  
+  TESTSTRING2 = 'https://clients5.google.com/translate_a/t?client=dict-chrome-ex&sl=auto&tl=ja&q=bonjour';    
+  TESTSTRING3 = 'https://clients5.google.com/translate_a/t?client=dict-chrome-ex&sl=auto&tl=de&q=ブロンズエディション';    
+  
+
+function GoogleTranslate(const Text, SrcLang, DstLang: string): string;
+var
+  Url, Json: string;
+  http: THTTPSend;
+  jo, ja: TJSON;
+begin
+  Url := Format(TBASE_URL, [SrcLang, DstLang, URLEncode(Text)]);
+  http := THTTPSend.Create;
+  try
+    if http.HTTPMethod('GET', Url) then begin
+      Json := ReadStrFromStream(http.Document, length(http.document));
+      jo := TJSON.Create;
+      try
+        jo.Parse(Json);
+        //ja := jo.A[0].A[0];           // erster Eintrag im Array
+        //Result := ja.A[0].Value;      // übersetzter Text
+      finally
+        jo.Free;
+      end;
+    end;
+  finally
+    http.Free;
+  end;
+end;
+
+function Text_to_translate_API5(AURL, aclient,langorig,langtarget,atext: string):string;
+var httpq: THttpConnectionWinInet;
+ rets: TStringStream;  heads2: Tstringlist; rets2: TMemoryStream;
+ heads: TStrings; iht: IHttpConnection;
+ jo: TJSON; jarr:TJsonArray2;
+  begin
+    httpq:= THttpConnectionWinInet.Create(true);
+    rets:= TStringStream.create('');
+    rets2:= TMemoryStream.create;
+    heads2:= TStringlist.create;     
+    //heads2.add('Accept: charset=utf-8');
+     heads2.add('User-Agent='+USERAGENT5);
+    heads2.add('Content="text/html; charset=utf-8"');
+    // heads2.add('ie= "UTF-8"');
+    heads2.add('Content-type=application/json; charset=UTF-8');
+    iht:=  httpq.setHeaders(heads2);
+    try
+       httpq.Get(Format(TBASE_URL,[langorig,langtarget,atext]),rets2);
+       writeln('server2: '+Httpq.GetResponseHeader('server'));
+       //writ(streamtostring3(rets2))
+       
+       jo:= TJSON.Create();
+       //jo.parse(rets.datastring) 
+       jo.parse(streamtostring3(rets2)); 
+       //writ(streamtostring3(rets2))
+       jarr:= jo.JsonArray;
+       if httpq.getresponsecode=200 Then result:=jarr[0].decode(streamtostring3(rets2)) //jarr[0].stringify
+       // if httpq.getresponsecode=200 Then result:=jarr[0].stringify
+       else result:='Failed:'+
+       itoa(Httpq.getresponsecode)+Httpq.GetResponseHeader('message'); 
+    except
+       writeln('EWI_HTTP: '+ExceptiontoString(exceptiontype,exceptionparam));
+    finally
+       //httpq.free;
+       httpq:= Nil;
+       rets.Free;
+       rets2.free;
+       jo.free;
+       heads2.free;
+       end; 
+  end;
+
+function Text_to_translate_API51(AURL, aclient,langorig,langtarget,atext: string):string;
+var httpq: THttpConnectionWinInet;
+    rets: TMemoryStream;
+    heads: TStrings; iht: IHttpConnection;
+    jo: TJSON; jarr:TJsonArray2;
+  begin
+    httpq:= THttpConnectionWinInet.Create(true);
+    rets:= TMemoryStream.create;
+    heads:= TStringlist.create;     
+     heads.add('User-Agent='+USERAGENT5);
+     heads.add('Content-type=application/json');
+    //heads2.add('Content-type=application/json; charset=UTF-8');
+    iht:=  httpq.setHeaders(heads);
+    try
+       httpq.Get(Format(TBASE_URL,[langorig,langtarget,atext]),rets);
+       writeln('server31: '+Httpq.GetResponseHeader('server'));
+       //writ((streamtostring2(rets)))
+       rets.savetofile(exepath+'examples\savefromstream.txt')
+       //openFile(exepath+'examples\savefromstream.txt')
+       
+       jo:= TJSON.Create();
+       jo.parse(loadfileUC(exepath+'examples\savefromstream.txt')); 
+       jarr:= jo.JsonArray;
+       if httpq.getresponsecode=200 Then begin
+        //result:=jarr[0].decode(streamtostring3(rets))
+        result:= loadfileUC(exepath+'examples\savefromstream.txt')
+       end
+
+       else result:='Failed:'+
+       itoa(Httpq.getresponsecode)+Httpq.GetResponseHeader('message'); 
+    except
+       writeln('EWI_HTTP: '+ExceptiontoString(exceptiontype,exceptionparam));
+    finally
+       //httpq.free;
+       httpq:= Nil;
+       rets.Free;
+       jo.free;
+       heads.free;
+    end; 
+  end;
+  
+function Text_to_translate_API52(AURL, aclient,langorig,langtarget,atext: string):string;
+var httpq: THttpConnectionWinInet;
+    rets: TStringStream; heads: TStrings; iht: IHttpConnection;
+    jo: TJSON; jarr:TJsonArray2;
+  begin
+    httpq:= THttpConnectionWinInet.Create(true);
+    rets:= TStringStream.create('');
+    heads:= TStringlist.create;     
+    heads.add('User-Agent='+USERAGENT5);
+    heads.add('Content-type=application/json');
+    iht:=  httpq.setHeaders(heads);                              
+    try
+       httpq.Get(Format(TBASE_URL,[langorig,langtarget,atext]),rets);
+       writeln('server31: '+Httpq.GetResponseHeader('server'));
+       rets.savetofile(exepath+'examples\savetrans.txt')
+       //openFile(exepath+'examples\savefromstream2.txt')
+     
+       jo:= TJSON.Create();
+       jo.parse(loadfileUC(exepath+'examples\savetrans.txt')); 
+       jarr:= jo.JsonArray;
+       if httpq.getresponsecode=200 Then 
+          result:=jarr[0].decode(loadfileUC(exepath+'examples\savetrans.txt'))
+       else result:='REST API Failed:'+
+                 itoa(Httpq.getresponsecode)+Httpq.GetResponseHeader('message'); 
+    except
+       writeln('EWI_HTTP: '+ExceptiontoString(exceptiontype,exceptionparam));
+    finally
+       //httpq.free;
+       httpq:= Nil;
+       rets.Free;
+       jo.free;
+       heads.free;
+    end; 
+  end;
+  
+const 
+ TESTSTRING4 = 'https://clients5.google.com/translate_a/t?client=dict-chrome-ex&sl=auto&tl=ja&q=';    
+ 
+function Text_to_translate_API53(AURL, aclient,langorig,langtarget,atext: string):string;
+var httpq: THttpConnectionWinInet;
+    rets: TStringStream; heads: TStrings; iht: IHttpConnection;
+    jo: TJSON; jarr:TJsonArray2; reqURL: string;
+  begin
+    httpq:= THttpConnectionWinInet.Create(true);
+    rets:= TStringStream.create('');
+    heads:= TStringlist.create;     
+    heads.add('User-Agent='+USERAGENT5);
+    heads.add('Content-type=application/json; charset=UTF-8');
+    heads.add('charset=UTF-8');
+    iht:=  httpq.setHeaders(heads);   
+    //requrl:= teststring4+'bonjour'      
+    //requrl:= teststring4+loadfileUC(exepath+'examples\savetrans2.txt');  
+    requrl:= teststring4+'peace';                        
+    try
+       //writ('requrl: '+reqURL+'filefrom: '+loadfileUC(exepath+'examples\savetrans2.txt'))
+       writ('requrl: '+reqURL)
+       
+       httpq.Get((reqURL),rets);
+       
+       writeln('server32: '+Httpq.GetResponseHeader('server'));
+       rets.savetofile(exepath+'examples\savetrans.txt')
+       //openFile(exepath+'examples\savefromstream2.txt')
+     
+       jo:= TJSON.Create();
+       jo.parse(loadfileUC(exepath+'examples\savetrans.txt')); 
+       jarr:= jo.JsonArray;
+       if httpq.getresponsecode=200 Then 
+          result:=jarr[0].decode(loadfileUC(exepath+'examples\savetrans.txt'))
+       else result:='REST API Failed:'+
+                 itoa(Httpq.getresponsecode)+Httpq.GetResponseHeader('message'); 
+    except
+       writeln('EWI_HTTP: '+ExceptiontoString(exceptiontype,exceptionparam));
+    finally
+       //httpq.free;
+       httpq:= Nil;
+       rets.Free;
+       jo.free;
+       heads.free;
+    end; 
+  end;
+
+function Text_to_translate_API54(AURL,aclient,lngorig,lngtarget,atext: string):string;
+var httpq: THttpRequestC; //THttpConnectionWinInet;
+    jo: TJSON; jarr:TJsonArray2; urlback: string;
+  begin
+    httpq:= THttpRequestC.create(self); 
+    httpq.headers.add('Accept: application/json; charset=utf-8');
+    //httpq.SecurityOptions:= [soSsl3,soPct,soIgnoreCertCNInvalid];
+    try
+       writ('requrl: '+wideFormat(AURL,[lngorig,lngtarget,atext]));
+       httpq.Get(wideFormat(AURL,[lngorig,lngtarget,atext]));
+       writ('http get status '+itoa(httpq.response.statuscode2));
+       urlback:= httpq.response.ContentAsUTF8String;
+       writ('ctype transback: '+(httpq.response.Contenttype));
+       jo:= TJSON.Create();
+       jo.parse(urlback); 
+       jarr:= jo.JsonArray;
+       if httpq.response.statuscode2=200 Then 
+          result:=jarr[0].decode(urlback)
+       else result:='REST API Failed:'+
+                 itoa(Httpq.response.statuscode2)+httpq.response.headers.tostring; 
+    except
+       writ('EWI_HTTP: '+ExceptiontoString(exceptiontype,exceptionparam));
+    finally
+       httpq.free;
+       httpq:= Nil;
+       jo.free;
+    end; 
+  end;
+
+  //https://libretranslate.com/
+  //https://publicapis.io/libretranslate-api
+  
+procedure FreeTranlate_API_Post(Sender: TObject; aURL: string);
+var httpreq: THttpRequestC; 
+    JSONStr: string;
+  begin
+     httpreq:= THttpRequestC.create(self);
+     //httpreq.headers.add('Content-type: application/json; charset=UTF-8');  
+      httpreq.headers.add('"Content-type": "application/json"');
+       httpreq.headers.add('User-Agent:'+USERAGENT5);
+     try
+       //JSONStr:= GeoJSON.Stringify; //ToJSON;
+       JSONStr:= '{' +
+         '"q": "this is the end",'+
+       //'"prompt": "%s",'+
+         '"source": "auto",'+
+         '"target": "de",'+  
+         '"format": "text",'+   
+         '"alternatives": 2'+    
+         // '"api_key": ""'+        
+         '}';
+
+       Memo2.Lines.Add('Post JSON created: ' + JSONStr);
+       try
+         writeln(formatJson(JSONStr));
+       except
+         write('JSON FormatError: '+ExceptiontoString(exceptiontype,exceptionparam)); 
+       end;  
+       //writ(botostr(httpreq.Post2(TBASE_URL6,JSONStr)))
+       if httpreq.Post2(aURL,JSONStr) then begin
+         Memo2.Lines.Add('API Response: '+formatJson(httpreq.Response.contentasstring));
+         writ('content-length:'+itoa(httpreq.response.Contentlength));
+       end;
+     except
+     //on E: Exception do
+       write('REQC_Err: '+ExceptiontoString(exceptiontype,exceptionparam));   
+     finally
+       httpreq.Free;  //THttpRequestC; 
+     end;  
+  end;
+
+  
+procedure TForm1ExportMapToAPI_Post(Sender: TObject);
+var
+  httpreq: THttpRequestC; 
+  Features, coords, ring: TJSONArray2; feature,Geometry,props:TJSONObject2;
+  //SSL: TIdSSLIOHandlerSocketOpenSSL;
+  GeoJSON: TJSON; //Object;   Features
+  JSONStr: string;
+  Response: string;
+begin
+  //HTTP := TIdHTTP.Create(nil);
+  httpreq:= THttpRequestC.create(self);
+  //SSL := TIdSSLIOHandlerSocketOpenSSL.Create(nil);
+  //Für GeoJSON ist der Medientyp formal application/geo+json,
+  httpreq.headers.add('Accept: application/json; charset=utf-8');
+  GeoJSON:= nil;
+  
+  try
+    //HTTP.IOHandler := SSL;
+    //HTTP.Request.ContentType := 'application/json';
+    // 1. Karte als GeoJSON erstellen (Bern-Beispiel)
+    GeoJSON:= TJSON.Create;
+    GeoJSON.put40('type', 'FeatureCollection');   //addpair
+    
+    features:= TJSONArray2.Create(nil);
+    Feature:= TJSONObject2.Create(nil);
+    Feature.put14('type', 'Feature');
+    
+    // Bern City Polygon (vereinfacht)
+    Geometry:= TJSONObject2.Create(nil);
+    Geometry.put14('type', 'Polygon');
+    Coords:= TJSONArray2.Create(nil);
+    Ring:= TJSONArray2.Create(nil)
+    ring.put4(7.4474); ring.put4(46.9480)
+    //ring.clear;
+      Coords.put6(Ring); ring.clear;
+    ring.put4(7.4535); ring.put4(46.9542)
+      Coords.put6(Ring); ring.clear;
+    ring.put4(7.4600); ring.put4(46.9500)
+      Coords.put6(Ring); ring.clear;
+    ring.put4(7.4474); ring.put4(46.9480)
+      Coords.put6(Ring); ring.clear;  
+     // ring. completed
+     //ring.putarr
+     // not finished must be an nested array -could be solved with clear
+    //ring.put6([7.4535, 46.9542]);
+   {   TJSONArray.Create([7.4474, 46.9480]),  // Bern SW
+      TJSONArray.Create([7.4535, 46.9542]),  // Bern Mitte
+      TJSONArray.Create([7.4600, 46.9500]),  // Bern NE  
+      TJSONArray.Create([7.4474, 46.9480])   // Zurück zum Start
+    );    }
+   //Coords.put6(Ring);
+    Geometry.putarr('coordinates', Coords);
+    Feature.putobj('geometry', Geometry);
+    
+    Props:= TJSONObject2.Create(nil);
+    Props.put14('name', 'Bern City Center');
+    Props.put14('timestamp', FormatDateTime('yyyy-mm-dd hh:nn:ss', Now));
+    Feature.putobj('properties', Props);
+    Features.put7(Feature);
+    GeoJSON.put41('features', Features);
+    
+    JSONStr:= GeoJSON.Stringify; //ToJSON;
+    Memo2.Lines.Add('Post GeoJSON created: ' + JSONStr);
+    writeln(formatjson(JSONStr));
+    // 2. POST an API (saves the Geo Map)
+    if  HTTPreq.Post2('https://jsonplaceholder.typicode.com/posts/', JSONStr) then begin
+      Memo2.Lines.Add('API Response: ' + HTTPreq.Response.contentasstring);
+      writeln('Map gespeichert! ID: ' + Copy(HTTPreq.Response.contentasstring, 1, 20));
+    end;
+  except
+    //on E: Exception do
+      //ShowMessage('Fehler: ' + E.Message);
+    writeln('EWI_HTTP: '+ExceptiontoString(exceptiontype,exceptionparam));   
+  end;
+  httpreq.Free;  //THttpRequestC; 
+  GeoJSON.Free;
+  //SSL.Free;
+  //HTTP.Free;
+end;
+
+//https://jsonplaceholder.typicode.com/guide/
+
+procedure TForm1ExportCreateResource_API_Post(Sender: TObject);
+var httpreq: THttpRequestC; 
+    JSONStr: string;
+  begin
+     httpreq:= THttpRequestC.create(self);
+     httpreq.headers.add('Content-type: application/json; charset=UTF-8');
+     try
+       //JSONStr:= GeoJSON.Stringify; //ToJSON;
+       JSONStr:= '{' +
+       '"title": "gpt-3.6-turbo-instruct",'+
+       //'"prompt": "%s",'+
+       '"body": "gpt-3.6-bar",'+
+       '"userId": 1'+            
+       '}';
+
+       Memo2.Lines.Add('Post JSON created: ' + JSONStr);
+       try
+         writeln(formatJson(JSONStr));
+       except
+         write('JSON FormatError: '+ExceptiontoString(exceptiontype,exceptionparam)); 
+       end;  
+       if httpreq.Post2('https://jsonplaceholder.typicode.com/posts/',JSONStr) then begin
+         Memo2.Lines.Add('API Response: '+formatJson(httpreq.Response.contentasstring));
+         writ('content-length:'+itoa(httpreq.response.Contentlength));
+       end;
+     except
+     //on E: Exception do
+       write('REQC_Err: '+ExceptiontoString(exceptiontype,exceptionparam));   
+     finally
+       httpreq.Free;  //THttpRequestC; 
+     end;  
+  end;
+
+function GEO_to_text_API2_randimage3(AURL, url_name, aApikey, afile: string): string;
+var httpq: THttpConnectionWinInet;
+    rets: TMemoryStream;  
+    heads: TStrings; iht: IHttpConnection; //lo3sthost:THTTPConnectionLostEvent;
+begin
+  httpq:= THttpConnectionWinInet.Create(true); 
+  rets:= TMemoryStream.create;
+  heads:= TStringlist.create;     
+  try 
+    heads.add('X-Api-Key='+aAPIkey);
+    heads.add('Accept=image/jpg');
+    iht:= httpq.setHeaders(heads);
+    httpq.Get(Format(AURL,[urlencode(url_name)]), rets);
+    if httpq.getresponsecode=200 Then begin
+       rets.Position:= 0;
+       //ALMimeBase64decodeStream(rets, rets2)
+       rets.savetofile(afile);
+       openfile(afile);
+     end  
+      else result:='Failed:'+
+             itoa(Httpq.getresponsecode)+Httpq.GetResponseHeader('message');
+  except  
+    writeln('EWI_HTTP: '+ExceptiontoString(exceptiontype,exceptionparam));
+  finally
+    httpq:= Nil;
+    heads.Free;
+    rets.Free;
+  end;                  
+end;                 //}
+
+
+function PyCodeObjectDetect2(imgpath, aAPIKey: string): string;
+begin
+  with TPythonEngine.Create(Nil) do begin
+  //pythonhome:= 'C:\Users\User\AppData\Local\Programs\Python\Python314\';
+  try
+    loadDLL;
+    autofinalize:= false;
+    ExecString('import requests, sys');
+    ExecStr('url= "https://api.api-ninjas.com/v1/objectdetection"'); 
+    ExecStr('image_file_descriptor = open("'+imgpath+'","rb")');  
+    ExecStr('headers= {"X-Api-Key":"'+aAPIKey+'"}'); 
+    ExecStr('files = {"image": image_file_descriptor}  ');
+    ExecStr('r = requests.post(url, headers=headers, files=files)');
+    println(evalstr('sys.version'));
+    result:= (EvalStr('r.json()')); 
+  except
+    raiseError;        
+  finally       
+    Free;
+  end; 
+ end;
+end; 
+
+//const Picpath='"C:\maxbox\maxbox51\examples\scripttest_latin_20240316_133552.jpg"';
+//const PICPath='"C:\maxbox\maxbox5\pascriptmaster2\pmaster2\restunits\Indy9\maxbox5\maxbox5\examples\geotextrandimage0222.jpg"';
+// const PICPath='.\examples\carcode12.png';
+  const PICPath='.\examples\superMypicture.jpg';
+// const PICPath='.\examples\geocitytextrandimage0221.jpg';
+
+
+function PyCodeGeoJSON_ObjectDetect(imgpath, aAPIKey: string): string;
+begin
+  with TPythonEngine.Create(Nil) do begin
+  //pythonhome:= 'C:\Users\User\AppData\Local\Programs\Python\Python312\';
+  try
+    loadDLL;
+    autofinalize:= false;
+    ExecString('import requests, geojson');
+    execstr('point = geojson.Point((8.5417, 47.3769))  # (longitude, latitude))');
+    ExecStr('url= "https://api.api-ninjas.com/v1/objectdetection"'); 
+    ExecStr('image_file_descriptor = open("'+imgpath+'","rb")');  
+    ExecStr('headers= {"X-Api-Key":"'+aAPIKey+'"}'); 
+    ExecStr('files = {"image": image_file_descriptor}  ');
+    ExecStr('r = requests.post(url, headers=headers, files=files)');
+    result:= (EvalStr('r.json()')); 
+  except
+    raiseError;        
+  finally       
+    Free;
+  end; 
+ end;
+end; 
+
+
+procedure PyCode2imagetotext(imgpath, aAPIKey: string);
+begin
+  with TPythonEngine.Create(Nil) do begin
+  try
+    loadDLL;
+    autofinalize:= false;
+    ExecString('import requests');
+    ExecStr('api_url= "https://api.api-ninjas.com/v1/imagetotext"'); 
+    //ExecStr('image_file_descriptor = open(r'+imgpath+', "rb")');  
+    ExecStr('image_file_descriptor = open(r"'+imgpath+'", "rb")');
+    ExecStr('files = {"image": image_file_descriptor}');
+     ExecStr('headers= {"X-Api-Key":"'+aAPIKey+'"}'); 
+    ExecStr('r = requests.post(api_url, headers=headers, files=files)');
+    //Println(EvalStr('requests.request("GET",url, headers=headers, data=payload).text')); 
+    println((EvalStr('r.json()'))); 
+  except
+    raiseError;        
+  finally       
+    free;
+  end; 
+ end;
+end; 
+
+function PyCode2imagetotext2(imgpath, aAPIKey: string): string;
+begin
+  with TPythonEngine.Create(Nil) do begin
+  try
+    loadDLL;
+    autofinalize:= false;
+    ExecString('import requests');
+    ExecStr('api_url= "https://api.api-ninjas.com/v1/imagetotext"'); 
+    //ExecStr('image_file_descriptor = open(r'+imgpath+', "rb")');  
+    ExecStr('image_file_descriptor = open(r"'+imgpath+'", "rb")'+lf+
+            'files = {"image": image_file_descriptor}'+lf+
+            'headers= {"X-Api-Key":"'+aAPIKey+'"}'+lf+
+            'r = requests.post(api_url, headers=headers, files=files)');
+    result:= ((EvalStr('r.json()'))); 
+  except
+    raiseError;        
+  finally       
+    free;
+  end; 
+ end;
+end; 
+
+function APIGetGeoCountry(AURL,url_name, aAPIKey: string): string;
+var encodedURL:String;
+ begin
+   encodedURL:= Format(AURL,[urlencode(url_name)]);
+   with THttpRequestC.create(self) do
+     try
+       writ('reqsend: '+encodedurl)
+       headers.add('X-Api-Key:'+aAPIkey);
+       if Get(encodedURL) then 
+          result:= (Response.ContentAsString)
+       else Writeln('APIError '+inttostr(Response.StatusCode2));
+     except
+       writeln('HTTPS: '+ExceptiontoString(exceptiontype,exceptionparam));
+     finally
+       free;
+     end;
+ end;  
+
+const
+  cFileName = 'fmain.pas';
+
+var backstr, validtext, atext, atextja: string;  IdDecoderMIME: TIdDecoderMIME;
+    t_latlong: TLatlong;  abig: int64;  acard: cardinal; anat: nativeuint;  bfloat: float;
+
+Begin //@main
+  //FilelessWB2PNG('https://www.pngrepo.com/png/429486/60/digger-excavator-shovel.png');
+  //FilelessWB2PNG('https://wiki.gnome.org/Apps/EyeOfGnome?action=AttachFile&do=get&target=screenshot.png');
+  
+  {backstr:= parseJsonvalue(GEO_to_text_API2_GEO(URL_APILAY_GEO, 'Vienna', L_APIKEY));
+   validtext:= StringReplace( backstr, '\n', CR+LF,[rfReplaceAll]); 
+   writeln(validtext);   //}                            
+ //writeln(formatJSON(GEO_to_text_API2_GEO(URL_APILAY_GEO, 'Athen', L_APIKEY)));
+ { t_latlong:= TAddressGeoCodeOSM8(URL_APILAY_GEO, 'Athen', L_APIKEY);
+   writ(jsonunescape(t_latlong.descript,#13#10));
+{   // }
+  
+  { backstr:= parseJsonvalue(GEO_to_text_API2_emoji(URL_APILAY_EMO, 'slightly smiling face', 
+                                          N_APIKEY));
+    validtext:= StringReplace( backstr, '\n', CR+LF,[rfReplaceAll]); 
+   
+   writeln(validtext);    // U+1F642 }
+   writeln(#$d83d#$de42);       
+   maxform1.setconsole;
+   setdebugcheck(true);
+   // pretest routine:
+   writeln(GEO_to_text_API2_randimage3(URL_APILAY_IMG2, 'nature',
+                                       NINJA_APIKEY, exepath+'randimage0221.jpg'));
+    
+   // println((PyCodeGeoJSON_ObjectDetect('./examples/geotreeman_test.jpeg', NINJA_APIKEY)));   
+                                       
+   //println((PyCodeGeoJSON_ObjectDetect('./examples/geotextrandimage022.jpg', NINJA_APIKEY)));   
+   //  println((PyCodeGeoJSONDetect('./examples/superMypicture.jpg', NINJA_APIKEY)));                                      
+   println((PyCodeGeoJSON_ObjectDetect(PICPath, NINJA_APIKEY)));   
+   writ(' ')                                                                                                                                           
+    //Pycode2imagetotext(URLIMAGEPATH3);           //change para to pic  - done
+                                                                           
+   atext:= (Pycode2imagetotext2(PICPath,  NINJA_APIKEY));
+   writ(' '); sleep(200)                                                            
+   
+   writeln((Text_to_translate_API54(TBASE_URLS,'dict-chrome-ex','auto','ja',atext)));  
+   //writeln((Text_to_translate_API54(TBASE_URLS,'dict-chrome-ex','auto','it','invalid')));  
+   
+   writ(formatJSON(APIGetGeoCountry(URL_APILAY_GEOCOUNTRY, 'Japan', NINJA_APIKEY)));
+                                   
+   // println(PyCodeObjectDetect2('./randimage01bee.jpg', N_APIKEY)); 
+     // sleep(500);   
+    //println(PyCodeObjectDetect2('./randimage012.jpg', N_APIKEY));   
+     //println(PyCodeObjectDetect2('./jpegfactory.jpg', NINJA_APIKEY));   
+    // println(PyCodeGeoJSON('./examples/jpegfactory.jpg', NINJA_APIKEY));   
+    // println('fom '+formatjson2('['+PyCodeGeoJSON('./examples/geotreeman_test.jpeg', NINJA_APIKEY)+']',3));   
+     //println((PyCodeGeoJSON('./examples/geotreeman_test.jpeg', NINJA_APIKEY)));   
+    // println((PyCodeGeoJSON('./examples/geosearandimage022.jpg', NINJA_APIKEY)));   
+     
+   { backstr:= HTTPClsComponentAPIDetection2(URL_APILAY_DETECT,'', N_APIKEY,'./randimage022.jpg');
+    println('JSONback '+formatjson2((backstr),3));
+     // } 
+    
+   //writeln(textsimilarity_API6(URL_APILAY_TEXTSIM,'',N_APIKEY, 'this is text1222789', 
+                                                      //'this is text222789________ '));
+    //sleep(2000)   
+    //StringCopy( const ASource : TKkString; At, Count : Int) : TKkString;                                               
+   // writeln(textsimilarity_API6(URL_APILAY_TEXTSIM,'',N_APIKEY, 
+     //                                    alcopystr(memo1.text,10,50), 
+       //                                   alcopystr(memo1.text,10,50)));                                                  
+    StringReplace( backstr, '\n', CR+LF,[rfReplaceAll]); 
+      //}
+   // testmultipartformdata2('gwM+25ePKBKfgnz40Q+s+w==sFarUVYdUdmV9mqR');
+   //membase64Test2();  
+  // writeln('out: '+replaceregexpr('<.*?>','that''s a <b>text test</b> with <i>HTML</i>signs',
+     //                                           '',true));    
+   //StrReplaceRegEx('that''s a <b>text test</b> with <i>HTML</i>signs','<.*?>',['th is']);   
+   
+  //aResponseContentHeader:TALHTTPResponseHeader2 
+  //https://synopse.info/forum/viewtopic.php?id=262
+  //https://stackoverflow.com/questions/5405827/thttpapiserver-sample
+   with THttpApiServer.create (true, '', nil, nil, 'apiproc') do begin
+     writeln(botostr(hasapi2));
+     //AddUrlAuthorize('root','888',false,'+',delete));
+     free
+   end; 
+   
+   //indy10test(TESTURL2);
+   //writeln(synGetRemoteMacAddress('192.168.56.1'));  
+   //writ(list_modules(exepath+'maxbox5_14beta80.exe'));  
+   
+  // TForm1ExportMapToAPI_Post(self);   
+  // sleep(500)                                                         
+  // TForm1ExportCreateResource_API_Post(self);
+   
+   //atext:= 'bonjour mes amis da la ville of coding avec design';
+   // atext:= ' mes amis da la ville';
+   // atext:= 'Programmieren mit Design';
+   //TranslateText('こんにちは、世界！', 'ja', 'de');  // Japanisch → Deutsch
+   // atext:= 'こんにちは、世界！';  // Japanisch → Deutsch
+   atext:= 'frieden'
+   atextja:= 'ブロンズエディション';
+   atext:= 'this must be a sustainable design'; 
+   atext:= memo2.text; //'language translator'; 
+   atext:= 'gespeichert'      //ゲシュパイヒャート
+   atext:= 'Xóɖɔɖókpɔ́';
+   atext:= 'Týdningur' ;
+   atext:= 'týðing';
+   atext:= 'Zeitraum';
+   atext:= 'renounced';
+   atext:= 'Laugengipfel';
+   atext:= 'Zeitgeist';
+   atext:= 'Japan';
+   atext:= 'Wikipedia';
+   atext:= 'serbatoio';
+   atext:= 'intelligence';
+    atext:= 'Even in the quitest moments';
+    
+   // writeln(utf8ToAnsi(Text_to_translate_API2(TBASE_URLS,'dict-chrome-ex','auto','es',atext)));
+    //writeln(Ansitoutf8(jsonunescape(Text_to_translate_API2(TBASE_URLS,'dict-chrome-ex','auto','ja',atext),#10#13)));
+   // writeln(utf8tostring(jsonunescape(Text_to_translate_API2(TBASE_URLS,'dict-chrome-ex','auto','ja',atext),#10#13)));
+    //writeln(utf8encode(jsonunescape(Text_to_translate_API2(TBASE_URLS,'dict-chrome-ex','auto','es',atext),#10#13)));
+   writeln(((Text_to_translate_API5(TBASE_URLS,'dict-chrome-ex','auto','es',atext))));
+  { writeln('mimecharset '+
+      CharsetConversion((Text_to_translate_API5(TBASE_URLS,'dict-chrome-ex','auto','es', 
+                                                      (atext))),UTF_8, ISO_8859_1)); 
+      }  
+       writeln(((Text_to_translate_API54(TBASE_URLS,'dict-chrome-ex','auto','es',atext))));                                              
+      writeln((Text_to_translate_API54(TBASE_URLS,'dict-chrome-ex','auto','it', atext)));  
+        writeln((Text_to_translate_API54(TBASE_URLS,'dict-chrome-ex','auto','ja',atext)));  
+                                                                                                            
+    (* writeln('mimecharset '+
+      CharsetConversion((Text_to_translate_API5(TBASE_URLS,'dict-chrome-ex','auto','ja', 
+                                                      (atext))),UTF_8, CP932{ISO_2022_JP}));  *)
+   //writeln('mimecharset '+
+    //CharsetConversion(jsonunescape(Text_to_translate_API51(TBASE_URLS,'dict-chrome-ex','auto','ja', 
+       //                                               (atext)),#13#10),ISO_2022_JP,UTF_8)); 
+    
+    //writeln(formatjson(Text_to_translate_API51(TBASE_URLS,'dict-chrome-ex','auto','ja', atext)));    
+    //writeln((Text_to_translate_API51(TBASE_URLS,'dict-chrome-ex','auto','ja', atext)));    
+    //writeln((Text_to_translate_API52(TBASE_URLS,'dict-chrome-ex','auto','de', atext)));  
+     //writeln((Text_to_translate_API54(TBASE_URLS,'dict-chrome-ex','auto','ja', atext)));  
+     
+     //writ(Format(TBASE_URL,['langorig','langtarget',atextja]));  
+     //writelnuc(atextja)
+     //writ(loadfile2(exepath+'examples\savetrans2.txt'));
+    
+    //writ('')                                                                                                 
+     //writeln((CharsetConversion(Text_to_translate_API51(TBASE_URLS,'dict-chrome-ex','auto','ja', 
+       //                                               (atext)),cp1252, cp1252)));          
+                                                                                                                 
+   //writeln(CharsetConversion('Die besten WÃ¼nsche zum Neuen Jahr 2026',UTF_8, cp1252))   
+   //writeln(CharsetConversion('DesinfektionslÃƒÆ’Ã‚Â¶sungstÃƒÆ’Ã‚Â¼cher fÃƒÆ’Ã‚Â¼r FlÃ¼chen', 
+     //                                                  UTF_8,ISO_8859_1));  
+   //FreeTranlate_API_Post(self,TBASE_URL8);   
+   
+   //openWeb('https://clients5.google.com/translate_a/t?client=dict-chrome-ex&sl=auto&tl=de&q=ブロンズエディション') ; 
+   //openWeb('https://translate.google.com/?sl=ja&tl=de&text=
+  // %E3%81%93%E3%82%93%E3%81%AB%E3%81%A1%E3%81%AF%E3%80%81%E4%B8%96%E7%95%8C&op=translate');    
+      
+      writ(jsonunescape('\u65e5\u672c\u8a9e',#13#10))  
+     //  writ(jsonunescape('\u671f\u9593',#13#10))  
+       abig:= (maxint64 div 2);
+      //writ(inttostr64(abig));       
+       acard:= maxcardinal;
+       anat:= MaxNativeUInt;
+     // writ(inttostr64(anat));  
+     //  bfloat:= maxint64 / 2;
+     // writ(flots(bfloat));   
+        bfloat:= (Maxcardinal);
+      //writ(floattostr(bfloat+Maxcardinal+maxcardinal));   
+      //writ(floattostr(bfloat+Maxcardinal+maxint64));    
+      //writ(floattostr(bfloat+Maxcardinal));  
+      bfloat:= pow(2,64); 
+      writ(floattostr(bfloat));  
+      writ(bigpow(2,64));
+         abig:= 9223372036854775807;
+      writ(inttostr64(abig));                                                                                    
+     // StrToInt64('9223372036854775807');
+                                                                                                                 
+End.
+
+Ref: https://api-ninjas.com/api/randomimage
+     https://www.npmjs.com/package/google-translate-api-jp?activeTab=readme 
+     https://www.sljfaq.org/afaq/encodings.html
+     コーディングとデザインの街から友人の皆さんへ
+     https://github.com/ssut/py-googletrans/issues/268
+     https://www.geeksforgeeks.org/python/how-to-make-a-google-translation-api-using-python/
+http://www.rolandmuseum.de/syn_ana.php
+https://www.coderstool.com/unicode-text-converter
+https://maxkleiner1.medium.com/free-google-translator-api-486a0529cb01
+https://www.academia.edu/164468548/Maxbox_starter167_FreeTranslatorAPI_maXbox
+https://unibe-ch.academia.edu/MaxKleiner/Papers
+
+Image to Text API
+The Image to Text API detects and extracts text from images using state-of-the-art optical 
+character recognition (OCR) algorithms. 
+It can detect texts of different sizes, fonts, and even handwriting.
+
+Country API
+The Country API provides key geographic, demographic, and economic statistics about every country in the world.
+
+Available endpoints:
+
+/v1/country - Get country data from given parameters
+/v1/allcountries - Get a list of all countries
+
+debug: 95-SyntaxError: unexpected character after line continuation character (line 1, offset 33): 
+'image_file_descriptor = open(r.\examples\geocitytextrandimage0221.jpg, "rb")' 937 err:20
+change   ExecStr('image_file_descriptor = open(r'+imgpath+', "rb")');  to
+          ExecStr('image_file_descriptor = open(r"'+imgpath+'", "rb")');  
+
+debug: 204-SystemError: initialization of md__mypyc did not return an extension module 937 err:20
+autofinalize:= false;
+
+debug: 3-SyntaxError: invalid syntax. Perhaps you forgot a comma? (line 1, offset 30): 
+'image_file_descriptor = open(r"
+"C:\maxbox\maxbox5\pascriptmaster2\pmaster2\restunits\Indy9\maxbox5\maxbox5\examples\geotextrandimage022.jpg",
+ "rb")' 937 err:20
+ 
+ debug: 179-The requested header could not be located. 939 err:20
+HTTPS: Exception: The requested header could not be located.
+ffrom headers.add('X-Api-Key='+aAPIkey); to headers.add('X-Api-Key:'+aAPIkey);
+True
+
+
+[{'label': 'car', 'confidence': '0.78', 'bounding_box': {'x1': '253', 'y1': '455', 'x2': '458', 'y2': '540'}}, 
+{'label': 'car', 'confidence': '0.74', 'bounding_box': {'x1': '103', 'y1': '444', 'x2': '217', 'y2': '490'}}, 
+{'label': 'car', 'confidence': '0.66', 'bounding_box': {'x1': '746', 'y1': '383', 'x2': '860', 'y2': '418'}}, 
+{'label': 'car', 'confidence': '0.56', 'bounding_box': {'x1': '94', 'y1': '445', 'x2': '147', 'y2': '483'}}, 
+{'label': 'car', 'confidence': '0.53', 'bounding_box': {'x1': '718', 'y1': '456', 'x2': '834', 'y2': '495'}}, 
+{'label': 'traffic light', 'confidence': '0.45', 'bounding_box': {'x1': '508', 'y1': '386', 'x2': '540', 'y2': '429'}},
+ {'label': 'bench', 'confidence': '0.44', 'bounding_box': {'x1': '718', 'y1': '456', 'x2': '834', 'y2': '495'}}, 
+ {'label': 'person', 'confidence': '0.43', 'bounding_box': {'x1': '487', 'y1': '441', 'x2': '505', 'y2': '474'}}, 
+ {'label': 'car', 'confidence': '0.4', 'bounding_box': {'x1': '63', 'y1': '448', 'x2': '94', 'y2': '475'}}, 
+ {'label': 'traffic light', 'confidence': '0.4', 'bounding_box': {'x1': '493', 'y1': '389', 'x2': '517', 'y2': '423'}}, 
+ {'label': 'truck', 'confidence': '0.4', 'bounding_box': {'x1': '103', 'y1': '444', 'x2': '217', 'y2': '490'}}, 
+ {'label': 'car', 'confidence': '0.4', 'bounding_box': {'x1': '167', 'y1': '452', 'x2': '232', 'y2': '486'}}, 
+ {'label': 'car', 'confidence': '0.39', 'bounding_box': {'x1': '735', 'y1': '383', 'x2': '815', 'y2': '415'}},
+  {'label': 'person', 'confidence': '0.38', 'bounding_box': {'x1': '490', 'y1': '421', 'x2': '513', 'y2': '467'}}, 
+  {'label': 'person', 'confidence': '0.37', 'bounding_box': {'x1': '491', 'y1': '438', 'x2': '512', 'y2': '476'}}, 
+  {'label': 'car', 'confidence': '0.37', 'bounding_box': {'x1': '128', 'y1': '440', 'x2': '175', 'y2': '453'}}, 
+  {'label': 'truck', 'confidence': '0.35', 'bounding_box': {'x1': '253', 'y1': '455', 'x2': '458', 'y2': '540'}}, 
+  {'label': 'traffic light', 'confidence': '0.34', 'bounding_box': {'x1': '494', 'y1': '430', 'x2': '514', 'y2': '465'}},
+   {'label': 'boat', 'confidence': '0.34', 'bounding_box': {'x1': '718', 'y1': '456', 'x2': '834', 'y2': '495'}}, 
+   {'label': 'car', 'confidence': '0.34', 'bounding_box': {'x1': '96', 'y1': '437', 'x2': '133', 'y2': '453'}}, 
+   {'label': 'traffic light', 'confidence': '0.34', 'bounding_box': {'x1': '474', 'y1': '363', 'x2': '505', 'y2': '399'}}, 
+   {'label': 'truck', 'confidence': '0.33', 'bounding_box': {'x1': '746', 'y1': '383', 'x2': '860', 'y2': '418'}}, 
+   {'label': 'car', 'confidence': '0.33', 'bounding_box': {'x1': '246', 'y1': '456', 'x2': '269', 'y2': '480'}}, 
+   {'label': 'car', 'confidence': '0.33', 'bounding_box': {'x1': '251', 'y1': '430', 'x2': '273', 'y2': '443'}},
+    {'label': 'car', 'confidence': '0.32', 'bounding_box': {'x1': '99', 'y1': '408', 'x2': '136', 'y2': '420'}}, 
+    {'label': 'car', 'confidence': '0.32', 'bounding_box': {'x1': '73', 'y1': '433', 'x2': '97', 'y2': '447'}}, 
+    {'label': 'car', 'confidence': '0.32', 'bounding_box': {'x1': '681', 'y1': '396', 'x2': '724', 'y2': '428'}}, 
+    {'label': 'car', 'confidence': '0.31', 'bounding_box': {'x1': '793', 'y1': '387', 'x2': '875', 'y2': '417'}}, 
+    {'label': 'car', 'confidence': '0.31', 'bounding_box': {'x1': '750', 'y1': '375', 'x2': '847', 'y2': '404'}}, 
+    {'label': 'traffic light', 'confidence': '0.31', 'bounding_box': {'x1': '294', 'y1': '383', 'x2': '319', 'y2': '433'}}, 
+    {'label': 'car', 'confidence': '0.31', 'bounding_box': {'x1': '133', 'y1': '404', 'x2': '178', 'y2': '418'}}, 
+    {'label': 'umbrella', 'confidence': '0.3', 'bounding_box': {'x1': '746', 'y1': '383', 'x2': '860', 'y2': '418'}}]
+                                               
+cheatsheet:
+<iframe src="https://claude.site/public/artifacts/11968d9f-d02c-4183-a7aa-68dcfefd382e/embed" title="Claude Artifact" width="100%" 
+height="600" frameborder="0" allow="clipboard-write" allowfullscreen></iframe>
+
+mindmap:
+<iframe src="https://claude.site/public/artifacts/8a58da49-1753-4522-b0a2-8207942b300e/embed" title="Claude Artifact" 
+width="100%" height="600" 
+frameborder="0" allow="clipboard-write" allowfullscreen></iframe>
+
+https://medium.com/@abhay.anand/day-3-linux-commands-you-should-know-65fb849561cc
+https://medium.com/100-days-of-linux/7-fundamental-use-cases-of-netcat-866364eb1742
+https://medium.com/@saravra/how-to-study-cybersecurity-64ee0478e87e
+
+Foto aktualisiert.
+Besten Dank für das neue Foto. Das Foto wird anhand den Fotorichtlinien geprüft. Sollte das Foto nicht den Anforderungen entsprechen, 
+werden Sie von uns informiert.
+role
+
+(502) 875 err:20
+EWI_HTTP: Exception: Can not send REST message 
+https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl=auto&tl=ja&q=bonjour mes amis da la ville of coding avec design, 
+error: Bad Gateway (502)
+debug: 222- 875 err:21
+debug: 207-The requested header could not be located. 878 err:20
+REQC_Err: Exception: The requested header could not be located.
+
+Re: [Embarcadero/RADStudio-DemoKit] EdgeView (Demo 10.4.2) does not work NavigateToString alone (Issue #5) 
+Contact photo
+From pantera3k on 2026-02-08 21:01
+Details Plain text
+
+pantera3k left a comment 
+(Embarcadero/RADStudio-DemoKit#5)
+it works if run the method before: EdgeBrowser1.CreateWebView.
+
+New in maXbox 5.2.9.198 (September 30, 2025)
+New in maXbox 5.1.4.98 (June 30, 2024)
+New in maXbox 5.1.4.95 (April 17, 2024)
+New in maXbox 5.1.4.90 (March 21, 2024)
+New in maXbox 4.7.6.50 (June 15, 2023)
+New in maXbox 4.7.6.20 (December 15, 2022)
+New in maXbox 4.7.6.10 (November 12, 2021)
+New in maXbox 4.7.5.80 (July 22, 2021)
+New in maXbox 4.7.4.64 (June 14, 2020)
+
+unit uPSI_Jsons;
+{
+jsodn for python php js  kotlin pascal
+  rename TJsonObject to TJsonObject2
+
+}
+interface
+ 
+uses
+   SysUtils
+  ,Classes
+  ,uPSComponent
+  ,uPSRuntime
+  ,uPSCompiler
+  ;
+ 
+type 
+(*----------------------------------------------------------------------------*)
+  TPSImport_Jsons = class(TPSPlugin)
+  public
+    procedure CompileImport1(CompExec: TPSScript); override;
+    procedure ExecImport1(CompExec: TPSScript; const ri: TPSRuntimeClassImporter); override;
+  end;
+ 
+ 
+{ compile-time registration functions }
+procedure SIRegister_TJson(CL: TPSPascalCompiler);
+procedure SIRegister_TJsonObject2(CL: TPSPascalCompiler);
+procedure SIRegister_TJsonPair(CL: TPSPascalCompiler);
+procedure SIRegister_TJsonArray2(CL: TPSPascalCompiler);
+procedure SIRegister_TJsonValue(CL: TPSPascalCompiler);
+procedure SIRegister_TJsonBase(CL: TPSPascalCompiler);
+procedure SIRegister_Jsons(CL: TPSPascalCompiler);
+
+{ run-time registration functions }
+procedure RIRegister_TJson(CL: TPSRuntimeClassImporter);
+procedure RIRegister_TJsonObject2(CL: TPSRuntimeClassImporter);
+procedure RIRegister_TJsonPair(CL: TPSRuntimeClassImporter);
+procedure RIRegister_TJsonArray2(CL: TPSRuntimeClassImporter);
+procedure RIRegister_TJsonValue(CL: TPSRuntimeClassImporter);
+procedure RIRegister_TJsonBase(CL: TPSRuntimeClassImporter);
+procedure RIRegister_Jsons(CL: TPSRuntimeClassImporter);
+
+procedure Register;
+
+implementation
+
+uses
+   jsonsutilsEx
+  ,Jsons
+  ;
+
+ //type  TJsonObject2  = TJsonObject;
+   //    TJsonArray2 = TJsonArray;
+
+ 
+procedure Register;
+begin
+  RegisterComponents('Pascal Script', [TPSImport_Jsons]);
+end;
+
+(* === compile-time registration functions === *)
+(*----------------------------------------------------------------------------*)
+procedure SIRegister_TJson(CL: TPSPascalCompiler);
+begin
+  //with RegClassS(CL,'TJsonBase', 'TJson') do
+  with CL.AddClassN(CL.FindClass('TJsonBase'),'TJson') do begin
+    RegisterMethod('Constructor Create');
+    RegisterMethod('Procedure Free');
+    RegisterMethod('Procedure Parse( JsonString : String)');
+    RegisterMethod('Function Stringify : String');
+    RegisterMethod('Procedure Assign( Source : TJsonBase)');
+    RegisterMethod('Procedure Delete21( const Index : Integer);');
+    RegisterMethod('Procedure Delete22( const Name : String);');
+    RegisterMethod('Procedure Clear');
+    RegisterMethod('Function Get23( const Index : Integer) : TJsonValue;');
+    RegisterMethod('Function Get24( const Name : String) : TJsonValue;');
+    RegisterMethod('Function Put25( const Value : TJsonEmpty) : TJsonValue;');
+    RegisterMethod('Function Put26( const Value : TJsonNull) : TJsonValue;');
+    RegisterMethod('Function Put27( const Value : Boolean) : TJsonValue;');
+    RegisterMethod('Function Put28( const Value : Integer) : TJsonValue;');
+    RegisterMethod('Function Put29( const Value : Extended) : TJsonValue;');
+    RegisterMethod('Function Put30( const Value : String) : TJsonValue;');
+    RegisterMethod('Function Put31( const Value : TJsonArray2) : TJsonValue;');
+    RegisterMethod('Function Put32( const Value : TJsonObject2) : TJsonValue;');
+    RegisterMethod('Function Put33( const Value : TJsonValue) : TJsonValue;');
+    RegisterMethod('Function Put34( const Value : TJson) : TJsonValue;');
+    RegisterMethod('Function Putbool( const Value : Boolean) : TJsonValue;');
+    RegisterMethod('Function Putint( const Value : Integer) : TJsonValue;');
+    RegisterMethod('Function Putext( const Value : Extended) : TJsonValue;');
+    RegisterMethod('Function Putstr( const Value : String) : TJsonValue;');
+    RegisterMethod('Function Putarr( const Value : TJsonArray2) : TJsonValue;');
+    RegisterMethod('Function Putobj( const Value : TJsonObject2) : TJsonValue;');
+    RegisterMethod('Function Putval( const Value : TJsonValue) : TJsonValue;');
+    RegisterMethod('Function Putjson( const Value : TJson) : TJsonValue;');
+
+    RegisterMethod('Function Put35( const Name : String; const Value : TJsonEmpty) : TJsonValue;');
+    RegisterMethod('Function Put36( const Name : String; const Value : TJsonNull) : TJsonValue;');
+    RegisterMethod('Function Put37( const Name : String; const Value : Boolean) : TJsonValue;');
+    RegisterMethod('Function Put38( const Name : String; const Value : Integer) : TJsonValue;');
+    RegisterMethod('Function Put39( const Name : String; const Value : Extended) : TJsonValue;');
+    RegisterMethod('Function Put40( const Name : String; const Value : String) : TJsonValue;');
+    RegisterMethod('Function Put41( const Name : String; const Value : TJsonArray2) : TJsonValue;');
+    RegisterMethod('Function Put42( const Name : String; const Value : TJsonObject2) : TJsonValue;');
+    RegisterMethod('Function Put43( const Name : String; const Value : TJsonValue) : TJsonValue;');
+    RegisterMethod('Function Put44( const Name : String; const Value : TJson) : TJsonValue;');
+    RegisterMethod('Function Put45( const Value : TJsonPair) : TJsonValue;');
+    RegisterProperty('StructType', 'TJsonStructType', iptr);
+    RegisterProperty('JsonObject', 'TJsonObject2', iptr);
+    RegisterProperty('JsonArray', 'TJsonArray2', iptr);
+    RegisterProperty('Count', 'Integer', iptr);
+    RegisterProperty('Values', 'TJsonValue String', iptr);
+    SetDefaultPropery('Values');
+  end;
+end;
+
+
+(*----------------------------------------------------------------------------*)
+procedure SIRegister_TJsonPair(CL: TPSPascalCompiler);
+begin
+  //with RegClassS(CL,'TJsonBase', 'TJsonPair') do
+  with CL.AddClassN(CL.FindClass('TJsonBase'),'TJsonPair') do begin
+    RegisterMethod('Constructor Create( AOwner : TJsonBase; const AName : String)');
+    RegisterMethod('Procedure Free');
+    RegisterMethod('Procedure Parse( JsonString : String)');
+    RegisterMethod('Function Stringify : String');
+    RegisterMethod('Procedure Assign( Source : TJsonBase)');
+    RegisterProperty('Name', 'String', iptrw);
+    RegisterProperty('Value', 'TJsonValue', iptr);
+  end;
+end;
+
+(*----------------------------------------------------------------------------*)
+procedure SIRegister_TJsonArray2(CL: TPSPascalCompiler);
+begin
+  //with RegClassS(CL,'TJsonBase', 'TJsonArray2') do
+  with CL.AddClassN(CL.FindClass('TJsonBase'),'TJsonArray2') do begin
+    RegisterMethod('Constructor Create( AOwner : TJsonBase)');
+    RegisterMethod('Procedure Free');
+    RegisterMethod('Procedure Parse( JsonString : String)');
+    RegisterMethod('Function Stringify : String');
+    RegisterMethod('Procedure Assign( Source : TJsonBase)');
+    RegisterMethod('Procedure Merge( Addition : TJsonArray2)');
+    RegisterMethod('Function Add : TJsonValue');
+    RegisterMethod('Function Insert( const Index : Integer) : TJsonValue');
+    RegisterMethod('Function Put0( const Value : TJsonEmpty) : TJsonValue;');
+    RegisterMethod('Function Put1( const Value : TJsonNull) : TJsonValue;');
+    RegisterMethod('Function Put2( const Value : Boolean) : TJsonValue;');
+    RegisterMethod('Function Put3( const Value : Integer) : TJsonValue;');
+    RegisterMethod('Function Put4( const Value : Extended) : TJsonValue;');
+    RegisterMethod('Function Put5( const Value : String) : TJsonValue;');
+    RegisterMethod('Function Put6( const Value : TJsonArray2) : TJsonValue;');
+    RegisterMethod('Function Put7( const Value : TJsonObject2) : TJsonValue;');
+    RegisterMethod('Function Put8( const Value : TJsonValue) : TJsonValue;');
+    RegisterMethod('Procedure Delete( const Index : Integer)');
+    RegisterMethod('Procedure Clear');
+    RegisterProperty('Count', 'Integer', iptr);
+    RegisterProperty('Items', 'TJsonValue Integer', iptr);
+    SetDefaultPropery('Items');
+  end;
+end;
+
+(*----------------------------------------------------------------------------*)
+procedure SIRegister_TJsonValue(CL: TPSPascalCompiler);
+begin
+  //with RegClassS(CL,'TJsonBase', 'TJsonValue') do
+  with CL.AddClassN(CL.FindClass('TJsonBase'),'TJsonValue') do begin
+    RegisterMethod('Constructor Create( AOwner : TJsonBase)');
+   RegisterMethod('Procedure Free');
+    RegisterMethod('Procedure Parse( JsonString : String)');
+    RegisterMethod('Function Stringify : String');
+    RegisterMethod('Procedure Assign( Source : TJsonBase)');
+    RegisterMethod('Procedure Clear');
+    RegisterProperty('ValueType', 'TJsonValueType', iptr);
+    RegisterProperty('AsString', 'String', iptrw);
+    RegisterProperty('AsNumber', 'Extended', iptrw);
+    RegisterProperty('AsInteger', 'Integer', iptrw);
+    RegisterProperty('AsBoolean', 'Boolean', iptrw);
+    RegisterProperty('AsObject', 'TJsonObject2', iptrw);
+    RegisterProperty('AsArray', 'TJsonArray2', iptrw);
+    RegisterProperty('IsNull', 'Boolean', iptrw);
+    RegisterProperty('IsEmpty', 'Boolean', iptrw);
+  end;
+end;
+
+(*----------------------------------------------------------------------------*)
+procedure SIRegister_TJsonBase(CL: TPSPascalCompiler);
+begin
+  //with RegClassS(CL,'TObject', 'TJsonBase') do
+  with CL.AddClassN(CL.FindClass('TObject'),'TJsonBase') do  begin
+    RegisterMethod('Constructor Create( AOwner : TJsonBase)');
+    RegisterMethod('Procedure Free');
+    RegisterMethod('Procedure Parse( JsonString : String)');
+    RegisterMethod('Function Stringify : String');
+    RegisterMethod('Procedure Assign( Source : TJsonBase)');
+    RegisterMethod('Function Encode( const S : String) : String');
+    RegisterMethod('Function Decode( const S : String) : String');
+    RegisterMethod('Procedure Split( const S : String; const Delimiter : Char; Strings : TStrings)');
+    RegisterMethod('Function IsJsonObject( const S : String) : Boolean');
+    RegisterMethod('Function IsJsonArray( const S : String) : Boolean');
+    RegisterMethod('Function IsJsonString( const S : String) : Boolean');
+    RegisterMethod('Function IsJsonNumber( const S : String) : Boolean');
+    RegisterMethod('Function IsJsonBoolean( const S : String) : Boolean');
+    RegisterMethod('Function IsJsonNull( const S : String) : Boolean');
+    RegisterMethod('Function AnalyzeJsonValueType( const S : String) : TJsonValueType');
+    RegisterProperty('Owner', 'TJsonBase', iptr);
+  end;
+end;
+
+(*----------------------------------------------------------------------------*)
+procedure SIRegister_Jsons(CL: TPSPascalCompiler);
+begin
+  CL.AddTypeS('TJsonValueType', '( jvNone, jvNull, jvString, jvNumber, jvBoolean, jvObject, jvArray )');
+  CL.AddTypeS('TJsonStructType', '( jsNone, jsArray, jsObject )');
+  CL.AddTypeS('TJsonNull', '( jsnull2 )');
+  CL.AddTypeS('TJsonEmpty', '( jsempty )');
+  SIRegister_TJsonBase(CL);
+  CL.AddClassN(CL.FindClass('TOBJECT'),'TJsonObject2');
+  CL.AddClassN(CL.FindClass('TOBJECT'),'TJsonArray2');
+  SIRegister_TJsonValue(CL);
+  SIRegister_TJsonArray2(CL);
+  SIRegister_TJsonPair(CL);
+  SIRegister_TJsonObject2(CL);
+  SIRegister_TJson(CL);
+end;
