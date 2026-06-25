@@ -124,3 +124,8 @@ https://hybrid-analysis.com/sample/39ecf837ed96b8df53b37223fee64e0d9544563c33e1c
 
 ![mx5_screenshot2](https://github.com/user-attachments/assets/7afbb643-5d5f-4001-ab98-e3be1c791b8f)
 
+<iframe src="https://www.slideshare.net/slideshow/embed_code/key/xfLXiWcpmMzSnJ" width="610" height="515"frameborder="0" marginwidth="0" marginheight="0" scrolling="no"style="border: var(--border-1) solid #CCC; border-width:1px; margin-bottom:5px; max-width:100%;"allowfullscreen></iframe>
+<div style="margin-bottom:5px"><strong><a href="https://www.slideshare.net/slideshow/advanced-geo-intelligence-integrating-maps-apis-and-ai-for-enhanced-geospatial-analysis/288228122" 
+title="advanced-geo-intelligence-integrating-maps-apis-and-ai-for-enhanced-geospatial-analysis" target="_blank">advanced-geo-intelligence-integrating-maps-apis-and-ai-for-enhanced-geospatial-analysis</a></strong>from <strong><a href="https://www.slideshare.net/MaxKleiner3" target="_blank">MaxKleiner3</a></strong></div>
+
+
