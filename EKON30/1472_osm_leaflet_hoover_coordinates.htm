@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Leaflet OSM Hover Coordinates on maXbox</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <style>
+    #map {
+      height: 100vh; /* Full screen height */
+      width: 100%;
+    }
+    #coords {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 5px 10px;
+      font-family: monospace;
+      border-radius: 4px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+      z-index: 10000; /* Ensure it's above all map layers and controls */
+      pointer-events: none; /* Let mouse events pass through */
+    }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+<div id="coords">Lat: -, Lng: -</div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+  // Create the map and set initial view
+  const map = L.map('map').setView([46.948, 7.447], 13); // Example: Bern
+
+  // Add OpenStreetMap tile layer
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  // Get the coordinates display element
+  const coordsDiv = document.getElementById('coords');
+
+  // Update coordinates on mouse move
+  map.on('mousemove', function(e) {
+    const lat = e.latlng.lat.toFixed(6);
+    const lng = e.latlng.lng.toFixed(6);
+    coordsDiv.textContent = `Lat: ${lat}, Lng: ${lng}`;
+  });
+</script>
+
+</body>
+</html>
