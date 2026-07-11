@@ -25,18 +25,32 @@
       z-index: 10000; /* Ensure it's above all map layers and controls */
       pointer-events: none; /* Let mouse events pass through */
     }
+    #toast {
+      position: absolute;
+      bottom: 50px;
+      left: 10px;
+      background: #4caf50;
+      color: white;
+      padding: 5px 10px;
+      font-family: monospace;
+      border-radius: 4px;
+      font-size: 0.9em;
+      z-index: 10000; /* Ensure it's above all map layers and controls */
+      display: none;
+    }
   </style>
 </head>
 <body>
 
 <div id="map"></div>
 <div id="coords">Lat: -, Lng: -</div>
+<div id="toast">Copied!</div>
 
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
   // Create the map and set initial view
-  const map = L.map('map').setView([46.948, 7.447], 13); // Example: Bern
+  const map = L.map('map').setView([46.948, 7.447], 13); // Example: Bern, CH
 
   // Add OpenStreetMap tile layer
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -46,6 +60,7 @@
 
   // Get the coordinates display element
   const coordsDiv = document.getElementById('coords');
+  const toast = document.getElementById('toast');
 
   // Update coordinates on mouse move
   map.on('mousemove', function(e) {
@@ -53,7 +68,30 @@
     const lng = e.latlng.lng.toFixed(6);
     coordsDiv.textContent = `Lat: ${lat}, Lng: ${lng}`;
   });
-</script>
+ 
+// Click to copy coordinates
+  map.on('click', function(e) {
+    const lat = e.latlng.lat.toFixed(6);
+    const lng = e.latlng.lng.toFixed(6);
+    const coordText = `${lat}, ${lng}`;
 
-</body>
+    // Try to copy to clipboard
+    navigator.clipboard.writeText(coordText).then(() => {
+      showToast("Copied: " + coordText);
+    }).catch(err => {
+      console.error("Clipboard copy failed:", err);
+      showToast("Copy failed");
+    });
+  });
+
+  // Show toast message
+  function showToast(message) {
+    toast.textContent = message;
+    toast.style.display = 'block';
+    setTimeout(() => {
+      toast.style.display = 'none';
+    }, 2500);
+  }
+  </script>
+ </body>
 </html>
