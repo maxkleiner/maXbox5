@@ -1,6 +1,7 @@
 program APILayer_Demo64_GEO_Severals_JS_6_GeoJSON_OSM51;
 
 //note : almost finished yet! for Tutor 191  + https getdirect2  coords!
+//http://www.softwareschule.ch/examples/maxbox_starter191.pdf
 //note: you need no file anymore  (exepath+'examples\1472_osm_geojson_complete.htm'); 
 
 //{$IFDEF Lazarus}
@@ -49,6 +50,7 @@ const
   GEOJSON2 = 'https://github.com/maxkleiner/maXbox5/blob/main/EKON30/1472_city_bern_polygon2.geojson';
   GEOJSON3 = 'https://github.com/maxkleiner/maXbox5/blob/main/EKON30/1472_osm_leaflet_hoover_coordinates.htm';
   GEOJSON4 = 'https://raw.githack.com/maxkleiner/maXbox5/main/EKON30/1472_osm_leaflet_hoover_coordinates.htm';
+  GEOJSON5 = 'http://softwareschule.ch/latlong.htm';
   OSMDirect ='https://www.openstreetmap.org/#map=16/46.94842/7.45034';  
   OSM_URLFormat ='https://www.openstreetmap.org/#map=%.2f/%.5f/%.5f';   
   //TESTURL5 = 'https://raw.githack.com/maxkleiner/maXbox5/blob/main/EKON30/1472_osm_geojson_complete.htm';  
@@ -582,6 +584,10 @@ end.
 Doc: 1 🌍 Playground with GeoJSON, Leaflet & JavaScript, EdgeView in maXbox 🌍   
 
     we set a point and a polygon ⚙️ on the map!  
+    
+    https://youtu.be/BCt2m-67FVk
+    
+    https://raw.githack.com/maxkleiner/maXbox5/main/EKON30/1472_osm_leaflet_hoover_coordinates.htm
 
    A position is an array of numbers.  There MUST be two or more
       elements.  The first two elements are longitude and latitude, or
