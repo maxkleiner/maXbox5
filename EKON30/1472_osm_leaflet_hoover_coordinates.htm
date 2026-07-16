@@ -77,7 +77,7 @@
 
     // Try to copy to clipboard
     navigator.clipboard.writeText(coordText).then(() => {
-      showToast("Copied: " + coordText);
+      showToast("Clp Copied: " + coordText);
     }).catch(err => {
       console.error("Clipboard copy failed:", err);
       showToast("Copy failed");
