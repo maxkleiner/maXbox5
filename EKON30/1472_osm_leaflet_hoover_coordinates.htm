@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Leaflet OSM Hover Coordinates on maXbox</title>
+  <title>Leaflet OSM Hover Coordinates on maXbox5</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Leaflet CSS -->
@@ -58,6 +58,44 @@
     attribution: '&copy; OpenStreetMap contributors'
   }).addTo(map);
 
+  // Example GeoJSON data (Point + Polygon)
+    const geojsonData = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": { "name": "Coords Point" },
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [7.447422, 46.947945] // lon, lat from point 46.947945, 7.447422
+                }
+            }
+         ]
+    };
+                                                       
+  // Add GeoJSON layer with styling and popup
+    L.geoJSON(geojsonData, {
+        style: feature => ({
+            color: feature.properties.name === "Sample Polygon" ? "blue" : "red",
+            weight: 2
+        }),
+        pointToLayer: (feature, latlng) => {
+            return L.circleMarker(latlng, {
+                radius: 6,
+                fillColor: "red",
+                color: "#000",
+                weight: 1,
+                opacity: 1,
+                fillOpacity: 0.7
+            });
+        },
+        onEachFeature: (feature, layer) => {
+            if (feature.properties && feature.properties.name) {
+                layer.bindPopup(feature.properties.name);
+            }
+        }
+    }).addTo(map);
+  
   // Get the coordinates display element
   const coordsDiv = document.getElementById('coords');
   const toast = document.getElementById('toast');
