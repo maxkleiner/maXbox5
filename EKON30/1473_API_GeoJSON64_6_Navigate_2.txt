@@ -1,0 +1,544 @@
+program APILayer_Demo64_GEO_Severals_JS_6_GeoJSON_OSM54Navigate_2_LightRefactor;
+
+//note : almost finished yet! for Tutor 192  + https getdirect2  coords!  file embeeding with params
+//http://www.softwareschule.ch/examples/maxbox_starter192.pdf
+//note: you need no file anymore  (exepath+'examples\1472_osm_geojson_complete.htm'); 
+
+//{$IFDEF Lazarus}
+//  {$APPTYPE CONSOLE}  ☮ ✞ π 📌 🌍 📚
+//{/$ENDIF}
+
+const
+  USERAGENT5 = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)'+
+                   ' Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0 '; 
+  USERAGENT2 = 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1';  
+  USERAGENT3 = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)'+
+                   ' Chrome/125.0.0.0 Safari/537.3'; // chrome + win   
+  USERAGENT4 = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15'+
+                   ' (KHTML, like Gecko) Version/17.4.1 Safari/605.1.1';           // safari + mac
+  USERAGENT1 = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '+    // edge + win
+                   '(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.';               
+
+ 
+  TESTURL = 'https://graphical.weather.gov/xml/DWMLgen/schema/latest_DWML.txt';
+  TESTURL2 = 'https://maxbox4.wordpress.com/2024/03/06/geocoding-iv/';
+  //Const JSAPP4 = 'https://raw.githack.com/breitsch2/maXbox4/master/assets/tetris2.html'; 
+  TESTURL4 = 'https://raw.githack.com/maxkleiner/restcountries/master/src/test/geocodescript.htm';
+  TESTURL3 = 'https://raw.githack.com/maxkleiner/restcountries/blob/master/src/test/geocodescript.htm';
+  TESTURL51= 'https://rawcdn.githack.com/maxkleiner/maXbox5/ba90663a236596fe6fda02ec8e85dd8825f40b55/EKON30/1472_osm_leaflet_hoover_coordinates.htm';
+  GEOJSON2 = 'https://github.com/maxkleiner/maXbox5/blob/main/EKON30/1472_city_bern_polygon2.geojson';
+  GEOJSON3 = 'https://github.com/maxkleiner/maXbox5/blob/main/EKON30/1472_osm_leaflet_hoover_coordinates.htm';
+  GEOJSON4 = 'https://raw.githack.com/maxkleiner/maXbox5/main/EKON30/1472_osm_leaflet_hoover_coordinates.htm';
+  GEOJSON5 = 'http://softwareschule.ch/latlong.htm';
+  OSMDirect ='https://www.openstreetmap.org/#map=16/46.94842/7.45034';  
+  OSM_URLFormat ='https://www.openstreetmap.org/#map=%.2f/%.5f/%.5f';   
+  //TESTURL5 = 'https://raw.githack.com/maxkleiner/maXbox5/blob/main/EKON30/1472_osm_geojson_complete.htm';  
+  TESTURL5 = 'https://raw.githack.com/maxkleiner/maXbox5/main/EKON30/1472_osm_geojson_complete.htm';     
+  TESTURL6 = 'https://raw.githack.com/maxkleiner/maXbox5/main/EKON30/1472_osm_leaflet_hoover_coordinates.htm';     
+
+(*
+{$I .\NINJAAPIKEY.INC}  no key needed!
+const
+   N_APIKEY = NINJA_APIKEY;
+   L_APIKEY = LAYER_APIKEY;  *)
+   
+{uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, OleCtrls, SHDocVw, StdCtrls, ExtCtrls, XPMan, ComCtrls, MSHTML;   }
+  
+var JS_SCRIPT2: string;  
+ 
+//{$R *.dfm}
+//Coords: lat 47.58300 lng 12.16921 Kufstein, Bezirk Kufstein, Tirol, 6330, Österreich place_id: 62777717
+
+const EARTHQUAKE_HTML_GEOJSON =
+'<html>                                                                '+
+'  <head>                                                              '+
+'    <title>Earthquake Markers</title>                                 '+
+'                                                                        '+
+'    <link rel="stylesheet" type="text/css" href="./style.css" />        '+
+'    <script type="module" src="./index.js"></script>                    '+
+'  </head>                                                                 '+
+'  <body>                                                                  '+
+'    <div id="map"></div>                                                  '+
+'    <!--                                                                               '+
+'      The `defer` attribute causes the script to execute after the full HTML           '+
+'      document has been parsed. For non-blocking uses, avoiding race conditions,       '+
+'      and consistent behavior across browsers, consider loading using Promises. See     '+
+'      https://developers.google.com/maps/documentation/javascript/load-maps-js-api      '+
+'      for more information.                                                             '+
+'      -->                                                                               '+
+'    <script                                                                              '+
+'      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly" '+
+'      defer                                    '+
+'    ></script>                                 '+
+'  </body>                                      '+
+'</html>                                        ';
+
+ 
+//HOVER_JS_SCRIPT:=  '':
+//const HOOVER_COORDINATES2 =
+function SetSCRIPT_PARAMS(vlat,vlong,vzoom: string): boolean;
+begin
+ result:= false;
+ JS_SCRIPT2:=                                                                             
+'<!DOCTYPE html>                                                           '+lf+
+'<html>                                                                    '+lf+
+'<head>                                                                    '+lf+
+'  <meta charset="utf-8" />                                                '+lf+
+'  <title>Leaflet OSM Hover Coordinates on maXbox52</title>                '+lf+
+'  <meta name="viewport" content="width=device-width, initial-scale=1.0">  '+lf+
+'                                                                          '+lf+
+'  <!-- Leaflet CSS -->                                                    '+lf+
+'  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />'+lf+
+'                                                                          '+lf+
+'  <style>                                                                 '+lf+
+'    #map {                                                                '+lf+
+'      height: 100vh; /* Full screen height */                             '+lf+
+'      width: 100%;                                                        '+lf+
+'    }                                                                     '+lf+
+'    #coords {                                                             '+lf+
+'      position: absolute;                                                 '+lf+
+'      bottom: 10px;                                                       '+lf+
+'      left: 10px;                                                         '+lf+
+'      background: rgba(255, 255, 255, 0.8);                               '+lf+
+'      padding: 5px 10px;                                                  '+lf+
+'      font-family: monospace;                                             '+lf+
+'      border-radius: 4px;                                                 '+lf+
+'      box-shadow: 0 0 5px rgba(0,0,0,0.3);                                '+lf+
+'      z-index: 10000; /* Ensure its above all map layers and controls */  '+lf+
+'      pointer-events: none; /* Let mouse events pass through */           '+lf+
+'    }                                                                     '+lf+
+' #toast {                                                                 '+lf+
+'      position: absolute;                                                 '+lf+
+'      bottom: 50px;                                                       '+lf+
+'      left: 10px;                                                         '+lf+
+'      background: #4caf50;                                                '+lf+
+'      color: white;                                                       '+lf+
+'      padding: 5px 10px;                                                  '+lf+
+'      font-family: monospace;                                             '+lf+
+'      border-radius: 4px;                                                 '+lf+
+'      font-size: 0.9em;                                                   '+lf+
+'      z-index: 10000; /* Ensure its above all map layers and controls */  '+lf+
+'      display: none;                                                      '+lf+
+'    }                                                                     '+lf+
+'  </style>                                                                '+lf+
+'</head>                                                                   '+lf+
+'<body>                                                                    '+lf+
+'<div id="map"></div>                                                      '+lf+
+'<div id="coords">Lat: -, Lng: -</div>                                     '+lf+
+'<div id="toast">Clipbrd Copied!</div>                                     '+lf+                         
+'                                                                          '+lf+
+'<!-- Leaflet JS -->                                                       '+lf+
+'<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>         '+lf+
+'<script>                                                                  '+lf+
+'  // Create the map and set initial view                                  '+lf+
+'// const map = L.map("map").setView([46.948, 7.447], 13); //Example: Bern '+lf+
+'  const map =                                                             '+lf+
+'     L.map("map").setView(['+vlat+','+vlong+'],'+vzoom+'); //params       '+lf+
+'                                                                          '+lf+
+'  // Add OpenStreetMap tile layer                                         '+lf+
+'  L.tileLayer(''https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'', {   '+lf+
+'    maxZoom: 19,                                                          '+lf+
+'    attribution: ''&copy; OpenStreetMap contributors''                    '+lf+
+'  }).addTo(map);                                                          '+lf+
+'                                                                          '+lf+
+'  // Get the coordinates display element                                  '+lf+
+'  const coordsDiv = document.getElementById("coords");                    '+lf+
+'  const toast = document.getElementById("toast");                         '+lf+
+'                                                                          '+lf+
+'  // Update coordinates on mouse move                                     '+lf+
+'  map.on(''mousemove'', function(e) {                                     '+lf+
+'    const lat = e.latlng.lat.toFixed(6);                                  '+lf+
+'    const lng = e.latlng.lng.toFixed(6);                                  '+lf+
+'    coordsDiv.textContent = `Lat: ${lat}, Lng: ${lng}`;                   '+lf+
+'  });                                                                     '+lf+
+'                                                                          '+lf+
+'  // Click to copy coordinates                                            '+lf+
+'  map.on("click", function(e) {                                           '+lf+
+'    const lat = e.latlng.lat.toFixed(6);                                  '+lf+
+'    const lng = e.latlng.lng.toFixed(6);                                  '+lf+
+'    const coordText = `${lat}, ${lng}`;                                   '+lf+
+'                                                                          '+lf+
+'    // Try to copy to clipboard                                           '+lf+
+'    navigator.clipboard.writeText(coordText).then(() => {                 '+lf+
+'      showToast("Clipbd Copied: " + coordText);                           '+lf+
+'    }).catch(err => {                                                     '+lf+
+'      console.error("Clipboard copy failed:", err);                       '+lf+
+'      showToast("Copy failed");                                           '+lf+
+'    });                                                                   '+lf+
+'  });                                                                     '+lf+
+'                                                                          '+lf+
+'  // Show toast message                                                   '+lf+
+'  function showToast(message) {                                           '+lf+
+'    toast.textContent = message;                                          '+lf+
+'    toast.style.display = "block";                                        '+lf+
+'    setTimeout(() => {                                                    '+lf+
+'      toast.style.display = "none";                                       '+lf+
+'    }, 2500);                                                             '+lf+
+'  }                                                                       '+lf+
+'  </script>                                                               '+lf+
+' </body>                                                                  '+lf+
+'</html>                                                                   ';
+  result:= true;
+end;
+
+
+//{Public} Function GOOGLE_COUNT(searchTerm As String, xRes As Long, yRes As Long, Optional timeout As Long = 10) As Long
+//"type":"FeatureCollection","name":"citypolygon","max":[18.0,50.65],"min":[-180.0,-90.0],
+//)
+
+const GEOJSON_Layer =
+'{                                                       '+lf+
+'    "type": "FeatureCollection","name":"citypolygon",   '+lf+
+'    "max":[18.0,50.65],"min":[-180.0,-90.0],            '+lf+
+'    "features": [                                       '+lf+
+'        {                                               '+lf+
+'            "type": "Feature",                          '+lf+
+'            "geometry": {                               '+lf+
+'                "type": "Polygon",                      '+lf+
+'                "coordinates": [                        '+lf+
+'                    [                                   '+lf+
+'                        7.4474,                         '+lf+
+'                        46.948                          '+lf+
+'                    ],                                  '+lf+
+'                    [                                   '+lf+
+'                        7.4535,                         '+lf+
+'                        46.9542                         '+lf+
+'                    ],                                  '+lf+
+'                    [                                   '+lf+
+'                        7.46,                           '+lf+
+'                        46.95                           '+lf+
+'                    ],                                  '+lf+
+'                    [                                   '+lf+
+'                        7.4474,                         '+lf+
+'                        46.948                          '+lf+
+'                    ]                                   '+lf+
+'                ]                                       '+lf+
+'            },                                          '+lf+
+'            "properties": {                             '+lf+
+'                "name": "Bern City Center",             '+lf+
+'                "timestamp": "2026-03-14 14:10:25"      '+lf+
+'            }                                           '+lf+
+'        }                                               '+lf+
+'    ]                                                   '+lf+
+'}                                                       ';
+
+var edgeviewfrm:  TEdgeViewForm;
+    edt1lat, edt2long: TEdit;
+    zoomf: double;
+
+procedure TEdit1Button1Click(Sender: TObject);
+ var htmlgeojs2: string;     
+   begin
+     writ('debc: '+edt1lat.text+' '+edt2long.text)
+     htmlgeojs2:= utf8decode(HttpGetDirect2(GEOJSON4));
+     htmlgeojs2:= (stringreplace((htmlgeojs2),
+                               'const map = L.map(''map'').setView([46.948, 7.447], 13);',
+                               'const map = L.map("map").setView(['+(edt1lat.text)+','
+                                         +(edt2long.text)+'],'+flots(zoomf)+'); //params',
+                               [rfReplaceAll]));
+     htmlgeojs2:= (stringreplace((htmlgeojs2),
+                               '"coordinates": [7.447422, 46.947945]',
+                               '"coordinates": ['+(edt2long.text)+','+(edt1lat.text)+']',
+                               [rfReplaceAll]));        //}                 
+     //htmlgeojs2:= utf8encode(stringreplace((HOVER_JS_SCRIPT2),LF,CRLF,[rfReplaceAll]));
+     htmlgeojs2:= utf8encode(stringreplace((htmlgeojs2),LF,CRLF,[rfReplaceAll]));
+     edgeviewfrm.memoHTML.Text:= utf8toansi(htmlgeojs2); ////GEOJSON_Layer; 
+     edgeviewfrm.btnSetSourceClick(self);
+   end;
+ 
+procedure letGeoJson_EdgeOSM_GeoJSON(lat,long: double; zoom: double);
+var htmlgeojs: string; runedt: TButton;
+ begin
+   edgeviewfrm:= TEdgeViewForm.create(self); 
+   with EdgeViewFrm do begin
+     width:= 1200;
+     height:= 1000;
+     edt1lat:= TEdit.create(edgeviewfrm);
+     with edt1lat do begin
+       parent:= edgeviewfrm
+       text:= flots(lat);
+       color:= clyellow;
+       setbounds(12,845,110,90)
+     end;  
+     edt2long:= TEdit.create(edgeviewfrm);
+     with edt2long do begin
+       parent:= edgeviewfrm
+       text:= flots(long);
+       color:= clyellow;
+       setbounds(12,880,110,90)
+     end;  
+     runedt:= TButton.create(edgeviewfrm);
+     with runedt do begin
+       parent:= edgeviewfrm
+       caption:= '&Run Edit';
+       //color:= clyellow;
+       onclick:= @TEdit1Button1Click;
+       setbounds(10,810,116,30)
+     end;  
+     caption:= caption+ ' - OSM GeoJSON Layer 2026_4'
+     //htmlgeojs:= loadfile(exepath+'examples\1472_osm_geojson_complete.htm'); 
+     if SetSCRIPT_PARAMS(Format('%.6f',[lat]),Format('%.6f',[long]),
+                                              format('%.2f',[zoom])) then 
+       //saveString(exepath+'examples\1473_geocodecoordsscript.htm',
+       //                               utf8encode(HOVER_JS_SCRIPT2));
+       htmlgeojs:= utf8encode(stringreplace((JS_SCRIPT2),LF,CRLF,[rfReplaceAll]));
+     //writ(utf8toansi(htmlgeojs));     
+     pagecontrol1.height:= 260;
+     pagecontrol1.activepage:= tabsheet3;
+     edit1.text:= TESTURL6; //OSMDIRECT; or 'https://wttr.in/Bern';
+     //edit1.text:= Format(OSM_URLFormat,[zoom, lon,lat]);//'https://wttr.in/Bern';
+     //btngoclick(self);
+     sleep(1500);
+     //memoJavaScript.text:= 'alert("hello Delphi! & maXbox5 JS")';
+     //btnExecuteScriptClick(self);
+     memoHTML.font.size:= 11;
+     memoHTML.color:= clsilver;
+     memoHTML.Text:= utf8toansi(htmlgeojs); ////GEOJSON_Layer; 
+     btnsetsource.caption:= '&Run Source'
+     //btnSetSourceClick(self);  //}
+     TEdit1Button1Click(self)
+     showmodal      //to save edge resources
+     free;
+   end; 
+ end;  
+ 
+ function GetGeoInfoMap5save(const lat,lon, zoom: double; asize: integer;
+                               const UrlGeoLookupInfo, apath: string): string;
+  var
+    pngStream: TMemoryStream;
+    MainMenu1: TMainMenu; File1: TMenuItem;
+  begin
+    pngStream:= TMemoryStream.Create;
+      try
+        Wininet_HttpGet(Format(UrlGeoLookupInfo,[lon,lat,zoom,asize-50,asize-50]), pngStream);
+      except
+        //lHTTP.Get1(Format(UrlGeoLookupInfo2,[IpAddress]), lStream);
+        writeln(ExceptionToString(ExceptionType, ExceptionParam));
+      end;
+    try
+      writ('size of geosat pic '+itoa(pngstream.size));
+      pngStream.Position:= 0;
+      pngStream.SaveToFile(apath);
+      //APATHGLOB:= apath;
+    finally
+     //Dispose;
+     //Free;
+     pngStream.Free;
+   end;
+ end;     
+                                                    
+                                       
+begin   //@main
+ // loadWebform();
+ // WebBrowser1.Navigate('https://wttr.in/Maribor');
+ // savestring(exepath+'geocodescriptgeojson.htm', utf8encode(HTML_JS_GEOJSONStr));
+   //letGeoJson_EdgeOSM(zoomf,46.948,7.4474);
+   //1472_osm_leaflet_hoover_coordinates.htm 
+  // if fileexists(exepath+'examples\1472_osm_geojson_complete.htm') then
+
+    zoomf:= 15;
+    writ(flots(DMS2Extended(8, 30, 0)));
+    writ(flots(DMS2Extended(47, 0, 0)));
+    if isinternetconnected then 
+        //letGeoJson_EdgeOSM_GeoJSON(46.948,7.4474,zoomf) //else 
+       letGeoJson_EdgeOSM_GeoJSON(47.0002,9.5002,zoomf) else 
+          showMessageBig('get some internet connection first to run');
+ 
+    openWeb('https://teetrains.wordpress.com/2026/08/04/webview-injection/');
+    
+  // openWeb(exepath+'examples\1472_geocodecoordsscript.htm');
+  // showmessagebig('download html of https://sourceforge.net/projects/maxbox5/files/examples/1472_osm_geojson_complete.htm/download');
+  // openWeb(TESTURL5);                                                                                                                 
+ end.
+
+Doc: 1 🌍 Playground with GeoJSON, Leaflet & JavaScript, EdgeView in maXbox 🌍   
+
+Ref: https://teetrains.wordpress.com/2026/08/04/webview-injection/
+     https://teetrains.wordpress.com/wp-content/uploads/2026/08/tutor192_web_view_injection_mapping_guide.png?w=1144
+
+    https://gpscoordinates.live/
+    https://notebook.google.com/notebook/a226fc55-244b-449b-a524-20cf6770a1ca/artifact/eb4e58f0-8dca-4441-8bc9-e5ad96408405?utm_source=nlm_web_share&utm_medium=google_oo&utm_campaign=art_share_1&utm_content=&utm_smc=nlm_web_share_google_oo_art_share_1_
+
+    we set a point and a polygon ⚙️ on the map!  
+    
+    https://dev.to/max_kleiner_9d12e786b3ecc/geojson-playground-on-map-coordinates-latlong-4fff
+    https://medium.com/@maxkleiner1/geojson-playground-on-map-coordinates-lat-long-05525f156f02
+    
+    https://youtu.be/BCt2m-67FVk
+    
+    https://raw.githack.com/maxkleiner/maXbox5/main/EKON30/1472_osm_leaflet_hoover_coordinates.htm
+
+   A position is an array of numbers.  There MUST be two or more
+      elements.  The first two elements are longitude and latitude, or
+      easting and northing, precisely in that order and using decimal
+      numbers.  Altitude or elevation MAY be included as an optional third
+      element.
+   
+ 
+
+If you want, I can extend this example to load live GeoJSON data directly from OpenStreetMap using Overpass API so you 
+can query real map features dynamically.
+Do you want me to prepare that version?
+
+Got it — you want to use Leaflet with OpenStreetMap tiles and show the coordinates when the user hovers over the map.
+
+Here’s a complete, runnable HTML + JavaScript example that does exactly that:
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Leaflet OSM Hover Coordinates</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <style>
+    #map {
+      height: 100vh; /* Full screen height */
+      width: 100%;
+    }
+    #coords {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 5px 10px;
+      font-family: monospace;
+      border-radius: 4px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+<div id="coords">Lat: -, Lng: -</div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+  // Create the map and set initial view
+  const map = L.map('map').setView([46.948, 7.447], 13); // Example: Bern
+
+  // Add OpenStreetMap tile layer
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  // Get the coordinates display element
+  const coordsDiv = document.getElementById('coords');
+
+  // Update coordinates on mouse move
+  map.on('mousemove', function(e) {
+    const lat = e.latlng.lat.toFixed(6);
+    const lng = e.latlng.lng.toFixed(6);
+    coordsDiv.textContent = `Lat: ${lat}, Lng: ${lng}`;
+  });
+</script>
+
+</body>
+</html>
+
+
+How it works
+Leaflet Map Setup
+
+Loads OSM tiles from https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png.
+Sets an initial center and zoom.
+Mouse Move Event
+
+map.on('mousemove', callback) listens for hover movement.
+e.latlng gives the latitude and longitude.
+Coordinates are rounded to 6 decimal places for readability.
+Coordinates Display
+A fixed-position <div> shows the live coordinates.
+✅ This works in any modern browser — just save as index.html and open.
+If you want, I can also make it so clicking on the map copies the coordinates to the clipboard.
+
+Do you want me to add that click-to-copy feature?
+
+Got it — you want the coordinates display to always stay on top of the map layers, even if Leaflet controls or popups are present.
+
+We can do that by giving the coordinates <div> a high z-index and ensuring it’s positioned above Leaflet’s own UI elements.
+
+Here’s the updated hover coordinates example with the fix:
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Leaflet OSM Hover Coordinates on maXbox</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <style>
+    #map {
+      height: 100vh; /* Full screen height */
+      width: 100%;
+    }
+    #coords {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 5px 10px;
+      font-family: monospace;
+      border-radius: 4px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+      z-index: 10000; /* Ensure it's above all map layers and controls */
+      pointer-events: none; /* Let mouse events pass through */
+    }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+<div id="coords">Lat: -, Lng: -</div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+  // Create the map and set initial view
+  const map = L.map('map').setView([46.948, 7.447], 13); // Example: Bern
+
+  // Add OpenStreetMap tile layer
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  // Get the coordinates display element
+  const coordsDiv = document.getElementById('coords');
+
+  // Update coordinates on mouse move
+  map.on('mousemove', function(e) {
+    const lat = e.latlng.lat.toFixed(6);
+    const lng = e.latlng.lng.toFixed(6);
+    coordsDiv.textContent = `Lat: ${lat}, Lng: ${lng}`;
+  });
+</script>
+</body>
+</html>
+
+Here’s the updated runnable example with a click-to-copy coordinates feature added.
+When you click anywhere on the map, the coordinates will be copied to your clipboard and a short confirmation will appear.
+
+https://learn.microsoft.com/en-us/dotnet/api/system.windows.forms.webbrowser.navigate?view=windowsdesktop-8.0
+
+You can use online map services (e.g. Google Map or Microsoft Bing); they both provide static map services alongside 
+their default dynamic map interfaces which work inside a web browser. They also support geo-location queries; that is, 
+you can send an address to their server, and retrieve a coordinate. They also provide different layers of information 
+and tools being drawn on the map.
+
+46.946498, 7.439353
+
+https://stackoverflow.com/questions/43662976/late-bind-an-ihtml-element
+https://theroadtodelphi.com/2010/08/07/using-the-google-maps-api-v3-from-delphi-part-i-basic-functionality/
+ref: https://theroadtodelphi.com/2010/08/07/using-the-google-maps-api-v3-from-delphi-part-i-basic-functionality/
