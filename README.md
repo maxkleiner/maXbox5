@@ -3,6 +3,11 @@ maXbox is a script tool engine, compiler and source lib all in one exe to design
 
 ![maxbox5_64logologo5](https://github.com/user-attachments/assets/f39ad1f4-3243-4104-ba45-5315b242e3e7)
 
+The maXbox platform is a self-contained scripting environment and compiler that functions as a precompiled virtual machine without requiring any installation. 
+This versatile tool utilizes a bytecode interpreter and an extensive library of over 37,000 functions to facilitate object-based programming.
+
+<img width="2752" height="1536" alt="1474_maXbox5_Portable_Scripting_Studio_Overview" src="https://github.com/user-attachments/assets/321fb3b8-af0e-4b8c-a9cc-5c613e8d2ea1" />
+
 *****************************************************************
 Release Notes maXbox 5.2.9.198 September 2025 mX529 beta64-bit🐞
 *****************************************************************
