@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-All maXbox Tutorials Table 2016/2017/2018/2019/2020/2021/2022/2023/2024/2025
+All maXbox Tutorials Table 2016/2017/2018/2019/2020/2021/2022/2023/2024/2025/2026
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -207,9 +207,44 @@ All maXbox Tutorials Table 2016/2017/2018/2019/2020/2021/2022/2023/2024/2025
     Tutor 172 GeoJSON View, March 2026
     Tutor 173 GeoJSON in Google Maps, March 2026
     Tutor 174 GeoJSON in OpenStreetMaps, March 2026
-    Tutor 175 Geo Intelligence, Apri 2026
+    Tutor 175 Geo Intelligence API, April 2026
+    Tutor 176 World News API, April 2026
+    Tutor 177 Best REST Client, May 2026
+    Tutor 178 Locoduino III, May 2026
+    Tutor 179 Just Intonation Musicsystem, May 2026
+    Tutor 180 Neural Network Functions, May 2026
+    Tutor 181 Board Game Regressor, May 2026 / June 2026
+    Tutor 182 Wine Debugging, May 2026 / June 2026
+    Tutor 183 Windows Media Player, June 2026
+    Tutor 184 A Quiz-API, June 2026
+    Tutor 185 The big mX5 Overview, June 2026
+    Tutor 186 Image2Text API2, June 2026
+    Tutor 187 Just Intonation Measurement, June 2026
+    Tutor 188 World News API2, June 2026
+    Tutor 189 RegEx Reflections, June 2026
+    Tutor 190 GEO Intelligence API Components EKON 30, July 2026
+    Tutor 191 Leaflet OSM Geo Coordinates, July 2026
+    Tutor 192 WebView Injection Geo Coordinates, August 2026
+    Tutor 193 Refactoring an API, August 2026
+    Tutor 194 Google Earth Engine API, September 2026
 
 
+https://de.slideshare.net/slideshow/advanced-geo-intelligence-integrating-maps-apis-and-ai-for-enhanced-geospatial-analysis/288228122
+https://de.scribd.com/document/1054781132/Maxbox-Starter190-Geo-Intelligence-Pipeline-Components-EKON30
+https://youtu.be/E97OROtEkGg
+
+https://teetrain2.wordpress.com/2026/06/17/regex-reflections/
+https://teeclassics1.wordpress.com/2026/05/06/just-intonation/
+https://medium.com/@maxkleiner1/image-to-text-api-2-5e539ccc6ebc
+https://dev.to/max_kleiner_9d12e786b3ecc/image-to-text-api-2jh
+Tutor 185: https://maxbox6.wordpress.com/maxbox/
+http://www.softwareschule.ch/download/maxbox_starter185.pdf
+https://teeclassics1.wordpress.com/models/
+https://maxkleiner1.medium.com/quiz-api-45950a09c475
+https://maxbox6.wordpress.com/2026/05/11/neural-network-functions/
+https://teeclassics1.wordpress.com/2026/05/06/just-intonation/
+https://teeclassics1.wordpress.com/2026/05/04/locoduino-iii/
+https://teetrain2.wordpress.com/2026/04/15/worldnewsapi/
 https://teetrains.wordpress.com/2026/03/17/geojson-in-osm/
 https://teetrains.wordpress.com/2026/03/11/barcode-api/
 https://teetrains.wordpress.com/2026/03/14/geojson/
