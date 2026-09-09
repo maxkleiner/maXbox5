@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memory Game by maXbox5 (JavaScript Version)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #f4f4f9;
+      margin: 30px;
+    }
+    .game-container {
+      width: 420px;
+      background: #ffffff;
+      border: 2px solid #888888;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .top-panel {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #e0e0e0;
+      padding: 8px 12px;
+      border-bottom: 1px solid #cccccc;
+      font-weight: bold;
+      font-size: 13px;
+    }
+    .button-group {
+      display: flex;
+      gap: 6px;
+    }
+    .btn {
+      padding: 5px 10px;
+      font-weight: bold;
+      background-color: #ffffff;
+      border: 1px solid #777777;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background-color: #e8e8e8;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 80px);
+      grid-gap: 4px;
+      padding: 12px;
+      justify-content: center;
+      background-color: #d0d0d0;
+    }
+    .cell {
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      font-weight: bold;
+      user-select: none;
+      cursor: pointer;
+      border: 1px solid #888888;
+      box-sizing: border-box;
+    }
+    /* State styling matching Delphi Canvas colors */
+    .cell.hidden {
+      background-color: #c0c0c0; /* clSilver */
+      color: #000000;            /* clBlack */
+    }
+    .cell.flipped {
+      background-color: #87ceeb; /* clSkyBlue */
+      color: #000080;            /* clNavy */
+    }
+    .cell.matched {
+      background-color: #c8e6c9; /* clMoneyGreen */
+      color: #008000;            /* clGreen */
+      cursor: default;
+    }
+    .progress-container {
+      width: 100%;
+      background-color: #e0e0e0;
+      height: 16px;
+      border-top: 1px solid #cccccc;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background-color: #4caf50;
+      transition: width 0.2s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-container">
+    <div class="top-panel">
+      <div id="scoreLabel">Turns: 0 &nbsp;&nbsp; Pairs Matched: 0 / 8</div>
+      <div class="button-group">
+        <button class="btn" onclick="toggleNumbersMode()" id="numBtn">Nums</button>
+        <button class="btn" onclick="resetGame()">New..</button>
+      </div>
+    </div>
+
+    <div class="grid" id="gridContainer"></div>
+
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+  </div>
+
+  <script>
+    const OPENDELAY = 500;
+    const TOTAL_PAIRS = 8;
+    const SYMBOLS = ['✂', '✈', '✉', '✌', '✏', '✒', '☕', '⚓'];
+
+    let cCards = [];
+    let flipped = [];
+    let matched = [];
+    let firstCard = -1;
+    let secondCard = -1;
+    let matchCount = 0;
+    let turnCount = 0;
+    let numbersBool = false;
+    let unflipTimerActive = false;
+
+    function initGame() {
+      matchCount = 0;
+      turnCount = 0;
+      firstCard = -1;
+      secondCard = -1;
+      unflipTimerActive = false;
+
+      cCards = [];
+      flipped = [];
+      matched = [];
+
+      // Initialize 8 pairs across 16 cards
+      for (let i = 0; i < TOTAL_PAIRS; i++) {
+        cCards.push(i);
+        cCards.push(i);
+        flipped.push(false);
+        flipped.push(false);
+        matched.push(false);
+        matched.push(false);
+      }
+
+      // Knuth/Fisher-Yates Shuffle algorithm
+      for (let i = cCards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const temp = cCards[i];
+        cCards[i] = cCards[j];
+        cCards[j] = temp;
+      }
+
+      updateUI();
+      renderGrid();
+    }
+
+    function renderGrid() {
+      const container = document.getElementById('gridContainer');
+      container.innerHTML = '';
+
+      for (let i = 0; i < cCards.length; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+
+        const displayValue = numbersBool ? cCards[i] : SYMBOLS[cCards[i]];
+
+        if (matched[i]) {
+          cell.classList.add('matched');
+          cell.textContent = displayValue;
+        } else if (flipped[i]) {
+          cell.classList.add('flipped');
+          cell.textContent = displayValue;
+        } else {
+          cell.classList.add('hidden');
+          cell.textContent = '*';
+        }
+
+        cell.addEventListener('click', () => selectCell(i));
+        container.appendChild(cell);
+      }
+    }
+
+    function selectCell(index) {
+      // Guard check: ignore clicks on flipped, matched, or during unflip delay
+      if (flipped[index] || matched[index] || unflipTimerActive) return;
+
+      flipped[index] = true;
+      renderGrid();
+
+      if (firstCard < 0) {
+        firstCard = index;
+      } else {
+        secondCard = index;
+        turnCount++;
+
+        if (cCards[firstCard] === cCards[secondCard]) {
+          // Card match found
+          matched[firstCard] = true;
+          matched[secondCard] = true;
+          matchCount++;
+
+          updateUI();
+          renderGrid();
+
+          if (matchCount === TOTAL_PAIRS) {
+            setTimeout(() => {
+              alert(`You got it Mem Master, Gewonnen in ${turnCount} turns!`);
+            }, 100);
+          }
+
+          firstCard = -1;
+          secondCard = -1;
+        } else {
+          // Mismatch found: trigger non-blocking delay
+          updateUI();
+          unflipTimerActive = true;
+
+          setTimeout(() => {
+            flipped[firstCard] = false;
+            flipped[secondCard] = false;
+            firstCard = -1;
+            secondCard = -1;
+            unflipTimerActive = false;
+            renderGrid();
+          }, OPENDELAY);
+        }
+      }
+    }
+
+    function updateUI() {
+      document.getElementById('scoreLabel').innerHTML = 
+        `Turns: ${turnCount} &nbsp;&nbsp; Pairs Matched: ${matchCount} / ${TOTAL_PAIRS}`;
+      const progressPercent = (matchCount / TOTAL_PAIRS) * 100;
+      document.getElementById('progressBar').style.width = `${progressPercent}%`;
+    }
+
+    function toggleNumbersMode() {
+      numbersBool = !numbersBool;
+      document.getElementById('numBtn').textContent = numbersBool ? 'Syms' : 'Nums';
+      initGame();
+    }
+
+    function resetGame() {
+      initGame();
+    }
+
+    window.onload = initGame;
+  </script>
+</body>
+</html>
+
+<br>
+### Key Logic Replicated from `Memory_Game31` by maXbox5:
+* **Game Grid & Memory Sizing:** Sets up 8 pairs across 16 grid cells (4×4 layout).
+* **Card Shuffling:** Implements the Knuth shuffle loop to randomize card placements on startup.
+* **Color System:** Faithfully translates Delphi's `Canvas` colors (`clSilver` for hidden, `clSkyBlue` for flipped, and `clMoneyGreen` for matched) into CSS classes.
+* **Non-Blocking Mismatch Delay:** Replaces Delphi's `TTimer` with `setTimeout` (`OPENDELAY = 500` ms) to flip mismatched cards back face-down while guarding against user clicks during the delay.
+* **Score Tracker & Progress Bar:** Features the top status bar updating total turns/matches and a bottom progress bar reaching `100%` when all 8 pairs are found.
+* **Reset Button:** Re-initializes all state arrays and reshuffles cards when clicking **"New.."**.
+
