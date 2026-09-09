@@ -1,0 +1,306 @@
+Program Memory_Game31;
+
+//{$IFDEF Lazarus}
+//  {$APPTYPE FORM} ☮ ✞ π 📌  Memory Example Tutor 195 🖼️ 📥 ⚙️ 🖥️ 🌐 🧠 📦 🎯
+//{/$ENDIF}
+//todo: new button, offset, free resources (form,timer etc.)
+//V31 switch between numbers & symbols - nums btn toogle
+
+procedure memoryMainRoutine; forward;  
+
+const OPENDELAY = 500;
+      OFFSET = 0;         //range in font index for numbers, double digits = 10
+      
+var
+  Form1: TForm;
+  Grid1: TDrawGrid;
+  UnflipTimer: TTimer;      // Non-blocking timer for mismatches
+  ScoreLabel: TLabel;       // Dynamic turn and match counter
+  ProgBar: TProgressBar;    // Visual progress bar
+  cCards: array of Integer;  // Card values
+  Flipped: array of Boolean;
+  Matched: array of Boolean;  // Tracks matched pairs for distinct styling
+  FirstCard, SecondCard: Integer;
+  MatchCount, TotalPairs: Integer;
+  TurnCount: Integer;        // Tracks player's total turns
+  numbersbool: boolean;      // switch numbers - symbols
+ 
+procedure FormGridCreate(Sender: TObject);
+var i, j, k: Integer;
+begin
+  TotalPairs:= 8;  // 4x4 grid = 16 cards
+  SetLength(cCards, TotalPairs * 2 + 0);
+  SetLength(Flipped, TotalPairs * 2 + 0);
+  SetLength(Matched, TotalPairs * 2 + 0);
+   
+  // Initialize pairs -  symbols
+  for i:= 0 to TotalPairs - 1 do begin
+    cCards[i * 2]:= i + OFFSET;
+    cCards[i * 2 + 1]:= i + OFFSET;
+    Flipped[i * 2]:= False;
+    Flipped[i * 2 + 1]:= False;
+    Matched[i * 2]:= False;
+    Matched[i * 2 + 1]:= False;
+  end;
+   
+  // Shuffle cards
+  Randomize;
+  writ('debug ccards count: '+itoa(high(ccards)+1))
+  for i:= High(cCards) downto 1 do begin
+    j:= Random(i + 1);
+    k:= cCards[i];
+    cCards[i]:= cCards[j];
+    cCards[j]:= k;
+  end;
+  
+  Grid1.Font.Style2:= fsBold2;
+  Grid1.Font.Size:= 21;
+  if numbersbool then 
+    Grid1.Font.Name:= 'Arial'
+    else Grid1.Font.Name:= 'Wingdings';  
+  Grid1.ColCount:= 4;
+  Grid1.RowCount:= 4;
+  Grid1.FixedRows:= 0;
+  Grid1.FixedCols:= 0;
+  Grid1.DefaultColWidth:= 80;
+  Grid1.DefaultRowHeight:= 80;
+  Grid1.Options:= Grid1.Options + [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine];
+end;
+ 
+procedure Grid1DrawCell(Sender: TObject; ACol, ARow: Integer;
+                                   Rect: TRect; State: TGridDrawState);
+var Index: Integer;
+begin
+  Index:= ARow * Grid1.ColCount + ACol;
+  with Grid1.Canvas do begin
+    if Matched[Index] then begin
+      // Matched cards: soft money green background with dark green font
+      Brush.Color:= clMoneyGreen;
+      FillRect(Rect);
+      Font.Color:= clGreen;
+      TextOut(Rect.Left+18, Rect.Top+16, IntToStr(cCards[Index]));
+    end else if Flipped[Index] then begin
+      // Active flipped cards: soft sky blue background with dark blue font
+      Brush.Color:= clSkyBlue;
+      FillRect(Rect);
+      Font.Color:= clNavy;
+      TextOut(Rect.Left+18, Rect.Top+16, IntToStr(cCards[Index]));
+    end else begin
+      // Hidden cards: standard silver background with black asterisk
+      Brush.Color:= clSilver;
+      FillRect(Rect);
+      Font.Color:= clBlack;
+      TextOut(Rect.Left+18, Rect.Top+16, '*');
+    end;
+  end;
+end;
+
+procedure UnflipTimerTimer(Sender: TObject);
+begin
+  // Disable timer so it only executes once
+  UnflipTimer.Enabled:= False;
+  
+  // If we have a mismatch, flip the cards back face-down
+  if (FirstCard >= 0) and (SecondCard >= 0) then begin
+    Flipped[FirstCard]:= False;
+    Flipped[SecondCard]:= False;
+    Grid1.Invalidate;
+  end;
+  
+  // Reset selection indices to allow new selections
+  FirstCard:= -1;
+  SecondCard:= -1;
+end;
+ 
+procedure Grid1SelectCell(Sender: TObject; ACol, ARow: Integer;
+                                              var CanSelect: Boolean);
+var Index: Integer;
+begin
+  Index:= ARow * Grid1.ColCount + ACol;
+  
+  // Guard: Ignore if card is already face-up/matched OR if we are waiting on the unflip timer
+  if Flipped[Index] or Matched[Index] or UnflipTimer.Enabled then
+    Exit;
+    
+  Flipped[Index]:= True;
+  Grid1.Invalidate;
+   
+  if FirstCard < 0 then
+    FirstCard:= Index
+  else begin
+    SecondCard:= Index;
+    Inc(TurnCount); // Completed a turn sequence (flipping two cards)
+    
+    if cCards[FirstCard] = cCards[SecondCard] then begin
+      // card Match found!
+      Matched[FirstCard]:= True;
+      Matched[SecondCard]:= True;
+      Inc(MatchCount);
+      writ('debug match found: ' + itoa(matchcount));
+      
+      // Update visual components
+      ProgBar.Position:= MatchCount;
+      ScoreLabel.Caption:= '  Turns: ' + IntToStr(TurnCount) + '      Pairs Matched: ' + IntToStr(MatchCount) + ' / ' + IntToStr(TotalPairs);
+      Grid1.Invalidate;
+      
+      if MatchCount = TotalPairs then
+        ShowMessage('You got it Mem Master, Gewonnen in ' + IntToStr(TurnCount) + ' turns!');
+        
+      // Reset card selection immediately to allow the next turn
+      FirstCard:= -1;
+      SecondCard:= -1;
+    end else begin
+      // Mismatch found: update score board to reflect the turn increment
+      ScoreLabel.Caption:= '  Turns: ' + IntToStr(TurnCount) + '      Pairs Matched: ' + IntToStr(MatchCount) + ' / ' + IntToStr(TotalPairs);
+      
+      // Start the non-blocking timer to display cards briefly before unflipping
+      UnflipTimer.Enabled:= True;
+    end;
+  end;
+end;
+
+procedure ButtonNewClick(Sender: TObject);
+begin
+  //FirstCard:= -1;
+  //SecondCard:= -1;
+  MatchCount:= 0;
+  TurnCount:= 0;
+  TotalPairs:= 0;
+  SetLength(cCards, 0);  //reinit memarrays
+  SetLength(Flipped, 0);
+  SetLength(Matched, 0);
+  ProgBar.Position:= 0; 
+  //memoryMainRoutine();
+  FormGridCreate(self);
+end;
+
+procedure ButtonNumbersClick(Sender: TObject);
+begin
+  //FirstCard:= -1;
+  //SecondCard:= -1;
+  MatchCount:= 0;
+  TurnCount:= 0;
+  TotalPairs:= 0;
+  SetLength(cCards, 0);  //reinit memarrays
+  SetLength(Flipped, 0);
+  SetLength(Matched, 0);
+  numbersbool:= not Numbersbool;
+  if numbersbool then Tbutton(sender).caption:= 'Syms' else
+     Tbutton(sender).caption:= 'Numbs';
+  //memoryMainRoutine();
+  FormGridCreate(self);
+  ProgBar.Position:= 0;
+end;
+
+procedure TFrm_closeForm(Sender: TObject; var Action: TCloseAction);
+begin
+  ///afrm.Free;  
+  action:= caFree;
+  Form1:= NIL;
+  UnflipTimer.Free;
+  writeln('memory form close and free timer')
+  //sField.Free;
+end;
+ 
+procedure memoryMainRoutine;
+begin
+  Application.Initialize;
+  Form1:= TForm.Create(Application);
+  Form1.Position:= poScreenCenter;
+  Form1.FormStyle:= fsStayOnTop;
+  Form1.Caption:= 'Memory Game by maXbox5 (Non-Blocking3)';
+  Form1.SetBounds(10, 10, 450, 430); // Height increased to elegant fit for top panel and bottom bar
+  Form1.onclose:= @TFrm_closeForm;
+  
+  // Setup the Dynamic Turn and Score tracker at the top
+  ScoreLabel:= TLabel.Create(Form1);
+  ScoreLabel.Parent:= Form1;
+  ScoreLabel.Align:= alTop;
+  ScoreLabel.Height:= 24;
+  ScoreLabel.Font.Size:= 10;
+  ScoreLabel.Font.Style2:= fsBold2;
+  ScoreLabel.Caption:= '  Turns: 0      Pairs Matched: 0 / 8';
+  
+  // Setup the Visual Progress Bar at the bottom
+  ProgBar:= TProgressBar.Create(Form1);
+  ProgBar.Parent:= Form1;
+  ProgBar.Align:= alBottom;
+  ProgBar.Height:= 16;
+  ProgBar.Min:= 0;
+  ProgBar.Max:= 8;
+  ProgBar.Position:= 0;
+  
+  // Setup the game board grid in the client area
+  Grid1:= TDrawGrid.Create(Form1);
+  Grid1.Parent:= Form1;
+  Grid1.Align:= alClient;
+  Grid1.OnDrawCell:= @Grid1DrawCell;
+  Grid1.OnSelectCell:= @Grid1SelectCell;
+   
+  with TButton.create(form1) do begin
+     parent:= form1;
+     caption:= 'New..';
+     setbounds(335,40,80,40)
+     onclick:= @ButtonNewClick;
+  end;  
+  numbersbool:= false;
+  with TButton.create(form1) do begin
+     parent:= form1;
+     caption:= 'Nums';
+     setbounds(335,90,80,40)
+     onclick:= @ButtonNumbersClick;
+  end;  
+  
+  // Instantiate the TTimer for non-blocking unflip delay
+  UnflipTimer:= TTimer.Create(Form1);
+  UnflipTimer.Interval:= OPENDELAY;
+  UnflipTimer.OnTimer:= @UnflipTimerTimer;
+  UnflipTimer.Enabled:= False;
+  
+  FirstCard:= -1;
+  SecondCard:= -1;
+  MatchCount:= 0;
+  TurnCount:= 0;
+  
+  FormGridCreate(Form1);
+  Form1.Show;
+end;
+
+begin  //@main
+    //Init script
+    writeln(#$d83d#$de42);       
+    maxform1.setconsole;
+    processMessagesON;
+    setDebugOFF;
+    
+    //Main call
+    memoryMainRoutine();
+    writ((SHA384DigestToHex(CalcSHA384('https://raw.githack.com/maxkleiner/maXbox5/main/assets/memorygame31.htm'))));
+    OpenWeb('https://raw.githack.com/maxkleiner/maXbox5/main/assets/memorygame31.htm');
+End.
+
+ref: https://raw.githack.com/maxkleiner/maXbox5/main/assets/memorygame3.htm
+     secondpart
+     https://teetrains.wordpress.com/2026/09/02/google-earth-engine-api/
+     
+ref: https://dev.to/max_kleiner_9d12e786b3ecc/memory-game-11mm
+     https://teetrains.wordpress.com/2026/09/02/google-earth-engine-api/     (second part)
+     http://www.softwareschule.ch/download/maxbox_starter195.pdf
+     
+more Tasks:
+   Add a high-score system
+   How do I save scores to a text file?
+   Explain TTimer in Delphi  
+     
+Key Points:
+
+Canvas.Font.Color — controls the text color.
+Canvas.Brush.Color + FillRect — paints the background.
+TextRect — draws text clipped to the cell rectangle.
+gdSelected — lets you detect if the cell is selected and adjust colors accordingly.
+Avoid flicker — always fill the background before drawing text.
+
+✅ If you want different colors per cell, just add conditions on ACol and ARow inside OnDrawCell.
+     
+sha384-sI+mNbcHiuO9dy+hmrJTjiRjQsm6Awywx7VSUGapVK7fdlY6rY848iYTrrZeQml/
+https://raw.githack.com/maxkleiner/maXbox5/main/assets/memorygame31.htm
