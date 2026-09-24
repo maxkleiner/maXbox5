@@ -19,14 +19,14 @@ Funclist Func : 22257_; Source Compiled: 3’348’308 lines  🌈🙏🏻🔭
 Proclist Proc Size is: 13051_ ᛗᚨᛪᛒᛟᛪ
 *****************Now Constructors********************************************** 
 Constructlist Constructor Size is: 2052_
-def head: max: maXbox11_: 17/03/2026 20:55:20
+def head: max: maXbox11_: 16/09/2026 16:55:20
 file E:\maxbox\maxbox3\docs\maxbox_extract_funclist476_.txt  
 doc file: maxbox_extract_funclist476.txt(sort function)maxbox_functions_sortlist.txt
 all unit file: http://www.softwareschule.ch/examples/packages.txt
 all unit file2:http://www.softwareschule.ch/unitlist.htm
 -------------------------------------------------------------------------
 Funclist total Size all is: 373372! Constructor, Func and Procedure
-AExtraxt of EXE Functions of maXbox4.exe, locs of file = 51926_
+AExtraxt of EXE Functions of maXbox4.exe, locs of file = 52150_np
 ASize of EXE: 35,697,944 bytes  CRC32: 38562FA8      
 SHA1: of maXbox4.exe (4.7.6.50) D047DBD5412C3E4A436089018B9C7FACF17A2EB5 
 SHA-256 193679043c46821c4b2460269111ff112e7c67b49e9cd9d951854e61bceedac7
@@ -24598,6 +24598,55 @@ end;
 
 println('elements status: '+ajt['rows'].asarray[0].asObject['elements'].asarray[0].asobject['status'].asstring);  
 
+procedure DrawMultipleBoundingBoxesFromJSON(const AJsonStr, AImageFile: string);
+var
+  Root      : TJSONObject2;
+  Dets      : TJSONArray2;
+  Item,BBox : TJSONObject2;
+  i,x1,y1,x2,y2: Integer;
+  Bmp       : TBitmap;
+begin
+  // 1) Parse Detect JSON
+  root:= TJSONobject2.Create(nil);
+  root.Parse(AJsonStr); // as TJSONObject;
+  try
+    Dets:= Root.Values['detections'].asArray; //as TJSONArray;
+    Bmp:= TBitmap.Create;
+    try
+      Bmp.LoadFromFile(AImageFile);
+      Bmp.Canvas.Pen.Width:= 2;
+      Bmp.Canvas.Brush.Style:= bsClear;
+
+      // 2) Loop over detections
+      for i:= 0 to Dets.Count-1 do begin
+        Item:= Dets.Items[i].asObject; //as TJSONObject;
+        BBox:= Item.Values['bounding_box'].ASObject;
+        x1:= (BBox.values['x1'].asinteger);
+        y1:= (BBox.values['y1'].asinteger);
+        x2:= (BBox.values['x2'].asinteger);
+        y2:= (BBox.values['y2'].asinteger);
+        writeln(item.values['label'].asstring);
+        writ('debug x,y: '+itoa(i)+', '+itoa(x1)+' '+itoa(y1));
+        
+        // 3) Set color rect and label per box or class
+        Bmp.Canvas.Pen.Color:= clGreen;  // or map by class, etc.
+        Bmp.Canvas.Rectangle(x1, y1, x2, y2); //[web:15]
+        SetBkMode(bmp.Canvas.Handle, TRANSPARENT);
+        Bmp.Canvas.Font.size:= 15;
+        Bmp.Canvas.Font.Color:= clRed;
+        Bmp.Canvas.TextOut(x1,y1, item.values['label'].asstring);
+      end;
+      //Image1.Picture.Assign(Bmp);  // show or save as jpeg
+      //Bmp.SaveToFile(exepath+'examples\multigeoimage_with_box.bmp');
+      Bmp.SaveToFile(AIMAGEFILE);
+    finally
+      Bmp.Free;
+    end;
+  finally
+    Root.Free;     
+  end;
+end;
+
 Iterate JSON web API:
 [
   {
@@ -40768,13 +40817,54 @@ All maXbox Tutorials Table of Content 2014/2015/2016/2017/2018/2019/2020/2021/20
   Tutor 172 GeoJSON API, March 2026
   Tutor 173 GeoJSON on GMaps, March 2026
   Tutor 174 GeoJSON on OSM, March 2026
-  Tutor 175 Geo Intelligence, April 2026 
+  Tutor 175 Geo Intelligence APIs, April 2026 
+  Tutor 176 World News API, April 2026 
+  Tutor 177 Best Rest Client, May 2026 
+  Tutor 178 Locoduino III, May 2026
+  Tutor 179 Just Intonation Musicsystem, May 2026
+  Tutor 180 Neural Network Functions, May 2026
+  Tutor 181 Board Game Regressor, May 2026
+  Tutor 182 Wine Debugging, May 2026
+  Tutor 183 Win Media Player, June 2026
+  Tutor 184 A QUIZ-API, June 2026
+  Tutor 185 The big mX5 Overview, June 2026
+  Tutor 186 Image2Text API 2, June 2026
+  Tutor 187 Just Intonation Measurement, June 2026
+  Tutor 188 World News API 2, June 2026
+  Tutor 189 RegEx Reflections, June 2026
+  Tutor 190 GEO Intelligence Slides EKON 30, July 2026
+  Tutor 190_1 GEO Intelligence Report EKON 30, July 2026
+  Tutor 190_2 GEO Intelligence Entwickler German, July 2026
+  Tutor 191 Leaflet OSM Geo Coordinates, July 2026
+  Tutor 192 WebView Injection, August 2026
+  Tutor 193 Refactoring an API, August 2026
+  Tutor 194 Google Earth Engine API, September 2026
+  Tutor 195 Memory Master Game, September 2026
+  Tutor 196 Text2Speech API, September 2026
 
+  
+https://teetrains.wordpress.com/2026/08/04/webview-injection/  
+https://teetrains.wordpress.com/2026/09/02/google-earth-engine-api/
+
+With this simple app you can find any GEO Coordinates on the globe:
+Leaflet OSM Hover Coordinates on maXbox:
+
+  https://lnkd.in/ePhgDBpi       
+
+  https://tinyurl.com/yvt7ezsp
+
+GeoJSON Coordinates, July 2026
   
   maXbox5 Top 5 Algorithms, February 2025
   maXbox5 Tester- the soul of code, July 2024
   maXbox5 Hybrid Analysis, July 2024
   
+  https://teetrain2.wordpress.com/2026/06/17/regex-reflections/
+  https://medium.com/@maxkleiner1/quiz-api-45950a09c475
+  https://medium.com/@maxkleiner1/play-a-song-from-url-fc3a9a48f4e9
+  https://maxbox6.wordpress.com/2026/05/11/neural-network-functions/
+  https://teetrain2.wordpress.com/2026/04/15/worldnewsapi/
+  https://maxbox6.wordpress.com/2026/03/22/geo-intelligence/
   https://teetrains.wordpress.com/2026/03/17/geojson-in-osm/
   https://maxbox6.wohttps://maxkleiner1.medium.com/free-google-translator-api-486a0529cb01
   https://www.academia.edu/164468548/Maxbox_starter167_FreeTranslatorAPI_maXbox
@@ -40832,7 +40922,7 @@ https://repl.it/@MaxKleiner/machinelearning4#main.py
 https://github.com/project-jedi/jvcl/tree/master/jvcl/examples/JvChartDemo
 https://github.com/maxkleiner/python4delphi/blob/master/Source/PythonEngine.pas
 
-{$ All maXbox 4 or maXbox5 Examples List Exampleslist  }
+{$ All maXbox 4 or maXbox5 Examples List Exampleslist  all examples}
 https://github.com/maxkleiner/maXbox3/releases
 https://github.com/maxkleiner/maXbox4/releases
 https://github.com/maxkleiner/maXbox5
@@ -42685,8 +42775,68 @@ maxbox_mindmap.html                              1470_cCubicSpecialPrimes.txt
 1472_GEOMap_Routines.txt                         1472_city_bern_polygon_wide.geojson
 1472_GEOMap_Routines1.txt                        1472_API_GeoJSON64_5_javascript_maps2edge.txt
 1472_API_GeoJSON64_5_OSM_maps2edge.txt           1472_osm_geojson_complete.htm
-1472_API_GeoJSON64_5_OSM_maps2edge3.txt                                                                          
+1472_API_GeoJSON64_5_OSM_maps2edge3.txt          maxbox_starter174_GeoJSON_OpenStreetMaps.pdf
+1473_Geo_Intelligence_API1_3.txt                 1473_Geo_Intelligence_API1_4.txt
+1474_RangeExtractionApp.psb                      1474_RangeExtractionApp.txt
+1475_Moebius_function.txt                        1476_Symmetric_difference.txt
+1476_Symmetric_difference1.txt                   1477_Water_collected_between_towers.txt
+1477_Water_collected_between_towers_pascal.txt   1477_Water_collected_between_towers_pascal1.txt
+1473_Geo_Intelligence_API1_5.txt                 1473_Geo_Intelligence_API1_51.txt
+1473_JSON_BoundingBox_API1_51.txt                1473_JSON_BoundingBox_API1_51.htm
+1478_Zeckendorf_numbers.txt                      1479_WagstaffPrimes.txt
+1480_Zero_to_the_zero_power.txt                  1480_EquilibriumIndex.txt
+1480_Honaker_primes.txt                          1481_Music_Jazz_API1_1.txt
+1481_World_News_API1_2.txt                       1481_World_News_API1_3.txt
+1481_World_News_API1_3.htm                       1481_DashboardScreenshot2026-04-15103908.png  
+1121_sentiment_api3_bbc_newsfeed4rec21.txt       1481_World_News_API1_4form.txt
+1481_World_News_API1_5form.txt                   1481_World_News_API1_51form.txt
+1481Screenshot2026-04-23115937.png               1481_World_News_API1_52form.txt 
+1482_CmdrArduino_minimum3Copy.ino                1483_Just_Intonation_App.txt 
+1483GUIScreenshot2026-05-06 085828.png           1483_Just_Intonation1_App.txt
+1484_neural_network_functions.txt                1484_neural_network_functions1.txt
+1484_neural_network_functions2.txt               1484_GUIScreenshot2026-05-14095926.png
+1484_neural_network_functions2.htm               1484_neuralnetworkclass3test.txt   
+1484_neuralnetworkclass3test.txt                 1485_ABC_problem.txt
+1485_Screenshot2026-05-21_170056.png             1485_ABC_problem.htm  
+1485_ABC_problem_katakana.txt                    1486_shadow_song.txt
+1486_shadow_song1.txt                            1486_SongScreenshot2026-06-01143619.png
+1487_quiz_api1.txt                               1487_mX5Screenshot2026-06-03120324.png
+1487_ScreenshotWeb2026-06-03102941.png           1487_quiz_api12.txt    
+1176_APILayer_Demo64_latinumtranslate.txt        1481_World_News_API1_53form.txt
+1481_World_News_API1_54form.txt                  1488_commatize.txt
+1488_commatize_regex2.txt                        1415_weather_listview59.txt
+1473_Geo_Intelligence_API3_52.txt                1489_executors3_64bit.txt
+1489_executors31_64bit.txt                       946_U_Sudoku41_mX52_Form13.pas        
+1490_clickchasegame7.txt                         1490_clickchasegame9.txt
+1490_clickchasegame8.txt                         1472_API_GeoJSON64_6_OSM_maps2edge4.txt
+1472_API_GeoJSON64_6_OSM_maps2edge5hoover.txt    1472_osm_leaflet_hoover_coordinates.htm
+1472_API_GeoJSON64_6_OSM_maps2edge53hover.txt    1472_API_GeoJSON64_6_OSM_maps2edge54hover.txt
+1415_weather_listview60.txt                      weatherapp60.txt
+1415_weather_listview61.txt                      weatherapp61.txt
+1473_API_GeoJSON64_6_Navigate.txt                1473_API_GeoJSON64_6_Navigate_1.txt
+1473_API_GeoJSON64_6_Navigate_2.txt              1473_API_GeoJSON64_6_Navigate_2.txt
+1474_maXbox5_Portable_Scripting_Studio_Overview.png
+1491_maXbox_Unitslisting.txt                     1488_commatize_time_routines_UTC.txt
+1492_Base_16_numbers_needing_A_to_F.txt          1493_qrcode_api.txt
+1493_qrcode_api1.txt                             1493_qrcode_api12.txt
+1494_GoogleEarthEngine_API1_7.txt                maxbox_starter194_google__earth_engine_API.pdf
+1495_memory_game2.txt                            1495_memory_game3.txt
+1495_memorygame3_javascript.htm                  1495_memory_game31_vertical_flowchart.png
+memorygame31.htm                                 1495_memory_game31.txt
+1496_text2speech.txt                             1496_text2speech_async.txt
+1496_text2speech_formc.txt                       1496_text2speech_formc1.txt
 
+https://teetrains.wordpress.com/2026/09/02/google-earth-engine-api/
+Tutor192_Web_View_Injection_Mapping_Guide.png
+https://dev.to/max_kleiner_9d12e786b3ecc/geojson-playground-on-map-coordinates-latlong-4fff
+https://medium.com/@maxkleiner1/geojson-playground-on-map-coordinates-lat-long-05525f156f02
+https://teeclassics1.wordpress.com/movies/
+https://teetrain2.wordpress.com/2026/06/17/regex-reflections/
+https://medium.com/@breitsch2/geo-intelligence-a2b19aae10ff
+https://maxbox6.wordpress.com/2026/05/11/neural-network-functions/
+https://teeclassics1.wordpress.com/2026/05/06/just-intonation/
+https://teetrain2.wordpress.com/2026/04/15/worldnewsapi/                                                                                             
+https://maxbox6.wordpress.com/2026/03/22/geo-intelligence/
 https://teetrains.wordpress.com/2026/03/17/geojson-in-osm/                                       
 https://github.com/maxkleiner/BarcodeApiCreator
 https://maxbox6.wordpress.com/2025/11/30/starter165_addons/
@@ -42878,6 +43028,28 @@ begin
   result:= tbl[n].tostring(true);
   tbl[n].free;
 end;
+
+Be aware: to find L.map(‘’map’’).setView in JS you have to use double quotes, otherway stringreplace function can’t find it! (see below)
+
+procedure TEdit1Button1Click(Sender: TObject);
+ var htmlgeojs2: string;     
+   begin
+     writ('debc: '+edt1lat.text+' '+edt2long.text)
+     htmlgeojs2:= utf8decode(HttpGetDirect2(GEOJSON4));
+     htmlgeojs2:= (stringreplace((htmlgeojs2),              //also RegEx possible
+                               'const map = L.map(''map'').setView([46.948, 7.447], 13);',
+                               'const map = L.map("map").setView(['+(edt1lat.text)+','
+                                         +(edt2long.text)+'],'+flots(zoomf)+'); //params',
+                               [rfReplaceAll]));
+     htmlgeojs2:= (stringreplace((htmlgeojs2),
+                               '"coordinates": [7.447422, 46.947945]',
+                               '"coordinates": ['+(edt2long.text)+','+(edt1lat.text)+']',
+                               [rfReplaceAll]));        //}                 
+      //htmlgeojs2:= utf8encode(stringreplace((HOVER_JS_SCRIPT2),LF,CRLF,[rfReplaceAll]));
+     htmlgeojs2:= utf8encode(stringreplace((htmlgeojs2),LF,CRLF,[rfReplaceAll]));
+     edgeviewfrm.memoHTML.Text:= utf8toansi(htmlgeojs2); ////GEOJSON_Layer; 
+     edgeviewfrm.btnSetSourceClick(self);    //runs html + js engine!
+   end;
       
                                                       
 685 uPSI_ALQuickSortList;                      //alcinoe for list of double fast
@@ -43256,7 +43428,28 @@ http://www.softwareschule.ch/examples/pydemo112_1.htm
 http://www.softwareschule.ch/examples/pydemo112.htm
 http://www.softwareschule.ch/examples/pydemo112.txt
 http://www.softwareschule.ch/examples/translatorapi.txt
+http://www.softwareschule.ch/examples/geoint.txt
+http://www.softwareschule.ch/examples/geoint.htm
+http://www.softwareschule.ch/examples/boundingbox.txt
+http://www.softwareschule.ch/examples/boundingbox.htm
+http://www.softwareschule.ch/examples/geotestimage.jpg
+http://www.softwareschule.ch/examples/worldnewsapi.txt
+http://www.softwareschule.ch/examples/worldnewsapi.htm
+http://www.softwareschule.ch/examples/worldnewsapi2.txt
+http://www.softwareschule.ch/examples/worldnewsapi2.htm
+http://www.softwareschule.ch/examples/ann.txt
+http://www.softwareschule.ch/examples/abcproblem.txt
+http://www.softwareschule.ch/examples/weatherapp60.txt
+http://www.softwareschule.ch/examples/geomap6.txt
+http://www.softwareschule.ch/examples/geomap6.htm
+http://www.softwareschule.ch/examples/weatherapp61.txt
+http://www.softwareschule.ch/examples/memorygame2.txt
+http://www.softwareschule.ch/examples/memorygame3.txt
+http://www.softwareschule.ch/examples/memorygame31.htm
+https://raw.githack.com/maxkleiner/maXbox5/main/assets/memorygame31.htm
 
+
+https://teetrain2.wordpress.com/2026/04/15/worldnewsapi/                                                                                                                                                                                       
 https://dev.to/breitsch_breitsch_a34d774/time-space-matrix-i4f
 https://dev.to/max_kleiner_9d12e786b3ecc/lychrel-number-4ic9
 https://maxbox4.blogspot.com/2025/04/lychrel-number.html
@@ -49553,7 +49746,7 @@ end;
 
 https://github.com/marcieldeg/HttpComponent/blob/main/README.md
 HttpComponent /HttpClasses.pas
-
+https://github.com/marcieldeg/HttpComponent/blob/main/HttpClasses.pas
 
 procedure SIRegister_THttpRequestC(CL: TPSPascalCompiler);
 begin
@@ -49618,7 +49811,7 @@ end;
     property Headers: THeaders read FHeaders;
   end;
   
- type
+  type
   THeaders = class(TStringList)
   private
     procedure FromRawString(AStringHeaders: String);
@@ -49726,6 +49919,26 @@ begin
 end;
 
 http://www.softwareschule.ch/examples/apilayer2.txt
+
+const URL_APILAY_GEOCOUNTRY= 'https://api.api-ninjas.com/v1/country?name=%s';
+ 
+function APIGetGeoCountry(AURL,url_name,aAPIKey: string): string;
+var encodedURL:String;
+ begin
+   encodedURL:= Format(AURL,[urlencode(url_name)]);
+   with THttpRequestC.create(self) do
+     try
+       writ('reqsend: '+encodedurl)
+       headers.add('X-Api-Key:'+aAPIkey);
+       if Get(encodedURL) then
+          result:= (Response.ContentAsString)
+       else Writeln('APIError '+inttostr(Response.StatusCode2));
+     except
+       writeln('HTTPS: '+ExceptiontoString(exceptiontype,exceptionparam));
+     finally
+       free;
+     end;
+ end;  
 
 Diff from 5.0.2.28 to 5.0.2.30 to 5.1.4.98 VX
 ------------------------------------------------------------------
@@ -51924,3 +52137,14 @@ http://www.kleiner.ch/kleiner/maxbox_cheatsheet.html
 http://www.kleiner.ch/kleiner/maxbox_mindmap.html   
 https://github.com/maxkleiner/BarcodeApiCreator
 https://github.com/maxkleiner/Delphi-GeoMap-Component
+https://soundcloud.com/max-kleiner-481715070/11_the_one_and_only_prayer
+https://maxbox6.wordpress.com/2026/02/23/rosetta-code/
+https://soundcloud.com/max-kleiner-481715070/sets/improver4
+https://teetrains.wordpress.com/2026/04/21/cite-du-train-2026/
+https://maxbox6.wordpress.com/ekon-30/
+https://maxbox6.wordpress.com/2026/05/11/neural-network-functions/
+https://teeclassics1.wordpress.com/2026/05/06/just-intonation/
+https://maxbox6.wordpress.com/2026/05/11/neural-network-functions/
+https://soundcloud.com/max-kleiner-481715070/shadow_on_me_x_biotrain-mashup
+https://raw.githack.com/maxkleiner/maXbox5/main/assets/memorygame31.htm
+https://maxbox6.wordpress.com/wsindex/
