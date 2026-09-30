@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bayes' Theorem to Confusion Matrix & Precision-FPR Plotter of maXbox5</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f4f6f9;
+      color: #333333;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .app-container {
+      width: 960px;
+      background: #ffffff;
+      border: 1px solid #d0d7de;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    h2 {
+      margin-top: 0;
+      color: #1a252c;
+      border-bottom: 2px solid #e1e4e8;
+      padding-bottom: 10px;
+      font-size: 22px;
+    }
+    .layout-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .panel {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 6px;
+      padding: 16px;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .input-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    label {
+      font-weight: 600;
+      font-size: 13px;
+      color: #495057;
+    }
+    input[type="number"] {
+      width: 90px;
+      padding: 6px 8px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 14px;
+      text-align: right;
+    }
+    .slider-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: #eef2f5;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #dcdfe3;
+    }
+    input[type="range"] {
+      width: 100%;
+      cursor: pointer;
+    }
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+    .matrix-table th, .matrix-table td {
+      border: 1px solid #dee2e6;
+      padding: 8px;
+      text-align: center;
+    }
+    .matrix-table th {
+      background-color: #e9ecef;
+      font-weight: bold;
+    }
+    .cell-tp { background-color: #d1e7dd; color: #0f5132; font-weight: bold; }
+    .cell-fp { background-color: #f8d7da; color: #842029; font-weight: bold; }
+    .cell-fn { background-color: #fff3cd; color: #664d03; font-weight: bold; }
+    .cell-tn { background-color: #e2e3e5; color: #41464b; font-weight: bold; }
+    .metric-badge {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #0d6efd;
+      color: #ffffff;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 15px;
+      margin-top: 14px;
+    }
+    canvas {
+      background: #ffffff;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      width: 100%;
+      height: 380px;
+    }
+    .insight-box {
+      background-color: #e8f4f8;
+      border-left: 4px solid #0dcaf0;
+      padding: 12px;
+      font-size: 13px;
+      border-radius: 0 4px 4px 0;
+      color: #115160;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <h2>Bayes' Theorem to Confusion Matrix & Precision-FPR Plotter of maXbox5</h2>
+
+  <div class="layout-grid">
+    <!-- Left Column: Inputs & Confusion Matrix -->
+    <div class="panel">
+      <h3>1. Model & Population Parameters</h3>
+      <div class="input-group">
+        <div class="input-row">
+          <label for="popInput">Total Population:</label>
+          <input type="number" id="popInput" value="10000" step="100" oninput="updateCalculator()">
+        </div>
+        <div class="input-row">
+          <label for="prevInput">Class Prevalence P(A) [0..1]:</label>
+          <input type="number" id="prevInput" value="0.01" step="0.005" min="0.001" max="0.5" oninput="updateCalculator()">
+        </div>
+        <div class="input-row">
+          <label for="recallInput">Recall / Sensitivity (TPR) [0..1]:</label>
+          <input type="number" id="recallInput" value="0.90" step="0.01" min="0.1" max="1.0" oninput="updateCalculator()">
+        </div>
+      </div>
+
+      <div class="slider-row">
+        <div class="input-row">
+          <label for="fprSlider">False Positive Rate (FPR): <span id="fprValLabel">5.0%</span></label>
+        </div>
+        <input type="range" id="fprSlider" min="0" max="0.20" step="0.001" value="0.05" oninput="syncFprFromSlider()">
+      </div>
+
+      <h3>2. Empirical Confusion Matrix Counts</h3>
+      <table class="matrix-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Predicted Positive (+)</th>
+            <th>Predicted Negative (-)</th>
+            <th>Total Actual</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>Actual Positive (A)</th>
+            <td class="cell-tp" id="cellTP">90 (TP)</td>
+            <td class="cell-fn" id="cellFN">10 (FN)</td>
+            <td id="cellActPos">100</td>
+          </tr>
+          <tr>
+            <th>Actual Negative (&not;A)</th>
+            <td class="cell-fp" id="cellFP">495 (FP)</td>
+            <td class="cell-tn" id="cellTN">9405 (TN)</td>
+            <td id="cellActNeg">9900</td>
+          </tr>
+          <tr>
+            <th>Total Predicted</th>
+            <td id="cellPredPos" style="font-weight:bold;">585</td>
+            <td id="cellPredNeg" style="font-weight:bold;">9415</td>
+            <td id="cellTotalPop" style="font-weight:bold;">10000</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="metric-badge">
+        <span>Bayesian Precision P(A|+):</span>
+        <span id="precisionValue">15.38%</span>
+      </div>
+    </div>
+
+    <!-- Right Column: Real-Time Precision vs FPR Plotter -->
+    <div class="panel">
+      <h3>3. Precision vs. FPR Curve Plotter</h3>
+      <canvas id="plotCanvas" width="420" height="380"></canvas>
+      <div class="insight-box" id="insightText">
+        <strong>The Precision Paradox:</strong> At 1.0% prevalence, 495 false positives dwarf 90 true positives, causing precision to drop to 15.38% despite 90% recall and a low 5% FPR.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function syncFprFromSlider() {
+    const fpr = parseFloat(document.getElementById('fprSlider').value);
+    document.getElementById('fprValLabel').textContent = (fpr * 100).toFixed(1) + '%';
+    updateCalculator();
+  }
+
+  function updateCalculator() {
+    const pop = parseFloat(document.getElementById('popInput').value) || 10000;
+    const prev = parseFloat(document.getElementById('prevInput').value) || 0.01;
+    const recall = parseFloat(document.getElementById('recallInput').value) || 0.90;
+    const fpr = parseFloat(document.getElementById('fprSlider').value);
+
+    // 1. Compute Matrix Counts
+    const actPos = pop * prev;
+    const actNeg = pop * (1.0 - prev);
+
+    const tp = actPos * recall;
+    const fn = actPos - tp;
+    const fp = actNeg * fpr;
+    const tn = actNeg - fp;
+
+    const predPos = tp + fp;
+    const predNeg = tn + fn;
+
+    // 2. Compute Precision
+    const bayesPrecision = (predPos > 0) ? (tp / predPos) : 0;
+
+    // 3. Update Matrix UI
+    document.getElementById('cellTP').textContent = Math.round(tp) + ' (TP)';
+    document.getElementById('cellFN').textContent = Math.round(fn) + ' (FN)';
+    document.getElementById('cellFP').textContent = Math.round(fp) + ' (FP)';
+    document.getElementById('cellTN').textContent = Math.round(tn) + ' (TN)';
+
+    document.getElementById('cellActPos').textContent = Math.round(actPos);
+    document.getElementById('cellActNeg').textContent = Math.round(actNeg);
+    document.getElementById('cellPredPos').textContent = Math.round(predPos);
+    document.getElementById('cellPredNeg').textContent = Math.round(predNeg);
+    document.getElementById('cellTotalPop').textContent = Math.round(pop);
+
+    const precPercentStr = (bayesPrecision * 100).toFixed(2) + '%';
+    document.getElementById('precisionValue').textContent = precPercentStr;
+
+    // Update Insight Callout
+    document.getElementById('insightText').innerHTML = 
+      `<strong>The Precision Paradox:</strong> At ${(prev * 100).toFixed(1)}% prevalence, ` +
+      `<strong>${Math.round(fp)}</strong> false alarms dwarf <strong>${Math.round(tp)}</strong> true hits, ` +
+      `yielding <strong>${precPercentStr}</strong> precision despite ${(recall * 100).toFixed(0)}% recall.`;
+
+    // 4. Draw Canvas Plot
+    drawPlot(prev, recall, fpr, bayesPrecision);
+  }
+
+  function drawPlot(prev, recall, currentFPR, currentPrecision) {
+    const canvas = document.getElementById('plotCanvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width;
+    const H = canvas.height;
+
+    const marginLeft = 45;
+    const marginBottom = 40;
+    const marginTop = 30;
+    const marginRight = 25;
+
+    const plotW = W - marginLeft - marginRight;
+    const plotH = H - marginTop - marginBottom;
+
+    // Clear Canvas
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, W, H);
+
+    // Draw Plot Border
+    ctx.strokeStyle = '#dee2e6';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(marginLeft, marginTop, plotW, plotH);
+
+    // Grid Lines & Labels
+    ctx.fillStyle = '#6c757d';
+    ctx.font = '10px sans-serif';
+
+    // Y-Axis Ticks (Precision)
+    for (let i = 0; i <= 4; i++) {
+      const y = marginTop + plotH * (1.0 - i * 0.25);
+      ctx.beginPath();
+      ctx.moveTo(marginLeft, y);
+      ctx.lineTo(marginLeft + plotW, y);
+      ctx.strokeStyle = '#f0f0f0';
+      ctx.stroke();
+      ctx.fillText((i * 25) + '%', 10, y + 3);
+    }
+
+    // X-Axis Ticks (FPR 0.00 to 0.20)
+    for (let i = 0; i <= 4; i++) {
+      const x = marginLeft + plotW * (i / 4.0);
+      ctx.beginPath();
+      ctx.moveTo(x, marginTop);
+      ctx.lineTo(x, marginTop + plotH);
+      ctx.strokeStyle = '#f0f0f0';
+      ctx.stroke();
+      ctx.fillText((i * 0.05).toFixed(2), x - 10, marginTop + plotH + 15);
+    }
+
+    // Axis Header
+    ctx.fillStyle = '#212529';
+    ctx.font = 'bold 11px sans-serif';
+    ctx.fillText('False Positive Rate (FPR)', marginLeft + plotW / 3, marginTop + plotH + 32);
+    ctx.fillText('Precision vs. FPR Curve', marginLeft, marginTop - 10);
+
+    // Plot Primary Curve (Current Prevalence)
+    ctx.beginPath();
+    ctx.strokeStyle = '#0d6efd';
+    ctx.lineWidth = 2.5;
+
+    const steps = 100;
+    for (let i = 1; i <= steps; i++) {
+      const fprVal = (i / steps) * 0.20;
+      const precVal = (recall * prev) / (recall * prev + fprVal * (1.0 - prev));
+
+      const x = marginLeft + (fprVal / 0.20) * plotW;
+      const y = marginTop + (1.0 - precVal) * plotH;
+
+      if (i === 1) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // Plot Reference Curve (Higher Prevalence = 5%)
+    ctx.beginPath();
+    ctx.strokeStyle = '#adb5bd';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4]);
+
+    for (let i = 1; i <= steps; i++) {
+      const fprVal = (i / steps) * 0.20;
+      const precVal = (recall * 0.05) / (recall * 0.05 + fprVal * (1.0 - 0.05));
+
+      const x = marginLeft + (fprVal / 0.20) * plotW;
+      const y = marginTop + (1.0 - precVal) * plotH;
+
+      if (i === 1) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]); // Reset line dash
+
+    // Draw Crosshairs & Current Point
+    if (currentFPR >= 0 && currentFPR <= 0.20) {
+      const currX = marginLeft + (currentFPR / 0.20) * plotW;
+      const currY = marginTop + (1.0 - currentPrecision) * plotH;
+
+      // Crosshairs
+      ctx.strokeStyle = '#dc3545';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(currX, marginTop); ctx.lineTo(currX, marginTop + plotH);
+      ctx.moveTo(marginLeft, currY); ctx.lineTo(marginLeft + plotW, currY);
+      ctx.stroke();
+
+      // Operating Point Marker
+      ctx.fillStyle = '#dc3545';
+      ctx.beginPath();
+      ctx.arc(currX, currY, 6, 0, 2 * Math.PI);
+      ctx.fill();
+
+      // Coordinate Label
+      ctx.fillStyle = '#dc3545';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText(`(${(currentFPR*100).toFixed(1)}%, ${(currentPrecision*100).toFixed(1)}%)`, currX + 8, currY - 8);
+    }
+
+    // Legend
+    ctx.fillStyle = '#0d6efd'; ctx.fillText(`— Prev = ${(prev*100).toFixed(1)}%`, marginLeft + 10, marginTop + 15);
+    ctx.fillStyle = '#6c757d'; ctx.fillText(`-- Prev = 5.0% (Ref)`, marginLeft + 10, marginTop + 30);
+  }
+
+  // Initialize Calculator on Load
+  window.onload = updateCalculator;
+</script>
+
+</body>
+</html>
