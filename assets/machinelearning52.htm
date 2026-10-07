@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive SVM Kernel & Boundary Studio</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f0f2f5;
+      color: #212529;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .app-container {
+      width: 1000px;
+      background: #ffffff;
+      border: 1px solid #d0d7de;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    h2 {
+      margin: 0;
+      color: #0a2540;
+      border-bottom: 2px solid #e1e4e8;
+      padding-bottom: 10px;
+      font-size: 20px;
+    }
+    .layout-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 20px;
+    }
+    .panel {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 6px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .control-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    label {
+      font-weight: 600;
+      font-size: 13px;
+      color: #495057;
+    }
+    .val-badge {
+      font-size: 12px;
+      font-weight: bold;
+      color: #0d6efd;
+      background: #e7f1ff;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    select, input[type="range"] {
+      width: 100%;
+      box-sizing: border-box;
+    }
+    select {
+      padding: 6px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    .dataset-btns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    button {
+      padding: 8px;
+      border: 1px solid #ced4da;
+      background: #ffffff;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    button:hover {
+      background: #e9ecef;
+    }
+    button.active {
+      background: #0d6efd;
+      color: #ffffff;
+      border-color: #0d6efd;
+    }
+    .stats-card {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      border-radius: 6px;
+      padding: 12px;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .stats-card span {
+      color: #4ec9b0;
+    }
+    canvas {
+      background: #ffffff;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      width: 100%;
+      height: 480px;
+      cursor: crosshair;
+    }
+    .instruction-text {
+      font-size: 12px;
+      color: #6c757d;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <h2>Interactive maXbox Support Vector Machine (SVM) Boundary & Kernel Studio</h2>
+
+  <div class="layout-grid">
+    <!-- Left Control Panel -->
+    <div class="panel">
+      <!-- Dataset Selector -->
+      <div class="control-group">
+        <label>Select Preset Dataset:</label>
+        <div class="dataset-btns">
+          <button id="btnMoons" class="active" onclick="setDataset('moons')">Non-Linear Moons</button>
+          <button id="btnCircles" onclick="setDataset('circles')">Concentric Circles</button>
+          <button id="btnBlobs" onclick="setDataset('blobs')">Linear Blobs</button>
+          <button id="btnWine" onclick="setDataset('wine')">Wine PCA (2D)</button>
+        </div>
+      </div>
+
+      <!-- Kernel Selector -->
+      <div class="control-group">
+        <label for="kernelSelect">SVM Kernel Function:</label>
+        <select id="kernelSelect" onchange="updateSVM()">
+          <option value="rbf">Radial Basis Function (RBF)</option>
+          <option value="linear">Linear Kernel</option>
+          <option value="poly">Polynomial Kernel</option>
+          <option value="sigmoid">Sigmoid Kernel</option>
+        </select>
+      </div>
+
+      <!-- Regularization C Slider -->
+      <div class="control-group">
+        <div class="control-header">
+          <label for="cSlider">Regularization Parameter (C):</label>
+          <span id="cVal" class="val-badge">1.00</span>
+        </div>
+        <input type="range" id="cSlider" min="-2" max="3" step="0.1" value="0" oninput="updateSVM()">
+      </div>
+
+      <!-- Gamma Slider (RBF, Poly, Sigmoid) -->
+      <div class="control-group" id="gammaGroup">
+        <div class="control-header">
+          <label for="gammaSlider">Kernel Scale Gamma (&gamma;):</label>
+          <span id="gammaVal" class="val-badge">0.50</span>
+        </div>
+        <input type="range" id="gammaSlider" min="-2" max="1" step="0.1" value="-0.3" oninput="updateSVM()">
+      </div>
+
+      <!-- Poly Degree Slider -->
+      <div class="control-group" id="degreeGroup" style="display: none;">
+        <div class="control-header">
+          <label for="degreeSlider">Polynomial Degree (d):</label>
+          <span id="degreeVal" class="val-badge">3</span>
+        </div>
+        <input type="range" id="degreeSlider" min="2" max="6" step="1" value="3" oninput="updateSVM()">
+      </div>
+
+      <!-- Interactive Click Add Class -->
+      <div class="control-group">
+        <label>Click Canvas to Add Points:</label>
+        <div class="dataset-btns">
+          <button id="btnClassA" class="active" onclick="setClassAdd(1)">+ Class 1 (Red)</button>
+          <button id="btnClassB" onclick="setClassAdd(-1)">- Class 2 (Blue)</button>
+        </div>
+        <span class="instruction-text">* Click anywhere on canvas to add a new point.</span>
+      </div>
+
+      <!-- Live Stats Panel -->
+      <div class="stats-card">
+        <div>Total Points : <span id="statPoints">0</span></div>
+        <div>Support Vectors : <span id="statSVs">0</span></div>
+        <div>Accuracy Rate   : <span id="statAcc">0.0%</span></div>
+        <div>Solve Time      : <span id="statTime">0 ms</span></div>
+      </div>
+    </div>
+
+    <!-- Right Canvas Visualization Panel -->
+    <div class="panel">
+      <canvas id="svmCanvas" width="560" height="480"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+  let dataPoints = [];
+  let currentDataset = 'moons';
+  let activeAddClass = 1;
+
+  // Preset Datasets Generator
+  function generateDataset(type) {
+    dataPoints = [];
+    if (type === 'moons') {
+      for (let i = 0; i < 30; i++) {
+        let angle = (i / 30) * Math.PI;
+        dataPoints.push({ x: Math.cos(angle) * 1.5 - 0.5, y: Math.sin(angle) * 1.5 - 0.2, yLabel: 1 });
+        dataPoints.push({ x: 0.5 - Math.cos(angle) * 1.5, y: 0.2 - Math.sin(angle) * 1.5, yLabel: -1 });
+      }
+    } else if (type === 'circles') {
+      for (let i = 0; i < 24; i++) {
+        let angle = (i / 24) * 2 * Math.PI;
+        dataPoints.push({ x: Math.cos(angle) * 0.8, y: Math.sin(angle) * 0.8, yLabel: 1 });
+      }
+      for (let i = 0; i < 36; i++) {
+        let angle = (i / 36) * 2 * Math.PI;
+        dataPoints.push({ x: Math.cos(angle) * 2.2, y: Math.sin(angle) * 2.2, yLabel: -1 });
+      }
+    } else if (type === 'blobs') {
+      for (let i = 0; i < 25; i++) {
+        dataPoints.push({ x: -1.5 + (Math.random() - 0.5) * 1.2, y: 1.2 + (Math.random() - 0.5) * 1.2, yLabel: 1 });
+        dataPoints.push({ x: 1.2 + (Math.random() - 0.5) * 1.2, y: -1.0 + (Math.random() - 0.5) * 1.2, yLabel: -1 });
+      }
+    } else if (type === 'wine') { // Wine PCA projection simulation
+      const c1 = [[-1.8,-0.8],[-2.1,-0.5],[-1.5,-1.2],[-2.4,-0.2],[-1.2,-0.9],[-2.0,-1.5],[-1.7,-0.3]];
+      const c2 = [[0.8,1.2],[1.2,0.8],[0.5,1.5],[1.4,1.1],[0.9,0.5],[1.6,1.4],[0.3,0.9]];
+      c1.forEach(p => dataPoints.push({ x: p[0], y: p[1], yLabel: 1 }));
+      c2.forEach(p => dataPoints.push({ x: p[0], y: p[1], yLabel: -1 }));
+    }
+  }
+
+  function setDataset(type) {
+    currentDataset = type;
+    ['moons', 'circles', 'blobs', 'wine'].forEach(id => {
+      document.getElementById('btn' + id.charAt(0).toUpperCase() + id.slice(1)).classList.remove('active');
+    });
+    document.getElementById('btn' + type.charAt(0).toUpperCase() + type.slice(1)).classList.add('active');
+    generateDataset(type);
+    updateSVM();
+  }
+
+  function setClassAdd(cls) {
+    activeAddClass = cls;
+    document.getElementById('btnClassA').classList.toggle('active', cls === 1);
+    document.getElementById('btnClassB').classList.toggle('active', cls === -1);
+  }
+
+  // Sequential Minimal Optimization (SMO) Dual SVM Solver
+  function solveSMO(X, Y, C, kernelFunc, maxPasses = 20, tol = 1e-3) {
+    const N = X.length;
+    let alpha = new Float64Array(N);
+    let b = 0.0;
+
+    // Precompute Kernel Matrix
+    let K = Array.from({ length: N }, () => new Float64Array(N));
+    for (let i = 0; i < N; i++) {
+      for (let j = 0; j < N; j++) {
+        K[i][j] = kernelFunc(X[i], X[j]);
+      }
+    }
+
+    function predictScore(i) {
+      let sum = b;
+      for (let j = 0; j < N; j++) {
+        if (alpha[j] > 0) sum += alpha[j] * Y[j] * K[j][i];
+      }
+      return sum;
+    }
+
+    let passes = 0;
+    while (passes < maxPasses) {
+      let numChanged = 0;
+      for (let i = 0; i < N; i++) {
+        let Ei = predictScore(i) - Y[i];
+        if ((Y[i] * Ei < -tol && alpha[i] < C) || (Y[i] * Ei > tol && alpha[i] > 0)) {
+          let j = Math.floor(Math.random() * (N - 1));
+          if (j >= i) j++;
+
+          let Ej = predictScore(j) - Y[j];
+          let aiOld = alpha[i], ajOld = alpha[j];
+
+          let L = (Y[i] !== Y[j]) ? Math.max(0, alpha[j] - alpha[i]) : Math.max(0, alpha[i] + alpha[j] - C);
+          let H = (Y[i] !== Y[j]) ? Math.min(C, C + alpha[j] - alpha[i]) : Math.min(C, alpha[i] + alpha[j]);
+          if (Math.abs(L - H) < 1e-5) continue;
+
+          let eta = 2 * K[i][j] - K[i][i] - K[j][j];
+          if (eta >= 0) continue;
+
+          let ajNew = ajOld - (Y[j] * (Ei - Ej)) / eta;
+          ajNew = Math.min(H, Math.max(L, ajNew));
+          if (Math.abs(ajNew - ajOld) < 1e-5) continue;
+
+          let aiNew = aiOld + Y[i] * Y[j] * (ajOld - ajNew);
+
+          let b1 = b - Ei - Y[i] * (aiNew - aiOld) * K[i][i] - Y[j] * (ajNew - ajOld) * K[i][j];
+          let b2 = b - Ej - Y[i] * (aiNew - aiOld) * K[i][j] - Y[j] * (ajNew - ajOld) * K[j][j];
+
+          b = (0 < aiNew && aiNew < C) ? b1 : ((0 < ajNew && ajNew < C) ? b2 : (b1 + b2) / 2);
+
+          alpha[i] = aiNew;
+          alpha[j] = ajNew;
+          numChanged++;
+        }
+      }
+      passes = (numChanged === 0) ? passes + 1 : 0;
+    }
+
+    return { alpha, b, predict: (point) => {
+      let sum = b;
+      for (let j = 0; j < N; j++) {
+        if (alpha[j] > 0) sum += alpha[j] * Y[j] * kernelFunc(X[j], point);
+      }
+      return sum;
+    }};
+  }
+
+  function updateSVM() {
+    const startTime = performance.now();
+    const kernelType = document.getElementById('kernelSelect').value;
+    const C = Math.pow(10, parseFloat(document.getElementById('cSlider').value));
+    const gamma = Math.pow(10, parseFloat(document.getElementById('gammaSlider').value));
+    const degree = parseInt(document.getElementById('degreeSlider').value);
+
+    // Update Slider Value Badges
+    document.getElementById('cVal').textContent = C.toFixed(2);
+    document.getElementById('gammaVal').textContent = gamma.toFixed(2);
+    document.getElementById('degreeVal').textContent = degree;
+
+    // Toggle Parameter Visibility
+    document.getElementById('degreeGroup').style.display = (kernelType === 'poly') ? 'flex' : 'none';
+    document.getElementById('gammaGroup').style.display = (kernelType === 'linear') ? 'none' : 'flex';
+
+    // Kernel Function Definition
+    let kernelFunc;
+    if (kernelType === 'linear') {
+      kernelFunc = (a, b) => a.x * b.x + a.y * b.y;
+    } else if (kernelType === 'rbf') {
+      kernelFunc = (a, b) => Math.exp(-gamma * ((a.x - b.x) ** 2 + (a.y - b.y) ** 2));
+    } else if (kernelType === 'poly') {
+      kernelFunc = (a, b) => (a.x * b.x + a.y * b.y + 1) ** degree;
+    } else if (kernelType === 'sigmoid') {
+      kernelFunc = (a, b) => Math.tanh(gamma * (a.x * b.x + a.y * b.y) + 0.1);
+    }
+
+    const X = dataPoints.map(p => ({ x: p.x, y: p.y }));
+    const Y = dataPoints.map(p => p.yLabel);
+
+    const model = solveSMO(X, Y, C, kernelFunc);
+    const endTime = performance.now();
+
+    // Stats Calculation
+    let svCount = 0;
+    let correct = 0;
+    for (let i = 0; i < dataPoints.length; i++) {
+      if (model.alpha[i] > 1e-4) svCount++;
+      let pred = model.predict(X[i]) >= 0 ? 1 : -1;
+      if (pred === Y[i]) correct++;
+    }
+
+    document.getElementById('statPoints').textContent = dataPoints.length;
+    document.getElementById('statSVs').textContent = svCount;
+    document.getElementById('statAcc').textContent = ((correct / dataPoints.length) * 100).toFixed(1) + '%';
+    document.getElementById('statTime').textContent = (endTime - startTime).toFixed(1) + ' ms';
+
+    renderCanvas(model);
+  }
+
+  function renderCanvas(model) {
+    const canvas = document.getElementById('svmCanvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width;
+    const H = canvas.height;
+
+    // Coordinate Mapping [-3, 3] to Canvas Pixels
+    const toScreenX = (x) => ((x + 3) / 6) * W;
+    const toScreenY = (y) => ((3 - y) / 6) * H;
+    const toDataX = (sx) => (sx / W) * 6 - 3;
+    const toDataY = (sy) => 3 - (sy / H) * 6;
+
+    // Render Decision Regions Grid
+    const step = 6;
+    for (let px = 0; px < W; px += step) {
+      for (let py = 0; py < H; py += step) {
+        let val = model.predict({ x: toDataX(px), y: toDataY(py) });
+        if (val >= 0) {
+          ctx.fillStyle = `rgba(220, 53, 69, ${Math.min(0.35, 0.1 + val * 0.1)})`;
+        } else {
+          ctx.fillStyle = `rgba(13, 110, 253, ${Math.min(0.35, 0.1 - val * 0.1)})`;
+        }
+        ctx.fillRect(px, py, step, step);
+      }
+    }
+
+    // Render Contour Boundary (f(x) = 0, f(x) = 1, f(x) = -1)
+    for (let px = 0; px < W; px += 3) {
+      for (let py = 0; py < H; py += 3) {
+        let val = model.predict({ x: toDataX(px), y: toDataY(py) });
+        if (Math.abs(val) < 0.08) { // Boundary line f(x) = 0
+          ctx.fillStyle = '#000000';
+          ctx.fillRect(px, py, 2, 2);
+        } else if (Math.abs(val - 1.0) < 0.06 || Math.abs(val + 1.0) < 0.06) { // Margins
+          ctx.fillStyle = '#6c757d';
+          ctx.fillRect(px, py, 1, 1);
+        }
+      }
+    }
+
+    // Render Data Points & Support Vector Halos
+    dataPoints.forEach((p, idx) => {
+      const sx = toScreenX(p.x);
+      const sy = toScreenY(p.y);
+
+      // Support Vector Halo Ring
+      if (model.alpha[idx] > 1e-4) {
+        ctx.strokeStyle = '#ffc107';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(sx, sy, 9, 0, 2 * Math.PI);
+        ctx.stroke();
+      }
+
+      // Point Circle
+      ctx.fillStyle = p.yLabel === 1 ? '#dc3545' : '#0d6efd';
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(sx, sy, 6, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.stroke();
+    });
+  }
+
+  // Interactive Click Listener
+  document.getElementById('svmCanvas').addEventListener('click', (e) => {
+    const rect = e.target.getBoundingClientRect();
+    const sx = e.clientX - rect.left;
+    const sy = e.clientY - rect.top;
+
+    const dataX = (sx / e.target.width) * 6 - 3;
+    const dataY = 3 - (sy / e.target.height) * 6;
+
+    dataPoints.push({ x: dataX, y: dataY, yLabel: activeAddClass });
+    updateSVM();
+  });
+
+  // Initialize App on Load
+  window.onload = () => {
+    generateDataset('moons');
+    updateSVM();
+  };
+</script>
+
+</body>
+</html>
