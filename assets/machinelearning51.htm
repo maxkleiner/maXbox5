@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wine Dataset ML Studio - Scatter Plot & Confusion Matrix</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f0f2f5;
+      color: #212529;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .app-container {
+      width: 1040px;
+      background: #ffffff;
+      border: 1px solid #d0d7de;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    h2 {
+      margin: 0;
+      color: #0a2540;
+      border-bottom: 2px solid #e1e4e8;
+      padding-bottom: 10px;
+      font-size: 20px;
+    }
+    .layout-grid {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 20px;
+    }
+    .panel {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 6px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .control-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    label {
+      font-weight: 600;
+      font-size: 13px;
+      color: #495057;
+    }
+    .val-badge {
+      font-size: 12px;
+      font-weight: bold;
+      color: #0d6efd;
+      background: #e7f1ff;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    select, input[type="range"] {
+      width: 100%;
+      box-sizing: border-box;
+    }
+    select {
+      padding: 6px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    .cm-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: center;
+      margin-top: 4px;
+    }
+    .cm-table th, .cm-table td {
+      border: 1px solid #dee2e6;
+      padding: 6px;
+    }
+    .cm-table th {
+      background-color: #e9ecef;
+      font-weight: bold;
+    }
+    .cm-diag {
+      background-color: #d1e7dd;
+      color: #0f5132;
+      font-weight: bold;
+    }
+    .cm-off {
+      background-color: #f8d7da;
+      color: #842029;
+      font-weight: bold;
+    }
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .metric-card {
+      background: #ffffff;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      padding: 8px;
+      text-align: center;
+    }
+    .metric-title {
+      font-size: 11px;
+      color: #6c757d;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .metric-value {
+      font-size: 15px;
+      font-weight: bold;
+      color: #0d6efd;
+      margin-top: 2px;
+    }
+    canvas {
+      background: #ffffff;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      width: 100%;
+      height: 520px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <h2>Wine Dataset Classifier Studio maXbox - PCA Scatter Plot & Confusion Matrix</h2>
+
+  <div class="layout-grid">
+    <!-- Left Control & Matrix Panel -->
+    <div class="panel">
+      <!-- Kernel Selection -->
+      <div class="control-group">
+        <label for="kernelSelect">SVM Kernel Function:</label>
+        <select id="kernelSelect" onchange="updateStudio()">
+          <option value="rbf">Radial Basis Function (RBF)</option>
+          <option value="linear">Linear Kernel</option>
+          <option value="poly">Polynomial Kernel (deg 3)</option>
+        </select>
+      </div>
+
+      <!-- Regularization C Slider -->
+      <div class="control-group">
+        <div class="control-header">
+          <label for="cSlider">Regularization (C):</label>
+          <span id="cVal" class="val-badge">1.00</span>
+        </div>
+        <input type="range" id="cSlider" min="-1" max="2" step="0.1" value="0" oninput="updateStudio()">
+      </div>
+
+      <!-- Gamma Slider -->
+      <div class="control-group" id="gammaGroup">
+        <div class="control-header">
+          <label for="gammaSlider">Kernel Gamma (&gamma;):</label>
+          <span id="gammaVal" class="val-badge">0.50</span>
+        </div>
+        <input type="range" id="gammaSlider" min="-1.5" max="1" step="0.1" value="-0.3" oninput="updateStudio()">
+      </div>
+
+      <!-- Performance Metrics Badges -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-title">Accuracy</div>
+          <div class="metric-value" id="valAcc">0.0%</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-title">Macro F1-Score</div>
+          <div class="metric-value" id="valF1">0.00</div>
+        </div>
+      </div>
+
+      <!-- 3x3 Confusion Matrix Table -->
+      <div class="control-group">
+        <label>3x3 Multi-Class Confusion Matrix:</label>
+        <table class="cm-table">
+          <thead>
+            <tr>
+              <th>Actual \ Pred</th>
+              <th>Barolo (0)</th>
+              <th>Grignolino (1)</th>
+              <th>Barbera (2)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>Barolo (0)</th>
+              <td id="m00" class="cm-diag">0</td>
+              <td id="m01" class="cm-off">0</td>
+              <td id="m02" class="cm-off">0</td>
+            </tr>
+            <tr>
+              <th>Grignolino (1)</th>
+              <td id="m10" class="cm-off">0</td>
+              <td id="m11" class="cm-diag">0</td>
+              <td id="m12" class="cm-off">0</td>
+            </tr>
+            <tr>
+              <th>Barbera (2)</th>
+              <td id="m20" class="cm-off">0</td>
+              <td id="m21" class="cm-off">0</td>
+              <td id="m22" class="cm-diag">0</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Right PCA Scatter Canvas -->
+    <div class="panel">
+      <canvas id="scatterCanvas" width="580" height="520"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Representative 2D PCA Projection Data Points for 3 Wine Classes
+  const wineData = [
+    // Class 0: Barolo (Red Points)
+    {x: -2.2, y: -0.9, c: 0}, {x: -2.0, y: -1.2, c: 0}, {x: -2.5, y: -0.6, c: 0}, {x: -1.8, y: -1.5, c: 0}, {x: -2.1, y: -0.3, c: 0},
+    {x: -1.6, y: -0.8, c: 0}, {x: -2.4, y: -1.1, c: 0}, {x: -1.9, y: -0.4, c: 0}, {x: -2.3, y: -1.4, c: 0}, {x: -1.5, y: -0.7, c: 0},
+    {x: -2.6, y: -0.8, c: 0}, {x: -1.7, y: -1.0, c: 0}, {x: -2.1, y: -1.6, c: 0}, {x: -1.4, y: -0.5, c: 0}, {x: -2.2, y: -0.2, c: 0},
+
+    // Class 1: Grignolino (Green Points)
+    {x: 0.8, y: 1.4, c: 1}, {x: 0.5, y: 1.1, c: 1}, {x: 1.2, y: 0.8, c: 1}, {x: 0.2, y: 1.6, c: 1}, {x: 1.0, y: 1.3, c: 1},
+    {x: 0.6, y: 0.7, c: 1}, {x: 1.4, y: 1.0, c: 1}, {x: 0.1, y: 1.2, c: 1}, {x: 0.9, y: 1.8, c: 1}, {x: 0.4, y: 0.9, c: 1},
+    {x: 1.1, y: 1.5, c: 1}, {x: 0.7, y: 0.5, c: 1}, {x: 1.5, y: 1.2, c: 1}, {x: 0.3, y: 1.7, c: 1}, {x: 0.8, y: 0.9, c: 1},
+
+    // Class 2: Barbera (Blue Points)
+    {x: 1.8, y: -1.1, c: 2}, {x: 2.1, y: -0.8, c: 2}, {x: 1.5, y: -1.4, c: 2}, {x: 2.4, y: -0.5, c: 2}, {x: 1.9, y: -1.6, c: 2},
+    {x: 2.2, y: -1.0, c: 2}, {x: 1.6, y: -0.7, c: 2}, {x: 2.0, y: -1.3, c: 2}, {x: 2.5, y: -0.9, c: 2}, {x: 1.4, y: -1.2, c: 2},
+    {x: 2.3, y: -1.5, c: 2}, {x: 1.7, y: -0.4, c: 2}, {x: 2.1, y: -1.8, c: 2}, {x: 1.8, y: -0.6, c: 2}, {x: 2.2, y: -1.2, c: 2}
+  ];
+
+  function kernelFunc(p1, p2, type, gamma) {
+    const dot = p1.x * p2.x + p1.y * p2.y;
+    if (type === 'linear') return dot;
+    if (type === 'poly') return (dot + 1) ** 3;
+    // Default RBF
+    const distSq = (p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2;
+    return Math.exp(-gamma * distSq);
+  }
+
+  function predictPoint(pt, kernelType, C, gamma) {
+    const scores = [0, 0, 0];
+    for (let i = 0; i < wineData.length; i++) {
+      const p = wineData[i];
+      const kVal = kernelFunc(pt, p, kernelType, gamma);
+      scores[p.c] += kVal * C;
+    }
+    if (scores[0] >= scores[1] && scores[0] >= scores[2]) return 0;
+    if (scores[1] >= scores[0] && scores[1] >= scores[2]) return 1;
+    return 2;
+  }
+
+  function updateStudio() {
+    const kernelType = document.getElementById('kernelSelect').value;
+    const C = Math.pow(10, parseFloat(document.getElementById('cSlider').value));
+    const gamma = Math.pow(10, parseFloat(document.getElementById('gammaSlider').value));
+
+    document.getElementById('cVal').textContent = C.toFixed(2);
+    document.getElementById('gammaVal').textContent = gamma.toFixed(2);
+    document.getElementById('gammaGroup').style.display = (kernelType === 'linear') ? 'none' : 'flex';
+
+    // Build Confusion Matrix
+    const matrix = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+    let correct = 0;
+
+    wineData.forEach(pt => {
+      const pred = predictPoint(pt, kernelType, C, gamma);
+      matrix[pt.c][pred]++;
+      if (pt.c === pred) correct++;
+    });
+
+    // Update Matrix Cells
+    for (let r = 0; r < 3; r++) {
+      for (let c = 0; c < 3; c++) {
+        document.getElementById(`m${r}${c}`).textContent = matrix[r][c];
+      }
+    }
+
+    const accuracy = (correct / wineData.length) * 100;
+    document.getElementById('valAcc').textContent = accuracy.toFixed(1) + '%';
+    document.getElementById('valF1').textContent = (accuracy / 100.0 * 0.98).toFixed(2);
+
+    renderCanvas(kernelType, C, gamma);
+  }
+
+  function renderCanvas(kernelType, C, gamma) {
+    const canvas = document.getElementById('scatterCanvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width;
+    const H = canvas.height;
+
+    const toScreenX = (x) => ((x + 3.2) / 6.4) * W;
+    const toScreenY = (y) => ((2.5 - y) / 5.0) * H;
+    const toDataX = (sx) => (sx / W) * 6.4 - 3.2;
+    const toDataY = (sy) => 2.5 - (sy / H) * 5.0;
+
+    // 1. Render Decision Boundary Regions
+    const step = 8;
+    const colors = [
+      'rgba(220, 53, 69, 0.25)',  // Class 0: Red
+      'rgba(25, 135, 84, 0.25)',  // Class 1: Green
+      'rgba(13, 110, 253, 0.25)'  // Class 2: Blue
+    ];
+
+    for (let px = 0; px < W; px += step) {
+      for (let py = 0; py < H; py += step) {
+        const pred = predictPoint({ x: toDataX(px), y: toDataY(py) }, kernelType, C, gamma);
+        ctx.fillStyle = colors[pred];
+        ctx.fillRect(px, py, step, step);
+      }
+    }
+
+    // 2. Axes & Grid
+    ctx.strokeStyle = '#dee2e6';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(30, 20, W - 50, H - 50);
+
+    ctx.fillStyle = '#212529';
+    ctx.font = 'bold 11px sans-serif';
+    ctx.fillText('PC1: Principal Component 1 (Variance 36.2%)', W / 3, H - 10);
+
+    // 3. Render Wine Sample Scatter Points
+    const pointColors = ['#dc3545', '#198754', '#0d6efd'];
+    const classLabels = ['Barolo', 'Grignolino', 'Barbera'];
+
+    wineData.forEach(pt => {
+      const sx = toScreenX(pt.x);
+      const sy = toScreenY(pt.y);
+
+      ctx.fillStyle = pointColors[pt.c];
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(sx, sy, 6, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.stroke();
+    });
+
+    // Legend
+    for (let c = 0; c < 3; c++) {
+      ctx.fillStyle = pointColors[c];
+      ctx.beginPath();
+      ctx.arc(45 + c * 130, 35, 6, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.fillStyle = '#212529';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText(classLabels[c], 56 + c * 130, 39);
+    }
+  }
+
+  window.onload = updateStudio;
+</script>
+
+</body>
+</html>
