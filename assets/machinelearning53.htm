@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Probability Threshold & Confusion Matrix Simulator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 30px;
+            background-color: #f4f6f9;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        h2 {
+            margin-top: 0;
+            color: #1a252f;
+        }
+        .slider-container {
+            margin: 25px 0;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        label {
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        input[type=range] {
+            width: 100%;
+            margin-top: 12px;
+            cursor: pointer;
+        }
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .matrix-cell {
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            color: white;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .tp { background-color: #28a745; }
+        .fp { background-color: #ffc107; color: #212529; }
+        .fn { background-color: #dc3545; }
+        .tn { background-color: #0d6efd; }
+        .metrics-bar {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 25px;
+            background: #eef2f5;
+            padding: 18px;
+            border-radius: 8px;
+        }
+        .metric-item {
+            text-align: center;
+        }
+        .metric-title {
+            font-size: 0.9em;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .metric-value {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #111;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Classification Probability Threshold Simulator of maXbox5</h2>
+        <p>Drag the slider to adjust the decision probability threshold $t \in [0.01, 0.99]$ and observe real-time trade-offs between False Positives and False Negatives.</p>
+
+        <div class="slider-container">
+            <label for="threshold">Decision Threshold ($t$): <span id="thresh-display" style="color: #0d6efd;">0.50</span></label>
+            <input type="range" id="threshold" min="0.01" max="0.99" step="0.01" value="0.50">
+        </div>
+
+        <h3>Confusion Matrix</h3>
+        <div class="matrix-grid">
+            <div class="matrix-cell tp">True Positives (TP)<br><span id="tp-val" style="font-size: 1.5em;">45</span></div>
+            <div class="matrix-cell fp">False Positives (FP)<br><span id="fp-val" style="font-size: 1.5em;">3</span></div>
+            <div class="matrix-cell fn">False Negatives (FN)<br><span id="fn-val" style="font-size: 1.5em;">5</span></div>
+            <div class="matrix-cell tn">True Negatives (TN)<br><span id="tn-val" style="font-size: 1.5em;">47</span></div>
+        </div>
+
+        <div class="metrics-bar">
+            <div class="metric-item">
+                <div class="metric-title">Precision</div>
+                <div class="metric-value" id="precision-val">93.8%</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-title">Recall (TPR)</div>
+                <div class="metric-value" id="recall-val">90.0%</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-title">Specificity</div>
+                <div class="metric-value" id="specificity-val">94.0%</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-title">F1-Score</div>
+                <div class="metric-value" id="f1-val">91.8%</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Total population constants for simulation
+        const P = 50; // Total Actual Positives
+        const N = 50; // Total Actual Negatives
+
+        const slider = document.getElementById('threshold');
+        const threshDisplay = document.getElementById('thresh-display');
+
+        function calculateMetrics() {
+            const t = parseFloat(slider.value);
+            threshDisplay.textContent = t.toFixed(2);
+
+            // Simulation model modeling probability decay
+            let tp = Math.round(P * Math.pow(1 - t, 0.45));
+            let fn = P - tp;
+            let fp = Math.round(N * Math.pow(1 - t, 2.8));
+            let tn = N - fp;
+
+            let precision = (tp + fp) > 0 ? (tp / (tp + fp)) * 100 : 0;
+            let recall = (tp + fn) > 0 ? (tp / (tp + fn)) * 100 : 0;
+            let specificity = (tn + fp) > 0 ? (tn / (tn + fp)) * 100 : 0;
+            let f1 = (precision + recall) > 0 ? (2 * precision * recall) / (precision + recall) : 0;
+
+            // DOM Updates
+            document.getElementById('tp-val').textContent = tp;
+            document.getElementById('fp-val').textContent = fp;
+            document.getElementById('fn-val').textContent = fn;
+            document.getElementById('tn-val').textContent = tn;
+
+            document.getElementById('precision-val').textContent = precision.toFixed(1) + '%';
+            document.getElementById('recall-val').textContent = recall.toFixed(1) + '%';
+            document.getElementById('specificity-val').textContent = specificity.toFixed(1) + '%';
+            document.getElementById('f1-val').textContent = f1.toFixed(1) + '%';
+        }
+
+        slider.addEventListener('input', calculateMetrics);
+        calculateMetrics(); // Initial run
+    </script>
+</body>
+</html>
