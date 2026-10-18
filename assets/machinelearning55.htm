@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2x2 Confusion Matrix Interactive maXbox Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --primary: #2563eb;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --tp-bg: #dcfce7;
+            --tp-border: #16a34a;
+            --tn-bg: #e0f2fe;
+            --tn-border: #0284c7;
+            --fp-bg: #fef3c7;
+            --fp-border: #d97706;
+            --fn-bg: #fee2e2;
+            --fn-border: #dc2626;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 24px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            padding: 32px;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: var(--text-main);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 12px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #f1f5f9;
+        }
+
+        .control-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .matrix-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: 100px 120px 120px;
+            grid-template-rows: auto 120px 120px;
+            gap: 8px;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .cell {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            padding: 8px;
+        }
+
+        .cell-header {
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .cell-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 4px 0;
+        }
+
+        .cell-label {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        .tp { background: var(--tp-bg); border-color: var(--tp-border); color: #14532d; }
+        .fn { background: var(--fn-bg); border-color: var(--fn-border); color: #7f1d1d; }
+        .fp { background: var(--fp-bg); border-color: var(--fp-border); color: #78350f; }
+        .tn { background: var(--tn-bg); border-color: var(--tn-border); color: #0c4a6e; }
+
+        .metrics-section {
+            margin-top: 32px;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .metric-card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .metric-name {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 6px 0;
+        }
+
+        .metric-formula {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>2x2 Social Recognition Confusion Matrix Dashboard of maXbox5</h1>
+
+    <div class="layout">
+        <!-- Interactive Sliders -->
+        <div class="controls">
+            <h3>Adjust Counts</h3>
+            
+            <div class="control-group">
+                <div class="control-header">
+                    <span>True Positives (TP - Known & Correct)</span>
+                    <span id="tp-val">3</span>
+                </div>
+                <input type="range" id="tp" min="0" max="30" value="3">
+            </div>
+
+            <div class="control-group">
+                <div class="control-header">
+                    <span>False Negatives (FN - Known & Missed)</span>
+                    <span id="fn-val">2</span>
+                </div>
+                <input type="range" id="fn" min="0" max="30" value="2">
+            </div>
+
+            <div class="control-group">
+                <div class="control-header">
+                    <span>False Positives (FP - Unknown & Confused)</span>
+                    <span id="fp-val">1</span>
+                </div>
+                <input type="range" id="fp" min="0" max="30" value="1">
+            </div>
+
+            <div class="control-group">
+                <div class="control-header">
+                    <span>True Negatives (TN - Unknown & Correct)</span>
+                    <span id="tn-val">3</span>
+                </div>
+                <input type="range" id="tn" min="0" max="30" value="3">
+            </div>
+        </div>
+
+        <!-- Matrix Display Grid -->
+        <div class="matrix-container">
+            <h3>Confusion Matrix Layout</h3>
+            <div class="matrix-grid">
+                <div></div>
+                <div class="cell cell-header">Pred: Known</div>
+                <div class="cell cell-header">Pred: Unknown</div>
+
+                <div class="cell cell-header" style="justify-content: center;">Actual: Known</div>
+                <div class="cell tp">
+                    <div class="cell-value" id="cell-tp">3</div>
+                    <div class="cell-label">True Positive</div>
+                </div>
+                <div class="cell fn">
+                    <div class="cell-value" id="cell-fn">2</div>
+                    <div class="cell-label">False Negative</div>
+                </div>
+
+                <div class="cell cell-header" style="justify-content: center;">Actual: Unknown</div>
+                <div class="cell fp">
+                    <div class="cell-value" id="cell-fp">1</div>
+                    <div class="cell-label">False Positive</div>
+                </div>
+                <div class="cell tn">
+                    <div class="cell-value" id="cell-tn">3</div>
+                    <div class="cell-label">True Negative</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Metrics Section -->
+    <div class="metrics-section">
+        <h3>Calculated Metrics</h3>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-name">Accuracy</div>
+                <div class="metric-value" id="metric-acc">66.7%</div>
+                <div class="metric-formula">(TP + TN) / Total</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-name">Precision</div>
+                <div class="metric-value" id="metric-prec">75.0%</div>
+                <div class="metric-formula">TP / (TP + FP)</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-name">Recall / Sensitivity</div>
+                <div class="metric-value" id="metric-rec">60.0%</div>
+                <div class="metric-formula">TP / (TP + FN)</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-name">Specificity</div>
+                <div class="metric-value" id="metric-spec">75.0%</div>
+                <div class="metric-formula">TN / (TN + FP)</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-name">F1-Score</div>
+                <div class="metric-value" id="metric-f1">66.7%</div>
+                <div class="metric-formula">2 · (P · R) / (P + R)</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const tpInput = document.getElementById('tp');
+    const fnInput = document.getElementById('fn');
+    const fpInput = document.getElementById('fp');
+    const tnInput = document.getElementById('tn');
+
+    function updateDashboard() {
+        const tp = parseInt(tpInput.value) || 0;
+        const fn = parseInt(fnInput.value) || 0;
+        const fp = parseInt(fpInput.value) || 0;
+        const tn = parseInt(tnInput.value) || 0;
+
+        // Update Slider Label Displays
+        document.getElementById('tp-val').innerText = tp;
+        document.getElementById('fn-val').innerText = fn;
+        document.getElementById('fp-val').innerText = fp;
+        document.getElementById('tn-val').innerText = tn;
+
+        // Update Matrix Cell Display Values
+        document.getElementById('cell-tp').innerText = tp;
+        document.getElementById('cell-fn').innerText = fn;
+        document.getElementById('cell-fp').innerText = fp;
+        document.getElementById('cell-tn').innerText = tn;
+
+        const total = tp + fn + fp + tn;
+
+        // Metric Calculations with Division-by-Zero Guards
+        const acc = total > 0 ? ((tp + tn) / total) * 100 : 0;
+        const prec = (tp + fp) > 0 ? (tp / (tp + fp)) * 100 : 0;
+        const rec = (tp + fn) > 0 ? (tp / (tp + fn)) * 100 : 0;
+        const spec = (tn + fp) > 0 ? (tn / (tn + fp)) * 100 : 0;
+        const f1 = (prec + rec) > 0 ? (2 * prec * rec) / (prec + rec) : 0;
+
+        // Update Dashboard Text
+        document.getElementById('metric-acc').innerText = acc.toFixed(1) + '%';
+        document.getElementById('metric-prec').innerText = prec.toFixed(1) + '%';
+        document.getElementById('metric-rec').innerText = rec.toFixed(1) + '%';
+        document.getElementById('metric-spec').innerText = spec.toFixed(1) + '%';
+        document.getElementById('metric-f1').innerText = f1.toFixed(1) + '%';
+    }
+
+    // Attach Event Listeners
+    [tpInput, fnInput, fpInput, tnInput].forEach(element => {
+        element.addEventListener('input', updateDashboard);
+    });
+
+    // Initial Execution
+    updateDashboard();
+</script>
+
+</body>
+</html>
