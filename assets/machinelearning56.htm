@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3x3 Wine Dataset Confusion maXbox Matrix Dashboard (Version 3)</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-wine: #be123c;
+            --accent-wine-light: #fda4af;
+            --cell-empty: #334155;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 24px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            padding: 32px;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 1.6rem;
+            color: #fb7185;
+            border-bottom: 2px solid var(--card-border);
+            padding-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: normal;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 28px;
+            margin-top: 24px;
+        }
+
+        @media (max-width: 850px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            background: #0f172a;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .control-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--text-main);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+            accent-color: var(--accent-wine);
+        }
+
+        .btn-action {
+            background: linear-gradient(135deg, #e11d48, #9f1239);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(225, 29, 72, 0.3);
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(225, 29, 72, 0.5);
+        }
+
+        .matrix-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .matrix-header-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: 110px repeat(3, 110px);
+            grid-template-rows: auto repeat(3, 90px);
+            gap: 8px;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .cell {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            border: 1px solid var(--card-border);
+            padding: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .cell-header {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .cell-value {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin: 2px 0;
+        }
+
+        .metrics-section {
+            margin-top: 32px;
+            border-top: 1px solid var(--card-border);
+            padding-top: 24px;
+        }
+
+        .accuracy-badge {
+            background: #881337;
+            color: #ffe4e6;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .metric-card {
+            background: #0f172a;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .metric-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #fb7185;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin: 6px 0;
+            color: var(--text-muted);
+        }
+
+        .metric-row span:last-child {
+            font-weight: 700;
+            color: var(--text-main);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>
+        <span>🍷 3x3 Wine Confusion Matrix maXbox Studio</span>
+        <span class="accuracy-badge" id="overall-acc">Overall Accuracy: 0.00%</span>
+    </h1>
+    <div class="subtitle">Interactive Sample Sizes & Probabilistic ML Evaluation Engine (Version 3)</div>
+
+    <div class="layout">
+        <!-- Controls Side -->
+        <div class="controls">
+            <h3 style="margin: 0 0 10px 0; font-size: 1.05rem;">Class Sample Sizes</h3>
+
+            <div class="control-group">
+                <div class="control-header">
+                    <span>Barolo (Class 0) Count</span>
+                    <span id="n0-val" style="color:#fb7185;">18</span>
+                </div>
+                <input type="range" id="trk-n0" min="5" max="50" value="18">
+            </div>
+
+            <div class="control-group">
+                <div class="control-header">
+                    <span>Grignolino (Class 1) Count</span>
+                    <span id="n1-val" style="color:#fb7185;">21</span>
+                </div>
+                <input type="range" id="trk-n1" min="5" max="50" value="21">
+            </div>
+
+            <div class="control-group">
+                <div class="control-header">
+                    <span>Barbera (Class 2) Count</span>
+                    <span id="n2-val" style="color:#fb7185;">15</span>
+                </div>
+                <input type="range" id="trk-n2" min="5" max="50" value="15">
+            </div>
+
+            <button class="btn-action" id="btn-resimulate">🎲 Re-Simulate & Render</button>
+        </div>
+
+        <!-- Matrix Display Grid -->
+        <div class="matrix-container">
+            <div class="matrix-header-title">PREDICTED WINE CULTIVAR</div>
+            <div class="matrix-grid">
+                <div></div>
+                <div class="cell cell-header">Barolo (C0)</div>
+                <div class="cell cell-header">Grignolino (C1)</div>
+                <div class="cell cell-header">Barbera (C2)</div>
+
+                <div class="cell cell-header" style="justify-content: center; text-align: left; font-weight:700; color:#fb7185;">ACTUAL:<br>Barolo (C0)</div>
+                <div class="cell" id="c00"><div class="cell-value" id="v00">0</div></div>
+                <div class="cell" id="c01"><div class="cell-value" id="v01">0</div></div>
+                <div class="cell" id="c02"><div class="cell-value" id="v02">0</div></div>
+
+                <div class="cell cell-header" style="justify-content: center; text-align: left; font-weight:700; color:#fb7185;">ACTUAL:<br>Grignolino (C1)</div>
+                <div class="cell" id="c10"><div class="cell-value" id="v10">0</div></div>
+                <div class="cell" id="c11"><div class="cell-value" id="v11">0</div></div>
+                <div class="cell" id="c12"><div class="cell-value" id="v12">0</div></div>
+
+                <div class="cell cell-header" style="justify-content: center; text-align: left; font-weight:700; color:#fb7185;">ACTUAL:<br>Barbera (C2)</div>
+                <div class="cell" id="c20"><div class="cell-value" id="v20">0</div></div>
+                <div class="cell" id="c21"><div class="cell-value" id="v21">0</div></div>
+                <div class="cell" id="c22"><div class="cell-value" id="v22">0</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Per-Cultivar Performance Metrics -->
+    <div class="metrics-section">
+        <h3 style="margin-top:0; font-size: 1.1rem;">Per-Cultivar Evaluation Metrics</h3>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-title">Barolo (Class 0)</div>
+                <div class="metric-row"><span>Precision:</span><span id="m0-prec">0.00%</span></div>
+                <div class="metric-row"><span>Recall:</span><span id="m0-rec">0.00%</span></div>
+                <div class="metric-row"><span>F1-Score:</span><span id="m0-f1">0.00%</span></div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-title">Grignolino (Class 1)</div>
+                <div class="metric-row"><span>Precision:</span><span id="m1-prec">0.00%</span></div>
+                <div class="metric-row"><span>Recall:</span><span id="m1-rec">0.00%</span></div>
+                <div class="metric-row"><span>F1-Score:</span><span id="m1-f1">0.00%</span></div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-title">Barbera (Class 2)</div>
+                <div class="metric-row"><span>Precision:</span><span id="m2-prec">0.00%</span></div>
+                <div class="metric-row"><span>Recall:</span><span id="m2-rec">0.00%</span></div>
+                <div class="metric-row"><span>F1-Score:</span><span id="m2-f1">0.00%</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const trkN0 = document.getElementById('trk-n0');
+    const trkN1 = document.getElementById('trk-n1');
+    const trkN2 = document.getElementById('trk-n2');
+    const btnResimulate = document.getElementById('btn-resimulate');
+
+    function simulateAndRender() {
+        const n0 = parseInt(trkN0.value);
+        const n1 = parseInt(trkN1.value);
+        const n2 = parseInt(trkN2.value);
+
+        document.getElementById('n0-val').innerText = n0;
+        document.getElementById('n1-val').innerText = n1;
+        document.getElementById('n2-val').innerText = n2;
+
+        // Initialize 3x3 Confusion Matrix
+        let CM = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+        let correct = 0;
+        const total = n0 + n1 + n2;
+
+        // Simulate Barolo (C0) predictions (~92% accuracy)
+        for (let i = 0; i < n0; i++) {
+            let rand = Math.random() * 100;
+            let pred = (rand < 92) ? 0 : (rand < 97 ? 1 : 2);
+            CM[0][pred]++;
+            if (pred === 0) correct++;
+        }
+
+        // Simulate Grignolino (C1) predictions (~88% accuracy)
+        for (let i = 0; i < n1; i++) {
+            let rand = Math.random() * 100;
+            let pred = (rand < 88) ? 1 : (rand < 95 ? 2 : 0);
+            CM[1][pred]++;
+            if (pred === 1) correct++;
+        }
+
+        // Simulate Barbera (C2) predictions (~90% accuracy)
+        for (let i = 0; i < n2; i++) {
+            let rand = Math.random() * 100;
+            let pred = (rand < 90) ? 2 : (rand < 97 ? 1 : 0);
+            CM[2][pred]++;
+            if (pred === 2) correct++;
+        }
+
+        // Calculate max cell value for dynamic heatmap shading
+        let maxVal = 1;
+        for (let r = 0; r < 3; r++) {
+            for (let c = 0; c < 3; c++) {
+                if (CM[r][c] > maxVal) maxVal = CM[r][c];
+            }
+        }
+
+        // Update Matrix Cells with Burgundy Theme Shading
+        for (let r = 0; r < 3; r++) {
+            for (let c = 0; c < 3; c++) {
+                let count = CM[r][c];
+                document.getElementById(`v${r}${c}`).innerText = count;
+
+                let cellEl = document.getElementById(`c${r}${c}`);
+                let alpha = (count / maxVal) * 0.85;
+                
+                if (count === 0) {
+                    cellEl.style.backgroundColor = '#1e293b';
+                    cellEl.style.color = '#64748b';
+                } else if (r === c) {
+                    // Diagonal (Correct classification)
+                    cellEl.style.backgroundColor = `rgba(190, 18, 60, ${Math.max(alpha, 0.25)})`;
+                    cellEl.style.color = '#ffffff';
+                } else {
+                    // Off-diagonal (Misclassifications)
+                    cellEl.style.backgroundColor = `rgba(217, 119, 6, ${Math.max(alpha, 0.25)})`;
+                    cellEl.style.color = '#fef3c7';
+                }
+            }
+        }
+
+        // Calculate Overall Accuracy
+        const overallAcc = total > 0 ? (correct / total) * 100 : 0;
+        document.getElementById('overall-acc').innerText = `Overall Accuracy: ${overallAcc.toFixed(2)}% (${correct}/${total})`;
+
+        // Calculate Per-Class Metrics
+        for (let i = 0; i < 3; i++) {
+            let rowSum = CM[i][0] + CM[i][1] + CM[i][2]; // Actuals
+            let colSum = CM[0][i] + CM[1][i] + CM[2][i]; // Predictions
+
+            let prec = colSum > 0 ? (CM[i][i] / colSum) * 100 : 0;
+            let rec = rowSum > 0 ? (CM[i][i] / rowSum) * 100 : 0;
+            let f1 = (prec + rec) > 0 ? (2 * prec * rec) / (prec + rec) : 0;
+
+            document.getElementById(`m${i}-prec`).innerText = prec.toFixed(2) + '%';
+            document.getElementById(`m${i}-rec`).innerText = rec.toFixed(2) + '%';
+            document.getElementById(`m${i}-f1`).innerText = f1.toFixed(2) + '%';
+        }
+    }
+
+    // Attach Event Listeners
+    [trkN0, trkN1, trkN2].forEach(elem => elem.addEventListener('input', simulateAndRender));
+    btnResimulate.addEventListener('click', simulateAndRender);
+
+    // Initial Execution
+    simulateAndRender();
+</script>
+
+</body>
+</html>
