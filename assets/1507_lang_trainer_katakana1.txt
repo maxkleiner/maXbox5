@@ -1,0 +1,541 @@
+//program Language_Trainer;
+program Katakana_Language_Trainer_Studio1;
+
+//// Draws a colorful, symmetrical butterfly on a GUI TImage canvas natively in Object Pascal
+// Uses explicit UCS/Unicode 16-bit hex literals (#$30A2, etc.) for robust cross-locale rendering
+// maXbox5 / maXboxScript: Japanese Katakana Vocabulary & Character Trainer - fix format unicode
+// Interactive maXbox GUI program for learning Japanese Katakana signs, pronunciations, and loanword vocabulary
+
+//https://rosettacode.org/wiki/Commatizing_numbers#Delphi
+//{$IFDEF Lazarus}
+//  {$APPTYPE CONSOLE} 🦋 ⛩️ Katakana Example ⛩️ ア 🦋 🖼️ 📥 ⚙️ 🖥️ 🌐 🧠 🎯 🎨  for Tutor 205
+//{/$ENDIF}
+//https://apilayer.com/marketplace/image_to_text-api?txn=free&e=Sign%20Up&l=Success&live_demo=show
+//ToDo: add unicode symbols instad of nacked numbers - we use wingdings instead  - new btn, offset 
+
+function HasAlphaDigits(W: integer): boolean;
+{test if number has A..F in one or more of the digits}
+{Only works for numbers up to 9FF or 2559}
+begin
+Result:=((W and $000F) in [$000A,$000B,$000C,$000D,$000E,$000F]) or
+   ((W and $00F0) in [$00A0,$00B0,$00C0,$00D0,$00E0,$00F0]);
+end;
+
+const
+  TOTAL_ITEMS = 46;
+
+var
+  Form1: TForm;
+  LblTitle, LblKatakana, LblGroup, LblResult, LblScore, LblPrompt: TLabel;
+  EdtAnswer: TEdit;
+  BtnCheck, BtnNext, BtnHint, BtnReset: TButton;
+  MemoLog: TMemo;
+
+  Symbols, Romaji, Groups, Hints: array[0..45] of string;
+  HexCodes: array[0..45] of string;
+  CurrentIdx, TotalAttempts, CorrectCount: Integer;
+  IsChecked: Boolean;
+
+procedure InitKatakanaDataset;
+begin
+  // Vowels (A-row)
+  Symbols[0] := #$30A2; {'ア'}; Romaji[0]:= 'a';  Groups[0]:= 'Vowels (A-row)'; Hints[0]:= 'Vocab: America (アメリカ / amerika)';
+  Symbols[1]:= 'イ'; Romaji[1]:= 'i';  Groups[1]:= 'Vowels (A-row)'; Hints[1]:= 'Vocab: India (インド / indo)';
+  Symbols[2]:= 'ウ'; Romaji[2]:= 'u';  Groups[2]:= 'Vowels (A-row)'; Hints[2]:= 'Vocab: Vector (ベクトル / beku-toru)';
+  Symbols[3]:= 'エ'; Romaji[3]:= 'e';  Groups[3]:= 'Vowels (A-row)'; Hints[3]:= 'Vocab: Energy (エネルギ / enerugi)';
+  Symbols[4]:= 'オ'; Romaji[4]:= 'o';  Groups[4]:= 'Vowels (A-row)'; Hints[4]:= 'Vocab: Orange (オレンジ / orenji)';
+
+  // Ka-row
+  Symbols[5]:= 'カ'; Romaji[5]:= 'ka'; Groups[5]:= 'K-Group (Ka-row)'; Hints[5]:= 'Vocab: Camera (カメラ / kamera)';
+  Symbols[6]:= 'キ'; Romaji[6]:= 'ki'; Groups[6]:= 'K-Group (Ka-row)'; Hints[6]:= 'Vocab: King (キング / kingu)';
+  Symbols[7]:= 'ク'; Romaji[7]:= 'ku'; Groups[7]:= 'K-Group (Ka-row)'; Hints[7]:= 'Vocab: Class (クラス / kurasu)';
+  Symbols[8]:= 'ケ'; Romaji[8]:= 'ke'; Groups[8]:= 'K-Group (Ka-row)'; Hints[8]:= 'Vocab: Cake (ケーキ / keeki)';
+  Symbols[9]:= 'コ'; Romaji[9]:= 'ko'; Groups[9]:= 'K-Group (Ka-row)'; Hints[9]:= 'Vocab: Coffee (コーヒー / koohii)';
+
+  // Sa-row
+  Symbols[10]:= 'サ'; Romaji[10]:= 'sa'; Groups[10]:= 'S-Group (Sa-row)'; Hints[10]:= 'Vocab: Salad (サラダ / sarada)';
+  Symbols[11]:= 'シ'; Romaji[11]:= 'shi'; Groups[11]:= 'S-Group (Sa-row)'; Hints[11]:= 'Vocab: Shirt (シャツ / shatsu)';
+  Symbols[12]:= 'ス'; Romaji[12]:= 'su'; Groups[12]:= 'S-Group (Sa-row)'; Hints[12]:= 'Vocab: Sports (スポーツ / supootsu)';
+  Symbols[13]:= 'セ'; Romaji[13]:= 'se'; Groups[13]:= 'S-Group (Sa-row)'; Hints[13]:= 'Vocab: Center (センター / sentaa)';
+  Symbols[14]:= 'ソ'; Romaji[14]:= 'so'; Groups[14]:= 'S-Group (Sa-row)'; Hints[14]:= 'Vocab: Sofa (ソファー / sofaa)';
+
+  // Ta-row
+  Symbols[15]:= 'タ'; Romaji[15]:= 'ta'; Groups[15]:= 'T-Group (Ta-row)'; Hints[15]:= 'Vocab: Taxi (タクシー / takushii)';
+  Symbols[16]:= 'チ'; Romaji[16]:= 'chi'; Groups[16]:= 'T-Group (Ta-row)'; Hints[16]:= 'Vocab: Team (チーム / chiimu)';
+  Symbols[17]:= 'ツ'; Romaji[17]:= 'tsu'; Groups[17]:= 'T-Group (Ta-row)'; Hints[17]:= 'Vocab: Tour (ツアー / tsuaa)';
+  Symbols[18]:= 'テ'; Romaji[18]:= 'te'; Groups[18]:= 'T-Group (Ta-row)'; Hints[18]:= 'Vocab: Tennis (テニス / tenisus)';
+  Symbols[19]:= 'ト'; Romaji[19]:= 'to'; Groups[19]:= 'T-Group (Ta-row)'; Hints[19]:= 'Vocab: Tomato (トマト / tomato)';
+
+  // Na-row
+  Symbols[20]:= 'ナ'; Romaji[20]:= 'na'; Groups[20]:= 'N-Group (Na-row)'; Hints[20]:= 'Vocab: Knife (ナイフ / naifu)';
+  Symbols[21]:= 'ニ'; Romaji[21]:= 'ni'; Groups[21]:= 'N-Group (Na-row)'; Hints[21]:= 'Vocab: News (ニュース / nyuusu)';
+  Symbols[22]:= 'ヌ'; Romaji[22]:= 'nu'; Groups[22]:= 'N-Group (Na-row)'; Hints[22]:= 'Vocab: Noodle (ヌードル / nuudoru)';
+  Symbols[23]:= 'ネ'; Romaji[23]:= 'ne'; Groups[23]:= 'N-Group (Na-row)'; Hints[23]:= 'Vocab: Necktie (ネクタイ / nekutai)';
+  Symbols[24]:= 'ノ'; Romaji[24]:= 'no'; Groups[24]:= 'N-Group (Na-row)'; Hints[24]:= 'Vocab: Note (ノート / nooto)';
+end;
+
+procedure InitKatakanaDataset2;
+  // Vowels (A-row)
+ begin
+  // Vowels (A-row)
+  Symbols[0]:= #$30A2; HexCodes[0]:= '30A2'; Romaji[0]:= 'a';  Groups[0]:= 'Vowels (A-row)'; Hints[0]:= 'Vocab: America ('#$30A2#$30E1#$30EA#$30AB' / amerika)';  //アメリカ
+  Symbols[1]:= #$30A4; HexCodes[1]:= '30A4'; Romaji[1]:= 'i';  Groups[1]:= 'Vowels (A-row)'; Hints[1]:= 'Vocab: India (indo)';
+  Symbols[2]:= #$30A6; HexCodes[2]:= '30A6'; Romaji[2]:= 'u';  Groups[2]:= 'Vowels (A-row)'; Hints[2]:= 'Vocab: Vector (beku-toru)';
+  Symbols[3]:= #$30A8; HexCodes[3]:= '30A8'; Romaji[3]:= 'e';  Groups[3]:= 'Vowels (A-row)'; Hints[3]:= 'Vocab: Energy (enerugi)';
+  Symbols[4]:= #$30AA; HexCodes[4]:= '30AA'; Romaji[4]:= 'o';  Groups[4]:= 'Vowels (A-row)'; Hints[4]:= 'Vocab: Orange (orenji)';
+
+  // Ka-row
+  Symbols[5]:= #$30AB; HexCodes[5]:= '30AB'; Romaji[5]:= 'ka'; Groups[5]:= 'K-Group (Ka-row)'; Hints[5]:= 'Vocab: Camera (kamera)';
+  Symbols[6]:= #$30AD; HexCodes[6]:= '30AD'; Romaji[6]:= 'ki'; Groups[6]:= 'K-Group (Ka-row)'; Hints[6]:= 'Vocab: King (kingu)';
+  Symbols[7]:= #$30AF; HexCodes[7]:= '30AF'; Romaji[7]:= 'ku'; Groups[7]:= 'K-Group (Ka-row)'; Hints[7]:= 'Vocab: Class (kurasu)';
+  Symbols[8]:= #$30B1; HexCodes[8]:= '30B1'; Romaji[8]:= 'ke'; Groups[8]:= 'K-Group (Ka-row)'; Hints[8]:= 'Vocab: Cake (keeki)';
+  Symbols[9]:= #$30B3; HexCodes[9]:= '30B3'; Romaji[9]:= 'ko'; Groups[9]:= 'K-Group (Ka-row)'; Hints[9]:= 'Vocab: Coffee (koohii)';
+
+  // Sa-row
+  Symbols[10]:= #$30B5; HexCodes[10]:= '30B5'; Romaji[10]:= 'sa'; Groups[10]:= 'S-Group (Sa-row)'; Hints[10]:= 'Vocab: Salad (sarada)';
+  Symbols[11]:= #$30B7; HexCodes[11]:= '30B7'; Romaji[11]:= 'shi'; Groups[11]:= 'S-Group (Sa-row)'; Hints[11]:= 'Vocab: Shirt (shatsu)';
+  Symbols[12]:= #$30B9; HexCodes[12]:= '30B9'; Romaji[12]:= 'su'; Groups[12]:= 'S-Group (Sa-row)'; Hints[12]:= 'Vocab: Sports ('#$30B9'pootsu)';
+  Symbols[13]:= #$30BB; HexCodes[13]:= '30BB'; Romaji[13]:= 'se'; Groups[13]:= 'S-Group (Sa-row)'; Hints[13]:= 'Vocab: Center (sentaa)';
+  Symbols[14]:= #$30BD; HexCodes[14]:= '30BD'; Romaji[14]:= 'so'; Groups[14]:= 'S-Group (Sa-row)'; Hints[14]:= 'Vocab: Sofa (sofaa)';
+
+  // Ta-row
+  Symbols[15]:= #$30BF; HexCodes[15]:= '30BF'; Romaji[15]:= 'ta'; Groups[15]:= 'T-Group (Ta-row)'; Hints[15]:= 'Vocab: Taxi (takushii)';
+  Symbols[16]:= #$30C1; HexCodes[16]:= '30C1'; Romaji[16]:= 'chi'; Groups[16]:= 'T-Group (Ta-row)'; Hints[16]:= 'Vocab: Team (chiimu)';
+  Symbols[17]:= #$30C4; HexCodes[17]:= '30C4'; Romaji[17]:= 'tsu'; Groups[17]:= 'T-Group (Ta-row)'; Hints[17]:= 'Vocab: Tour (tsuaa)';
+  Symbols[18]:= #$30C6; HexCodes[18]:= '30C6'; Romaji[18]:= 'te'; Groups[18]:= 'T-Group (Ta-row)'; Hints[18]:= 'Vocab: Tennis (tenisu)';
+  Symbols[19]:= #$30C8; HexCodes[19]:= '30C8'; Romaji[19]:= 'to'; Groups[19]:= 'T-Group (Ta-row)'; Hints[19]:= 'Vocab: Tomato (tomato)';
+
+  // Na-row
+  Symbols[20]:= #$30CA; HexCodes[20]:= '30CA'; Romaji[20]:= 'na'; Groups[20]:= 'N-Group (Na-row)'; Hints[20]:= 'Vocab: Knife (naifu)';
+  Symbols[21]:= #$30CB; HexCodes[21]:= '30CB'; Romaji[21]:= 'ni'; Groups[21]:= 'N-Group (Na-row)'; Hints[21]:= 'Vocab: News (nyuusu)';
+  Symbols[22]:= #$30CC; HexCodes[22]:= '30CC'; Romaji[22]:= 'nu'; Groups[22]:= 'N-Group (Na-row)'; Hints[22]:= 'Vocab: Noodle (nuudoru)';
+  Symbols[23]:= #$30CD; HexCodes[23]:= '30CD'; Romaji[23]:= 'ne'; Groups[23]:= 'N-Group (Na-row)'; Hints[23]:= 'Vocab: Necktie (nekutai)';
+  Symbols[24]:= #$30CE; HexCodes[24]:= '30CE'; Romaji[24]:= 'no'; Groups[24]:= 'N-Group (Na-row)'; Hints[24]:= 'Vocab: Note (nooto)';
+  //Ha-row
+  Symbols[25] := #$30CF; HexCodes[25]:= '30CF'; Romaji[25]:= 'ha'; Groups[25]:= 'H-Group (Ha-row)'; Hints[25]:= 'Vocab: Ham (ハム / hamu)';
+  Symbols[26]:= #$30D2; HexCodes[26]:= '30D2'; Romaji[26]:= 'hi'; Groups[26]:= 'H-Group (Ha-row)'; Hints[26]:= 'Vocab: Hero (ヒロー / hiroo)';
+  Symbols[27]:= #$30D5; HexCodes[27]:= '30D5'; Romaji[27]:= 'fu'; Groups[27]:= 'H-Group (Ha-row)'; Hints[27]:= 'Vocab: Fork (フォーク / fooku)';
+  Symbols[28]:= #$30D8; HexCodes[28]:= '30D8'; Romaji[28]:= 'he'; Groups[28]:= 'H-Group (Ha-row)'; Hints[28]:= 'Vocab: Helicopter (ヘリコプター / herikoputaa)';
+  Symbols[29]:= #$30DB; HexCodes[29]:= '30DB'; Romaji[29]:= 'ho'; Groups[29]:= 'H-Group (Ha-row)'; Hints[29]:= 'Vocab: Hotel (ホテル / hoteru)';
+  //MA-row
+  Symbols[30]:= #$30DE; HexCodes[30]:= '30DE'; Romaji[30]:= 'ma'; Groups[30]:= 'M-Group (Ma-row)'; Hints[30]:= 'Vocab: Mask (マスク / masuku)';
+  Symbols[31]:= #$30DF; HexCodes[31]:= '30DF'; Romaji[31]:= 'mi'; Groups[31]:= 'M-Group (Ma-row)'; Hints[31]:= 'Vocab: Milk (ミルク / miruku)';
+  Symbols[32]:= #$30E0; HexCodes[32]:= '30E0'; Romaji[32]:= 'mu'; Groups[32]:= 'M-Group (Ma-row)'; Hints[32]:= 'Vocab: Music (ミュージック / myuujikku)';
+  Symbols[33]:= #$30E1; HexCodes[33]:= '30E1'; Romaji[33]:= 'me'; Groups[33]:= 'M-Group (Ma-row)'; Hints[33]:= 'Vocab: Menu (メニュー / menyuu)';
+  Symbols[34]:= #$30E2; HexCodes[34]:= '30E2'; Romaji[34]:= 'mo'; Groups[34]:= 'M-Group (Ma-row)'; Hints[34]:= 'Vocab: Monitor (モニター / monitaa)';
+  //YA+RA-row
+  Symbols[35]:= #$30E4; HexCodes[35]:= '30E4'; Romaji[35]:= 'ya'; Groups[35]:= 'Y-Group (Ya-row)'; Hints[35]:= 'Vocab: Yahoo (ヤフー / yafuu)';
+  Symbols[36]:= #$30E6; HexCodes[36]:= '30E6'; Romaji[36]:= 'yu'; Groups[36]:= 'Y-Group (Ya-row)'; Hints[36]:= 'Vocab: User (ユーザー / yuuzaa)';
+  Symbols[37]:= #$30E8; HexCodes[37]:= '30E8'; Romaji[37]:= 'yo'; Groups[37]:= 'Y-Group (Ya-row)'; Hints[37]:= 'Vocab: Yogurt (ヨーグルト / yooguruto)';
+  Symbols[38]:= #$30E9; HexCodes[38]:= '30E9'; Romaji[38]:= 'ra'; Groups[38]:= 'R-Group (Ra-row)'; Hints[38]:= 'Vocab: Radio (ラジオ / rajio)';
+  Symbols[39]:= #$30EA; HexCodes[39]:= '30EA'; Romaji[39]:= 'ri'; Groups[39]:= 'R-Group (Ra-row)'; Hints[39]:= 'Vocab: Ribbon (リボン / ribon)';
+  Symbols[40]:= #$30EB; HexCodes[40]:= '30EB'; Romaji[40]:= 'ru'; Groups[40]:= 'R-Group (Ra-row)'; Hints[40]:= 'Vocab: Rule (ルール / ruuru)';
+  Symbols[41]:= #$30EC; HexCodes[41]:= '30EC'; Romaji[41]:= 're'; Groups[41]:= 'R-Group (Ra-row)'; Hints[41]:= 'Vocab: Lemon (レモン / remon)';
+  Symbols[42]:= #$30ED; HexCodes[42]:= '30ED'; Romaji[42]:= 'ro'; Groups[42]:= 'R-Group (Ra-row)'; Hints[42]:= 'Vocab: Robot (ロボット / robotto)';
+  Symbols[43]:= #$30EF; HexCodes[43]:= '30EF'; Romaji[43]:= 'wa'; Groups[43]:= 'W-Group (Wa-row)'; Hints[43]:= 'Vocab: Wine (ワイン / wain)';
+  Symbols[44]:= #$30F2; HexCodes[44]:= '30F2'; Romaji[44]:= 'wo'; Groups[44]:= 'W-Group (Wa-row)'; Hints[44]:= 'Vocab: Particle Wo (ヲ)';
+  Symbols[45]:= #$30F3; HexCodes[45]:= '30F3'; Romaji[45]:= 'n'; Groups[45]:= 'N-Singular'; Hints[45]:= 'Vocab: Pan / Bread (パン / pan)';
+
+ end;
+ 
+procedure InitKatakanaDataset3;
+begin
+  Symbols[0] := #$30A2; HexCodes[0]:= '30A2'; Romaji[0]:= 'a'; Groups[0]:= 'Vowels (A-row)'; Hints[0]:= 'Vocab: America ('#$30A2#$30E1#$30EA#$30AB' / amerika)';
+  Symbols[1]:= #$30A4; HexCodes[1]:= '30A4'; Romaji[1]:= 'i'; Groups[1]:= 'Vowels (A-row)'; Hints[1]:= 'Vocab: India ('#$30A4#$30F3#$30C9' / indo)';
+  Symbols[2]:= #$30A6; HexCodes[2]:= '30A6'; Romaji[2]:= 'u'; Groups[2]:= 'Vowels (A-row)'; Hints[2]:= 'Vocab: Vector ('#$30D9#$30AF#$30C8#$30EB' / beku-toru)';
+  Symbols[3]:= #$30A8; HexCodes[3]:= '30A8'; Romaji[3]:= 'e'; Groups[3]:= 'Vowels (A-row)'; Hints[3]:= 'Vocab: Energy ('#$30A8#$30CD#$30EB#$30AE' / enerugi)';
+  Symbols[4]:= #$30AA; HexCodes[4]:= '30AA'; Romaji[4]:= 'o'; Groups[4]:= 'Vowels (A-row)'; Hints[4]:= 'Vocab: Orange ('#$30AA#$30EC#$30F3#$30B8' / orenji)';
+  Symbols[5]:= #$30AB; HexCodes[5]:= '30AB'; Romaji[5]:= 'ka'; Groups[5]:= 'K-Group (Ka-row)'; Hints[5]:= 'Vocab: Camera ('#$30AB#$30E1#$30E9' / kamera)';
+  Symbols[6]:= #$30AD; HexCodes[6]:= '30AD'; Romaji[6]:= 'ki'; Groups[6]:= 'K-Group (Ka-row)'; Hints[6]:= 'Vocab: King ('#$30AD#$30F3#$30B0' / kingu)';
+  Symbols[7]:= #$30AF; HexCodes[7]:= '30AF'; Romaji[7]:= 'ku'; Groups[7]:= 'K-Group (Ka-row)'; Hints[7]:= 'Vocab: Class ('#$30AF#$30E9#$30B9' / kurasu)';
+  Symbols[8]:= #$30B1; HexCodes[8]:= '30B1'; Romaji[8]:= 'ke'; Groups[8]:= 'K-Group (Ka-row)'; Hints[8]:= 'Vocab: Cake ('#$30B1#$30FC#$30AD' / keeki)';
+  Symbols[9]:= #$30B3; HexCodes[9]:= '30B3'; Romaji[9]:= 'ko'; Groups[9]:= 'K-Group (Ka-row)'; Hints[9]:= 'Vocab: Coffee ('#$30B3#$30FC#$30D2#$30FC' / koohii)';
+  Symbols[10]:= #$30B5; HexCodes[10]:= '30B5'; Romaji[10]:= 'sa'; Groups[10]:= 'S-Group (Sa-row)'; Hints[10]:= 'Vocab: Salad ('#$30B5#$30E9#$30C0' / sarada)';
+  Symbols[11]:= #$30B7; HexCodes[11]:= '30B7'; Romaji[11]:= 'shi'; Groups[11]:= 'S-Group (Sa-row)'; Hints[11]:= 'Vocab: Shirt ('#$30B7#$30E3#$30C4' / shatsu)';
+  Symbols[12]:= #$30B9; HexCodes[12]:= '30B9'; Romaji[12]:= 'su'; Groups[12]:= 'S-Group (Sa-row)'; Hints[12]:= 'Vocab: Sports ('#$30B9#$30DD#$30FC#$30C4' / supootsu)';
+  Symbols[13]:= #$30BB; HexCodes[13]:= '30BB'; Romaji[13]:= 'se'; Groups[13]:= 'S-Group (Sa-row)'; Hints[13]:= 'Vocab: Center ('#$30BB#$30F3#$30BF#$30FC' / sentaa)';
+  Symbols[14]:= #$30BD; HexCodes[14]:= '30BD'; Romaji[14]:= 'so'; Groups[14]:= 'S-Group (Sa-row)'; Hints[14]:= 'Vocab: Sofa ('#$30BD#$30D5#$30A1#$30FC' / sofaa)';
+  Symbols[15]:= #$30BF; HexCodes[15]:= '30BF'; Romaji[15]:= 'ta'; Groups[15]:= 'T-Group (Ta-row)'; Hints[15]:= 'Vocab: Taxi ('#$30BF#$30AF#$30B7#$30FC' / takushii)';
+  Symbols[16]:= #$30C1; HexCodes[16]:= '30C1'; Romaji[16]:= 'chi'; Groups[16]:= 'T-Group (Ta-row)'; Hints[16]:= 'Vocab: Team ('#$30C1#$30FC#$30E0' / chiimu)';
+  Symbols[17]:= #$30C4; HexCodes[17]:= '30C4'; Romaji[17]:= 'tsu'; Groups[17]:= 'T-Group (Ta-row)'; Hints[17]:= 'Vocab: Tour ('#$30C4#$30A2#$30FC' / tsuaa)';
+  Symbols[18]:= #$30C6; HexCodes[18]:= '30C6'; Romaji[18]:= 'te'; Groups[18]:= 'T-Group (Ta-row)'; Hints[18]:= 'Vocab: Tennis ('#$30C6#$30CB#$30B9' / tenisu)';
+  Symbols[19]:= #$30C8; HexCodes[19]:= '30C8'; Romaji[19]:= 'to'; Groups[19]:= 'T-Group (Ta-row)'; Hints[19]:= 'Vocab: Tomato ('#$30C8#$30DE#$30C8' / tomato)';
+  Symbols[20]:= #$30CA; HexCodes[20]:= '30CA'; Romaji[20]:= 'na'; Groups[20]:= 'N-Group (Na-row)'; Hints[20]:= 'Vocab: Knife ('#$30CA#$30A4#$30D5' / naifu)';
+  Symbols[21]:= #$30CB; HexCodes[21]:= '30CB'; Romaji[21]:= 'ni'; Groups[21]:= 'N-Group (Na-row)'; Hints[21]:= 'Vocab: News ('#$30CB#$30E5#$30FC#$30B9' / nyuusu)';
+  Symbols[22]:= #$30CC; HexCodes[22]:= '30CC'; Romaji[22]:= 'nu'; Groups[22]:= 'N-Group (Na-row)'; Hints[22]:= 'Vocab: Noodle ('#$30CC#$30FC#$30C9#$30EB' / nuudoru)';
+  Symbols[23]:= #$30CD; HexCodes[23]:= '30CD'; Romaji[23]:= 'ne'; Groups[23]:= 'N-Group (Na-row)'; Hints[23]:= 'Vocab: Necktie ('#$30CD#$30AF#$30BF#$30A4' / nekutai)';
+  Symbols[24]:= #$30CE; HexCodes[24]:= '30CE'; Romaji[24]:= 'no'; Groups[24]:= 'N-Group (Na-row)'; Hints[24]:= 'Vocab: Note ('#$30CE#$30FC#$30C8' / nooto)';
+  Symbols[25]:= #$30CF; HexCodes[25]:= '30CF'; Romaji[25]:= 'ha'; Groups[25]:= 'H-Group (Ha-row)'; Hints[25]:= 'Vocab: Ham ('#$30CF#$30E0' / hamu)';
+  Symbols[26]:= #$30D2; HexCodes[26]:= '30D2'; Romaji[26]:= 'hi'; Groups[26]:= 'H-Group (Ha-row)'; Hints[26]:= 'Vocab: Hero ('#$30D2#$30ED#$30FC' / hiroo)';
+  Symbols[27]:= #$30D5; HexCodes[27]:= '30D5'; Romaji[27]:= 'fu'; Groups[27]:= 'H-Group (Ha-row)'; Hints[27]:= 'Vocab: Fork ('#$30D5#$30A9#$30FC#$30AF' / fooku)';
+  Symbols[28]:= #$30D8; HexCodes[28]:= '30D8'; Romaji[28]:= 'he'; Groups[28]:= 'H-Group (Ha-row)'; Hints[28]:= 'Vocab: Helicopter ('#$30D8#$30EA#$30B3#$30D7#$30BF#$30FC' / herikoputaa)';
+  Symbols[29]:= #$30DB; HexCodes[29]:= '30DB'; Romaji[29]:= 'ho'; Groups[29]:= 'H-Group (Ha-row)'; Hints[29]:= 'Vocab: Hotel ('#$30DB#$30C6#$30EB' / hoteru)';
+  Symbols[30]:= #$30DE; HexCodes[30]:= '30DE'; Romaji[30]:= 'ma'; Groups[30]:= 'M-Group (Ma-row)'; Hints[30]:= 'Vocab: Mask ('#$30DE#$30B9#$30AF' / masuku)';
+  Symbols[31]:= #$30DF; HexCodes[31]:= '30DF'; Romaji[31]:= 'mi'; Groups[31]:= 'M-Group (Ma-row)'; Hints[31]:= 'Vocab: Milk ('#$30DF#$30EB#$30AF' / miruku)';
+  Symbols[32]:= #$30E0; HexCodes[32]:= '30E0'; Romaji[32]:= 'mu'; Groups[32]:= 'M-Group (Ma-row)'; Hints[32]:= 'Vocab: Music ('#$30DF#$30E5#$30FC#$30B8#$30C3#$30AF' / myuujikku)';
+  Symbols[33]:= #$30E1; HexCodes[33]:= '30E1'; Romaji[33]:= 'me'; Groups[33]:= 'M-Group (Ma-row)'; Hints[33]:= 'Vocab: Menu ('#$30E1#$30CB#$30E5#$30FC' / menyuu)';
+  Symbols[34]:= #$30E2; HexCodes[34]:= '30E2'; Romaji[34]:= 'mo'; Groups[34]:= 'M-Group (Ma-row)'; Hints[34]:= 'Vocab: Monitor ('#$30E2#$30CB#$30BF#$30FC' / monitaa)';
+  Symbols[35]:= #$30E4; HexCodes[35]:= '30E4'; Romaji[35]:= 'ya'; Groups[35]:= 'Y-Group (Ya-row)'; Hints[35]:= 'Vocab: Yahoo ('#$30E4#$30D5#$30FC' / yafuu)';
+  Symbols[36]:= #$30E6; HexCodes[36]:= '30E6'; Romaji[36]:= 'yu'; Groups[36]:= 'Y-Group (Ya-row)'; Hints[36]:= 'Vocab: User ('#$30E6#$30FC#$30B6#$30FC' / yuuzaa)';
+  Symbols[37]:= #$30E8; HexCodes[37]:= '30E8'; Romaji[37]:= 'yo'; Groups[37]:= 'Y-Group (Ya-row)'; Hints[37]:= 'Vocab: Yogurt ('#$30E8#$30FC#$30B0#$30EB#$30C8' / yooguruto)';
+  Symbols[38]:= #$30E9; HexCodes[38]:= '30E9'; Romaji[38]:= 'ra'; Groups[38]:= 'R-Group (Ra-row)'; Hints[38]:= 'Vocab: Radio ('#$30E9#$30B8#$30AA' / rajio)';
+  Symbols[39]:= #$30EA; HexCodes[39]:= '30EA'; Romaji[39]:= 'ri'; Groups[39]:= 'R-Group (Ra-row)'; Hints[39]:= 'Vocab: Ribbon ('#$30EA#$30DC#$30F3' / ribon)';
+  Symbols[40]:= #$30EB; HexCodes[40]:= '30EB'; Romaji[40]:= 'ru'; Groups[40]:= 'R-Group (Ra-row)'; Hints[40]:= 'Vocab: Rule ('#$30EB#$30FC#$30EB' / ruuru)';
+  Symbols[41]:= #$30EC; HexCodes[41]:= '30EC'; Romaji[41]:= 're'; Groups[41]:= 'R-Group (Ra-row)'; Hints[41]:= 'Vocab: Lemon ('#$30EC#$30E2#$30F3' / remon)';
+  Symbols[42]:= #$30ED; HexCodes[42]:= '30ED'; Romaji[42]:= 'ro'; Groups[42]:= 'R-Group (Ra-row)'; Hints[42]:= 'Vocab: Robot ('#$30ED#$30DC#$30C3#$30C8' / robotto)';
+  Symbols[43]:= #$30EF; HexCodes[43]:= '30EF'; Romaji[43]:= 'wa'; Groups[43]:= 'W-Group (Wa-row)'; Hints[43]:= 'Vocab: Wine ('#$30EF#$30A4#$30F3' / wain)';
+  Symbols[44]:= #$30F2; HexCodes[44]:= '30F2'; Romaji[44]:= 'wo'; Groups[44]:= 'W-Group (Wa-row)'; Hints[44]:= 'Vocab: Particle Wo ('#$30F2' / wo)';
+  Symbols[45]:= #$30F3; HexCodes[45]:= '30F3'; Romaji[45]:= 'n'; Groups[45]:= 'N-Singular'; Hints[45]:= 'Vocab: Pan / Bread ('#$30D1#$30F3' / pan)';
+end; 
+
+procedure UpdateScoreDisplay;
+var
+  Pct: Double;
+begin
+  if TotalAttempts > 0 then Pct:= (CorrectCount * 100.0) / TotalAttempts else Pct:= 0.0;
+  LblScore.Caption:= Format('Score: %d / %d  (Accuracy: %.1f%%)', [CorrectCount, TotalAttempts, Pct]);
+end;
+
+procedure LoadNewCharacterold(Sender: TObject);
+begin
+  CurrentIdx:= Random(TOTAL_ITEMS);
+  //CurrentIdx:= 0;
+  //LblKatakana.Caption:= Symbols[CurrentIdx];
+  LblKatakana.Caption:= Symbols[CurrentIdx];
+  //LblKatakana.Caption:= (#$D83E#$DD8B); 
+  LblGroup.Caption:= 'Group: ' + Groups[CurrentIdx];
+  LblResult.Caption:= 'Type the Romaji translation and click Check.';
+  LblResult.Font.Color:= clBlack;
+  //EdtAnswer.Text:= '';
+  //EdtAnswer.SetFocus;
+  IsChecked:= False;
+end;
+
+procedure LoadNewCharacter(Sender: TObject);
+begin
+  CurrentIdx:= Random(TOTAL_ITEMS);
+  //CurrentIdx:= 0;
+  LblKatakana.Caption:= Symbols[CurrentIdx];
+  LblGroup.Caption:= 'Group: '+ Groups[CurrentIdx]+' [UCS: U+' + HexCodes[CurrentIdx]+ ']';
+  LblResult.Caption:= 'Type the Romaji translation and click Check.';
+  LblResult.Font.Color:= clBlack;
+  EdtAnswer.Text:= '';
+  EdtAnswer.SetFocus;
+  IsChecked:= False;
+end;
+
+procedure CheckAnswer(Sender: TObject);
+var
+  UserAns, TargetAns: string;
+begin
+  if IsChecked then begin
+    LoadNewCharacter(Sender);
+    Exit;
+  end;
+
+  //UserAns:= LowerCase(Trim(EdtAnswer.Text));
+  UserAns:= LowerCase(boldtrim(EdtAnswer.Text));
+  writ('debug: '+userans)
+  TargetAns:= LowerCase(Romaji[CurrentIdx]);
+  Inc(TotalAttempts);
+  IsChecked:= True;
+
+ (* if UserAns = TargetAns then begin
+    Inc(CorrectCount);
+    LblResult.Caption:= 'CORRECT!  ' + Symbols[CurrentIdx] + ' = ' + TargetAns;
+    LblResult.Font.Color:= clGreen;
+    MemoLog.Lines.Add(Format('[%d]  %s -> %s (Correct)', [TotalAttempts, Symbols[CurrentIdx], UserAns]));
+  end else begin
+    LblResult.Caption:= Format('INCORRECT!  %s is "%s" (You typed: "%s")', [Symbols[CurrentIdx], TargetAns, UserAns]);
+    LblResult.Font.Color:= clRed;
+    MemoLog.Lines.Add(Format('[%d]  %s -> %s (Expected: %s)', [TotalAttempts, Symbols[CurrentIdx], UserAns, TargetAns]));
+  end; *)
+  if UserAns = TargetAns then begin
+    Inc(CorrectCount);
+    LblResult.Caption:= 'CORRECT!  '+Symbols[CurrentIdx]+' (U+'+HexCodes[CurrentIdx]+') = '+TargetAns;
+    LblResult.Font.Color:= clGreen;
+    MemoLog.Lines.Add(unicodeFormat('[%d]  %s (U+%s) -> %s (Correct)',
+    //MemoLog.Lines.Add(Format('[%d]  '+Symbols[CurrentIdx]+' (U+%s) -> %s (Correct)',
+                        [TotalAttempts,Symbols[CurrentIdx],HexCodes[CurrentIdx],UserAns]));
+  end else begin
+    LblResult.Caption:= Format('INCORRECT!  %s (U+%s) is "%s" (You typed: "%s")',
+                        [Symbols[CurrentIdx],HexCodes[CurrentIdx],TargetAns,UserAns]);
+    LblResult.Font.Color:= clRed;
+    MemoLog.Lines.Add(unicodeFormat('[%d]  %s (U+%s) -> %s (Expected: %s)',
+                        [TotalAttempts,Symbols[CurrentIdx],HexCodes[CurrentIdx],UserAns,TargetAns]));
+  end;
+
+  //UpdateScoreDisplay;
+  UpdateScoreDisplay;
+end;
+
+procedure ShowHintold(Sender: TObject);
+begin
+  ShowMessage('HINT for ' + Symbols[CurrentIdx] + ':' + #13#10 +
+              'Group: ' + Groups[CurrentIdx] + #13#10 +
+              Hints[CurrentIdx]);
+end;
+
+procedure ShowHint(Sender: TObject);
+begin
+  ShowMessage('HINT for '+Symbols[CurrentIdx]+' (U+'+HexCodes[CurrentIdx]+'):'+#13#10+
+              'Group: ' + Groups[CurrentIdx]+ #13#10 +
+              'Unicode: U+' + HexCodes[CurrentIdx]+ #13#10 +
+              Hints[CurrentIdx]);
+end;
+
+procedure ResetStats(Sender: TObject);
+begin
+  TotalAttempts:= 0; CorrectCount:= 0; UpdateScoreDisplay;
+  MemoLog.Clear;
+  MemoLog.Lines.Add('=== KATAKANA TRAINER SESSION RESET ===');
+  LoadNewCharacter(Sender);
+end;
+
+procedure closeForm(Sender: TObject; var Action: TCloseAction);
+  begin
+    //imagelist2.Free;   
+    //FormML.Free;
+    action:= caFree;
+    Form1:= NIL;
+    //Screen.Cursor:= crDefault
+    writeln('Katakana form and log closed..');
+  end;
+
+procedure ShowLang_GUI;
+begin
+  Randomize;
+  InitKatakanaDataset3;
+  TotalAttempts:= 0; CorrectCount:= 0; IsChecked:= False;
+
+  Application.Initialize;
+  Form1:= TForm.Create(Application);
+  Form1.Icon.LoadFromResourceName(HInstance,'XUNIT');
+  Form1.Caption:= 'maXbox Japanese Katakana Vocabulary Trainer Studio';
+  Form1.SetBounds(100, 100, 745, 520);
+  Form1.Position:= poScreenCenter;
+  form1.formstyle:= fsstayontop;
+  Form1.onClose:= @closeForm;
+
+  LblTitle:= TLabel.Create(Form1); LblTitle.Parent:= Form1;
+  LblTitle.SetBounds(20, 15, 700, 24);
+  LblTitle.Caption:= 'Japanese Katakana Character & Vocabulary Trainer';
+  LblTitle.Font.Name:= 'Arial'; LblTitle.Font.Size:= 13; LblTitle.Font.Style2:= fsBold2;
+  LblTitle.Font.Color:= clNavy;
+
+  LblKatakana:= TLabel.Create(Form1); LblKatakana.Parent:= Form1;
+  LblKatakana.SetBounds(20, 50, 200, 110);
+  LblKatakana.Alignment:= taCenter;
+  LblKatakana.Font.Name:= 'Arial'; LblKatakana.Font.Size:= 64; LblKatakana.Font.Style2:= fsBold2;
+  LblKatakana.Font.Color:= $7319F6; //clDarkRed;
+
+  LblGroup:= TLabel.Create(Form1); LblGroup.Parent:= Form1;
+  LblGroup.SetBounds(240, 55, 200, 20);
+  LblGroup.Font.Name:= 'Arial'; LblGroup.Font.Size:= 10; LblGroup.Font.Style2:= fsBold2;
+
+  LblPrompt:= TLabel.Create(Form1); LblPrompt.Parent:= Form1;
+  LblPrompt.SetBounds(240, 80, 200, 18);
+  LblPrompt.Caption:= 'Enter Romaji Pronunciation:';
+
+  EdtAnswer:= TEdit.Create(Form1); EdtAnswer.Parent:= Form1;
+  EdtAnswer.SetBounds(240, 108, 180, 32);
+  EdtAnswer.Font.Name:= 'Arial'; EdtAnswer.Font.Size:= 14;
+
+  BtnCheck:= TButton.Create(Form1); BtnCheck.Parent:= Form1;
+  BtnCheck.SetBounds(240, 150, 120, 32); BtnCheck.Caption:= 'Check Answer'; BtnCheck.OnClick:= @CheckAnswer;
+  BtnNext:= TButton.Create(Form1); BtnNext.Parent:= Form1;
+  BtnNext.SetBounds(370, 150, 120, 32); BtnNext.Caption:= 'Next Sign'; BtnNext.OnClick:= @LoadNewCharacter;
+  BtnHint:= TButton.Create(Form1); BtnHint.Parent:= Form1;
+  BtnHint.SetBounds(500, 150, 100, 32); BtnHint.Caption:= 'Show Hint'; BtnHint.OnClick:= @ShowHint;
+  BtnReset:= TButton.Create(Form1); BtnReset.Parent:= Form1;
+  BtnReset.SetBounds(610, 150, 100, 32); BtnReset.Caption:= 'Reset Score'; BtnReset.OnClick:= @ResetStats;
+
+  LblResult:= TLabel.Create(Form1); LblResult.Parent:= Form1;
+  LblResult.SetBounds(20, 195, 700, 24);
+  LblResult.Font.Name:= 'Arial'; LblResult.Font.Size:= 11; LblResult.Font.Style2:= fsBold2;
+
+  LblScore:= TLabel.Create(Form1); LblScore.Parent:= Form1;
+  LblScore.SetBounds(20, 230, 700, 22);
+  LblScore.Font.Name:= 'Arial'; LblScore.Font.Size:= 10; //LblScore.Font.Style2:= fsBold2;
+  LblScore.Font.Color:= $095ACC //clDarkSlateGray;
+
+  MemoLog:= TMemo.Create(Form1); MemoLog.Parent:= Form1;
+  MemoLog.SetBounds(20, 260, 690, 200);
+  MemoLog.Font.Name:= 'Courier New'; MemoLog.Font.Size:= 9;
+  MemoLog.ScrollBars:= ssVertical;
+
+  //MemoLog.Lines.Add('=== JAPANESE KATAKANA TRAINER SESSION LOG ===');
+  MemoLog.Lines.Add('Instructions: Type the Romaji sound (e.g., "ka", "shi", "a") and click Check.');
+  MemoLog.Lines.Add('=== JAPANESE KATAKANA TRAINER SESSION LOG (v5) ===');
+  MemoLog.Lines.Add('Complete 46 Basic Katakana Syllabary (A,K,S,T,N,H,M, Y,R,W,N)');
+  //MemoLog.Lines.Add('Instructions: Type the Romaji sound (e.g., "ha","wa","n", "fu") and click Check.');
+  MemoLog.Lines.Add('');
+  UpdateScoreDisplay;
+  //LoadNewCharacter(Form1);
+  Form1.Show;
+  LoadNewCharacter(Form1);
+end;
+
+
+Begin //@main
+ { t_latlong:= TAddressGeoCodeOSM8(URL_APILAY_GEO, 'Athen', L_APIKEY);
+   writ(jsonunescape(t_latlong.descript,#13#10));
+ { backstr:= parseJsonvalue(GEO_to_text_API2_emoji(URL_APILAY_EMO, 'slightly smiling face', 
+                                          N_APIKEY));
+    validtext:= StringReplace( backstr, '\n', CR+LF,[rfReplaceAll]); 
+   writeln(validtext);    // U+1F642 }
+   writeln(#$d83d#$de42);    
+   writeln(#$D83E#$DD8B);  
+   //writeln(#$0001F98B);   
+   SetDebugoff;  
+   maxform1.setconsole;
+   
+   ShowLang_GUI();
+   writeln(#$30A2);  
+   Writeln('Hello '#$D83D#$DE42); // Displays: Hello 🙂
+    Writeln('Hello '#$d83d#$de42); // Displays: Hello 🙂
+  
+  //GetMorseTable(dots:Bool):Str;;  //whole table!
+  //writ(GetMorseTable(true))  //whole table!
+End.
+
+ref: https://www.loc.gov/marc/specifications/specchareacc/JapaneseHiraganaKatakana.html
+     https://teetrains.wordpress.com/faszination-modellbau/
+
+692522   30A2   E382A2   ア   Katakana letter A
+
+This Object Pascal GUI application runs natively in maXbox5 / maXbox6 and provides an 
+interactive vocabulary and character trainer for Japanese Katakana signs.
+
+// maXbox5 / maXbox6 Script: Japanese Katakana Vocabulary & Character Trainer
+// Interactive maXbox GUI program for learning Japanese Katakana signs, pronunciations, and loanword vocabulary
+// maXbox5 / maXbox6 Script v2: Interactive Butterfly Painter with Dynamic Color Trackbars
+// Allows real-time adjustment of forewing, hindwing, and spot pattern colors via trackbars
+
+Features of the maXbox Katakana Trainer
+Large Katakana Display: Presents Katakana signs (such as ア, カ, シ, ツ, ネ) in a prominent 64pt font.
+Romaji Input & Verification: Accepts user answers in Romaji (e.g., ka, shi, tsu), providing instant 
+visual feedback (CORRECT in green or INCORRECT with the expected answer in red).
+Vocabulary Hints: Includes a Show Hint feature displaying associated Japanese loanwords 
+(e.g. Camera for カ, Shirt for シ, Tennis for テ).
+Score Tracking & Performance Logging: Tracks total practice attempts, correct responses, 
+and real-time accuracy percentage, logging all user attempts in a TMemo control.
+
+Would you like me to update katakana_language_trainer.pas to build character strings directly 
+using these Unicode hex literals (#$30A2, etc.) 
+to prevent ANSI code-page rendering issues on non-Japanese Windows locales?
+
+Key Updates in Version 2
+Direct UCS/Unicode 16-Bit Hex Literals: Replaced string literals with explicit WideChar hex values
+ (e.g. Symbols[0] := #$30A2; for ア, Symbols[5] := #$30AB; for カ, Symbols[11] := #$30B7; for シ) 
+ to guarantee accurate character rendering across all Windows language locales without 
+ ANSI code-page conversion issues.
+Unicode Hex Code Display: Displays the exact U+XXXX hex code point alongside each 
+Katakana character in both the main GUI label and the session activity log
+
+38 Total Katakana Signs: Covers Vowels (A-row), K-Group, S-Group, T-Group, N-Group, M-Group, Y-Group, and R-Group.
+Direct WideChar Literals: Uses #$30E4 through #$30ED to ensure accurate character rendering on all Windows 
+locales without code-page dependencies.
+Real-time Hex Display: Displays U+XXXX hex code points alongside Romaji validation and loanword hints in 
+the maXbox GUI window.
+
+
+ref: https://www.chmlib.com/sapi/VB_SpVoice_Interface.htm
+     https://forum.lazarus.freepascal.org/index.php?topic=10104.0
+     https://dev.to/max_kleiner_9d12e786b3ecc/memory-game-11mm
+     https://teetrains.wordpress.com/2026/09/02/google-earth-engine-api/     (second part)
+     http://www.softwareschule.ch/download/maxbox_starter195.pdf
+     https://youtube.com/shorts/qawvTwVq7ms
+     https://youtube.com/shorts/dKfD_M0nWKM
+     https://livetoplant.com/best-jazz-bass-lines-to-practice-daily/
+     
+     # Source - https://stackoverflow.com/q/49871252
+# Posted by Neil
+# Retrieved 2026-09-16, License - CC BY-SA 3.0
+
+C:\maxbox\maxbox5\pascriptmaster2\pmaster2\restunits\Indy9\maxbox5\maxbox5>py -3.14 -m pip install comtypes
+WARNING: Cache entry deserialization failed, entry ignored
+Collecting comtypes
+  Downloading comtypes-1.4.16-py3-none-any.whl.metadata (7.8 kB)
+Downloading comtypes-1.4.16-py3-none-any.whl (296 kB)
+Installing collected packages: comtypes
+Successfully installed comtypes-1.4.16
+
+[notice] A new release of pip is available: 26.1.1 -> 26.2.1
+[notice] To update, run: python.exe -m pip install --upgrade pip
+
+✅ If you want different colors per cell, just add conditions on ACol and ARow inside OnDrawCell.
+
+If you want, I can give you an extended version that supports multi-line text, 
+alignment, and alternating row colors for TDrawGrid.
+In Delphi, a TDrawGrid does not have a built‑in “header row” like TStringGrid does — it’s just a blank canvas for you to draw cells.
+If you want the first row to be treated as normal data (not as a header), you simply need to:
+Set FixedRows to 0 in the Object Inspector or in code.
+Adjust your OnDrawCell logic so that it draws all rows the same way.
+You can program a memory game in maXbox using its built-in Object Pascal (Delphi-like) scripting engine 
+and the precompiled VCL components. maXbox even includes a proof-of-concept memory game example using a 
+grid of bitmaps. [sourceforge](https://sourceforge.net/p/maxbox/wikimax/maxbox_mainwiki/)
+
+## What maXbox is
+
+maXbox is a self-contained scripting tool, compiler, and source library in one executable. It uses an 
+Object Pascal/Delphi engine (RemObjects PascalScript) with hundreds of precompiled units and over 1,400 examples.
+ [blogs.embarcadero](https://blogs.embarcadero.com/fun-maxbox-is-an-all-in-one-script-engine-application-powered-by-delphi/)
+
+## Memory game approach in maXbox
+
+The documented approach uses a `TStringGrid`/`TDrawGrid` (or `QGrid` on Linux/CLX) filled with bitmap 
+images to represent cards.  The basic structure follows a typical game loop: 
+[sourceforge](https://sourceforge.net/p/maxbox/wikimax/maxbox_mainwiki/)
+
+1. **Configure and open window** – create the form and grid
+2. **Initialize resources** – load card images, shuffle pairs
+3. **Register input callbacks** – handle mouse clicks on grid cells
+4. **Event processing loop** – manage game state (flipping, matching, scoring) 
+[softwareschule](http://www.softwareschule.ch/download/maxbox_starter7.pdf)
+
+## Getting started
+
+1. Download maXbox from SourceForge and unzip (preserve folder structure) 
+[sourceforge](https://sourceforge.net/projects/maxbox/)
+2. Open maXbox, create a new script, paste the code above
+3. Press **F9** to compile and run [softwareschule](http://www.softwareschule.ch/download/maxbox_starter7.pdf)
+4. Extend with actual bitmap images instead of text, add timers for flip delays, and scoring
+
+For more examples, browse the 1,415+ examples in maXbox or check the 
+Pascal Education Program (PEP) examples on SourceForge. 
+[sourceforge](https://sourceforge.net/projects/maxbox/)
+  https://holgerscode.com/blog/dateutils-2-timezones-utc-de
+  https://www.timeanddate.com/time/utc-offsets.html
+
+This Delphi function **`Commatize`** adds grouping separators (like commas, spaces, or periods) to 
+a numeric substring inside a larger string, formatted similarly to how numbers are written with thousands separators.
+Doc: The fact that error code is not "one of the expected return values" tells for the versions that the error comes from an 
+underlying layer and this 
+API just passes it up on internal failure. As a clue, having disabled some network adapter on the system, you might 
+get rid of the error.
+
+https://medium.com/@abhay.anand/day-3-linux-commands-you-should-know-65fb849561cc
+https://medium.com/100-days-of-linux/7-fundamental-use-cases-of-netcat-866364eb1742
+https://medium.com/@saravra/how-to-study-cybersecurity-64ee0478e87e
+
+New in maXbox 5.2.9.198 (September 30, 2025)
+New in maXbox 5.1.4.98 (June 30, 2024)
+New in maXbox 5.1.4.95 (April 17, 2024)
+New in maXbox 5.1.4.90 (March 21, 2024)
+New in maXbox 4.7.6.50 (June 15, 2023)
+New in maXbox 4.7.6.20 (December 15, 2022)
+New in maXbox 4.7.6.10 (November 12, 2021)
+New in maXbox 4.7.5.80 (July 22, 2021)
+New in maXbox 4.7.4.64 (June 14, 2020)
+New in maXbox 4.7.4.62 (June 8, 2020)
+New in maXbox 4.7.4.60 (April 21, 2020)
+New in maXbox 4.7.3.60 (April 15, 2020)
+New in maXbox 4.7.2.82 (April 7, 2020)
+New in maXbox 4.7.1 (November 15, 2019)
+New in maXbox 4.6.3.10 (August 6, 2019)
+New in maXbox 4.5.8.10 (December 27, 2017)
+New in maXbox 4.2.8.10 (October 24, 2017)
+New in maXbox 4.2.6.10 (August 24, 2017)
+New in maXbox 4.2.5.10 (February 20, 2017)
+New in maXbox 4.2.4.80 (October 21, 2016)
