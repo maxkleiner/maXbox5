@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japanese Katakana Vocabulary & Character Trainer (46 Signs)</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-red: #ef4444;
+            --accent-red-dark: #991b1b;
+            --accent-green: #22c55e;
+            --accent-blue: #3b82f6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 24px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            padding: 32px;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: #fca5a5;
+            border-bottom: 2px solid var(--card-border);
+            padding-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .trainer-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 28px;
+        }
+
+        @media (max-width: 680px) {
+            .trainer-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card-display {
+            background: #0f172a;
+            border: 2px solid var(--card-border);
+            border-radius: 14px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+        }
+
+        .katakana-char {
+            font-size: 5rem;
+            font-weight: 800;
+            color: #f87171;
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+
+        .hex-tag {
+            font-family: monospace;
+            font-size: 0.85rem;
+            background: #1e293b;
+            color: var(--accent-blue);
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--card-border);
+        }
+
+        .group-tag {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        .input-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        input[type="text"] {
+            background: #0f172a;
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-red);
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        button {
+            border: none;
+            padding: 10px 16px;
+            font-weight: 700;
+            font-size: 0.88rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--accent-red);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-red-dark);
+        }
+
+        .btn-secondary {
+            background: #334155;
+            color: var(--text-main);
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .feedback-box {
+            min-height: 40px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .feedback-correct {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .feedback-incorrect {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .score-bar {
+            margin-top: 24px;
+            background: #0f172a;
+            padding: 14px 18px;
+            border-radius: 10px;
+            border: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .log-box {
+            margin-top: 20px;
+            background: #0f172a;
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 14px;
+            height: 140px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>
+        <span>⛩️ Katakana maXbox Language Trainer</span>
+        <span style="font-size:0.85rem; color:var(--text-muted);">46 Basic Signs</span>
+    </h1>
+    <div class="subtitle">Complete Syllabary Edition with UCS/Unicode Hex & Vocabulary Hints</div>
+
+    <div class="trainer-layout">
+        <!-- Katakana Card Display -->
+        <div class="card-display">
+            <div class="katakana-char" id="char-display">ア</div>
+            <div class="hex-tag" id="hex-display">U+30A2</div>
+            <div class="group-tag" id="group-display">Vowels (A-row)</div>
+        </div>
+
+        <!-- Interactive Input & Verification Controls -->
+        <div class="input-panel">
+            <div class="form-group">
+                <label for="romaji-input">Enter Romaji Translation:</label>
+                <input type="text" id="romaji-input" placeholder="e.g. ka, shi, a" autocomplete="off">
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-primary" id="btn-check">Check Answer</button>
+                <button class="btn-secondary" id="btn-next">Next Sign ➔</button>
+                <button class="btn-secondary" id="btn-hint">💡 Hint</button>
+                <button class="btn-secondary" id="btn-reset">Reset</button>
+            </div>
+
+            <div class="feedback-box" id="feedback-box" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- Score Summary -->
+    <div class="score-bar">
+        <span>Score: <span id="score-val">0 / 0</span></span>
+        <span>Accuracy: <span id="acc-val" style="color:var(--accent-blue);">0.0%</span></span>
+    </div>
+
+    <!-- Activity Log -->
+    <div class="log-box" id="log-box">
+        <div class="log-entry">=== KATAKANA TRAINER SESSION LOG INITIALIZED ===</div>
+        <div class="log-entry">Type the Romaji sound and click Check or press Enter.</div>
+    </div>
+</div>
+
+<script>
+    const dataset = [
+        // Vowels (5)
+        { char: 'ア', hex: '30A2', romaji: 'a', group: 'Vowels (A-row)', hint: 'America (アメリカ / amerika)' },
+        { char: 'イ', hex: '30A4', romaji: 'i', group: 'Vowels (A-row)', hint: 'India (インド / indo)' },
+        { char: 'ウ', hex: '30A6', romaji: 'u', group: 'Vowels (A-row)', hint: 'Vector (ベクトル / beku-toru)' },
+        { char: 'エ', hex: '30A8', romaji: 'e', group: 'Vowels (A-row)', hint: 'Energy (エネルギ / enerugi)' },
+        { char: 'オ', hex: '30AA', romaji: 'o', group: 'Vowels (A-row)', hint: 'Orange (オレンジ / orenji)' },
+        // K-Group (5)
+        { char: 'カ', hex: '30AB', romaji: 'ka', group: 'K-Group (Ka-row)', hint: 'Camera (カメラ / kamera)' },
+        { char: 'キ', hex: '30AD', romaji: 'ki', group: 'K-Group (Ka-row)', hint: 'King (キング / kingu)' },
+        { char: 'ク', hex: '30AF', romaji: 'ku', group: 'K-Group (Ka-row)', hint: 'Class (クラス / kurasu)' },
+        { char: 'ケ', hex: '30B1', romaji: 'ke', group: 'K-Group (Ka-row)', hint: 'Cake (ケーキ / keeki)' },
+        { char: 'コ', hex: '30B3', romaji: 'ko', group: 'K-Group (Ka-row)', hint: 'Coffee (コーヒー / koohii)' },
+        // S-Group (5)
+        { char: 'サ', hex: '30B5', romaji: 'sa', group: 'S-Group (Sa-row)', hint: 'Salad (サラダ / sarada)' },
+        { char: 'シ', hex: '30B7', romaji: 'shi', group: 'S-Group (Sa-row)', hint: 'Shirt (シャツ / shatsu)' },
+        { char: 'ス', hex: '30B9', romaji: 'su', group: 'S-Group (Sa-row)', hint: 'Sports (スポーツ / supootsu)' },
+        { char: 'セ', hex: '30BB', romaji: 'se', group: 'S-Group (Sa-row)', hint: 'Center (センター / sentaa)' },
+        { char: 'ソ', hex: '30BD', romaji: 'so', group: 'S-Group (Sa-row)', hint: 'Sofa (ソファー / sofaa)' },
+        // T-Group (5)
+        { char: 'タ', hex: '30BF', romaji: 'ta', group: 'T-Group (Ta-row)', hint: 'Taxi (タクシー / takushii)' },
+        { char: 'チ', hex: '30C1', romaji: 'chi', group: 'T-Group (Ta-row)', hint: 'Team (チーム / chiimu)' },
+        { char: 'ツ', hex: '30C4', romaji: 'tsu', group: 'T-Group (Ta-row)', hint: 'Tour (ツアー / tsuaa)' },
+        { char: 'テ', hex: '30C6', romaji: 'te', group: 'T-Group (Ta-row)', hint: 'Tennis (テニス / tenisus)' },
+        { char: 'ト', hex: '30C8', romaji: 'to', group: 'T-Group (Ta-row)', hint: 'Tomato (トマト / tomato)' },
+        // N-Group (5)
+        { char: 'ナ', hex: '30CA', romaji: 'na', group: 'N-Group (Na-row)', hint: 'Knife (ナイフ / naifu)' },
+        { char: 'ニ', hex: '30CB', romaji: 'ni', group: 'N-Group (Na-row)', hint: 'News (ニュース / nyuusu)' },
+        { char: 'ヌ', hex: '30CC', romaji: 'nu', group: 'N-Group (Na-row)', hint: 'Noodle (ヌードル / nuudoru)' },
+        { char: 'ネ', hex: '30CD', romaji: 'ne', group: 'N-Group (Na-row)', hint: 'Necktie (ネクタイ / nekutai)' },
+        { char: 'ノ', hex: '30CE', romaji: 'no', group: 'N-Group (Na-row)', hint: 'Note (ノート / nooto)' },
+        // H-Group (5)
+        { char: 'ハ', hex: '30CF', romaji: 'ha', group: 'H-Group (Ha-row)', hint: 'Ham (ハム / hamu)' },
+        { char: 'ヒ', hex: '30D2', romaji: 'hi', group: 'H-Group (Ha-row)', hint: 'Hero (ヒロー / hiroo)' },
+        { char: 'フ', hex: '30D5', romaji: 'fu', group: 'H-Group (Ha-row)', hint: 'Fork (フォーク / fooku)' },
+        { char: 'ヘ', hex: '30D8', romaji: 'he', group: 'H-Group (Ha-row)', hint: 'Helicopter (ヘリコプター / herikoputaa)' },
+        { char: 'ホ', hex: '30DB', romaji: 'ho', group: 'H-Group (Ha-row)', hint: 'Hotel (ホテル / hoteru)' },
+        // M-Group (5)
+        { char: 'マ', hex: '30DE', romaji: 'ma', group: 'M-Group (Ma-row)', hint: 'Mask (マスク / masuku)' },
+        { char: 'ミ', hex: '30DF', romaji: 'mi', group: 'M-Group (Ma-row)', hint: 'Milk (ミルク / miruku)' },
+        { char: 'ム', hex: '30E0', romaji: 'mu', group: 'M-Group (Ma-row)', hint: 'Music (ミュージック / myuujikku)' },
+        { char: 'メ', hex: '30E1', romaji: 'me', group: 'M-Group (Ma-row)', hint: 'Menu (メニュー / menyuu)' },
+        { char: 'モ', hex: '30E2', romaji: 'mo', group: 'M-Group (Ma-row)', hint: 'Monitor (モニター / monitaa)' },
+        // Y-Group (3)
+        { char: 'ヤ', hex: '30E4', romaji: 'ya', group: 'Y-Group (Ya-row)', hint: 'Yahoo (ヤフー / yafuu)' },
+        { char: 'ユ', hex: '30E6', romaji: 'yu', group: 'Y-Group (Ya-row)', hint: 'User (ユーザー / yuuzaa)' },
+        { char: 'ヨ', hex: '30E8', romaji: 'yo', group: 'Y-Group (Ya-row)', hint: 'Yogurt (ヨーグルト / yooguruto)' },
+        // R-Group (5)
+        { char: 'ラ', hex: '30E9', romaji: 'ra', group: 'R-Group (Ra-row)', hint: 'Radio (ラジオ / rajio)' },
+        { char: 'リ', hex: '30EA', romaji: 'ri', group: 'R-Group (Ra-row)', hint: 'Ribbon (リボン / ribon)' },
+        { char: 'ル', hex: '30EB', romaji: 'ru', group: 'R-Group (Ra-row)', hint: 'Rule (ルール / ruuru)' },
+        { char: 'レ', hex: '30EC', romaji: 're', group: 'R-Group (Ra-row)', hint: 'Lemon (レモン / remon)' },
+        { char: 'ロ', hex: '30ED', romaji: 'ro', group: 'R-Group (Ra-row)', hint: 'Robot (ロボット / robotto)' },
+        // W-Group & Singular N (3)
+        { char: 'ワ', hex: '30EF', romaji: 'wa', group: 'W-Group (Wa-row)', hint: 'Wine (ワイン / wain)' },
+        { char: 'ヲ', hex: '30F2', romaji: 'wo', group: 'W-Group (Wa-row)', hint: 'Particle Wo (ヲ)' },
+        { char: 'ン', hex: '30F3', romaji: 'n', group: 'N-Singular', hint: 'Pan / Bread (パン / pan)' }
+    ];
+
+    let currentIdx = 0;
+    let attempts = 0;
+    let correct = 0;
+    let isChecked = false;
+
+    const charDisplay = document.getElementById('char-display');
+    const hexDisplay = document.getElementById('hex-display');
+    const groupDisplay = document.getElementById('group-display');
+    const inputEl = document.getElementById('romaji-input');
+    const feedbackEl = document.getElementById('feedback-box');
+    const scoreEl = document.getElementById('score-val');
+    const accEl = document.getElementById('acc-val');
+    const logBox = document.getElementById('log-box');
+
+    function loadNewCard() {
+        currentIdx = Math.floor(Math.random() * dataset.length);
+        const item = dataset[currentIdx];
+
+        charDisplay.innerText = item.char;
+        hexDisplay.innerText = `U+${item.hex}`;
+        groupDisplay.innerText = item.group;
+
+        inputEl.value = '';
+        feedbackEl.style.display = 'none';
+        inputEl.focus();
+        isChecked = false;
+    }
+
+    function checkAnswer() {
+        if (isChecked) {
+            loadNewCard();
+            return;
+        }
+
+        const userAns = inputEl.value.trim().toLowerCase();
+        const targetAns = dataset[currentIdx].romaji.toLowerCase();
+        const item = dataset[currentIdx];
+
+        attempts++;
+        isChecked = true;
+
+        if (userAns === targetAns) {
+            correct++;
+            feedbackEl.className = 'feedback-box feedback-correct';
+            feedbackEl.innerText = `✓ CORRECT! ${item.char} (U+${item.hex}) = "${targetAns}"`;
+            addLog(`[${attempts}] ${item.char} (U+${item.hex}) -> "${userAns}" (CORRECT)`);
+        } else {
+            feedbackEl.className = 'feedback-box feedback-incorrect';
+            feedbackEl.innerText = `✗ INCORRECT! ${item.char} (U+${item.hex}) is "${targetAns}" (You typed: "${userAns || 'blank'}")`;
+            addLog(`[${attempts}] ${item.char} (U+${item.hex}) -> "${userAns || 'blank'}" (Expected: "${targetAns}")`);
+        }
+
+        feedbackEl.style.display = 'flex';
+        updateScore();
+    }
+
+    function showHint() {
+        const item = dataset[currentIdx];
+        alert(`HINT for ${item.char} (U+${item.hex}):\nGroup: ${item.group}\nVocab: ${item.hint}`);
+    }
+
+    function updateScore() {
+        const pct = attempts > 0 ? ((correct / attempts) * 100).toFixed(1) : '0.0';
+        scoreEl.innerText = `${correct} / ${attempts}`;
+        accEl.innerText = `${pct}%`;
+    }
+
+    function addLog(msg) {
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        entry.innerText = msg;
+        logBox.prepend(entry);
+    }
+
+    function resetSession() {
+        attempts = 0;
+        correct = 0;
+        updateScore();
+        logBox.innerHTML = '<div class="log-entry">=== SESSION RESET ===</div>';
+        loadNewCard();
+    }
+
+    // Event Listeners
+    document.getElementById('btn-check').addEventListener('click', checkAnswer);
+    document.getElementById('btn-next').addEventListener('click', loadNewCard);
+    document.getElementById('btn-hint').addEventListener('click', showHint);
+    document.getElementById('btn-reset').addEventListener('click', resetSession);
+
+    inputEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            checkAnswer();
+        }
+    });
+
+    // Initial load
+    loadNewCard();
+</script>
+
+</body>
+</html>
