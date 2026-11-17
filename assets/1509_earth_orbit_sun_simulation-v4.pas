@@ -1,5 +1,6 @@
 // maXbox5 / maXbox6 Script v4: Solar System Simulation with Main Asteroid Belt
-// Features Venus, Earth (+Moon), Mars, and 120 Procedural Belt Asteroids with Motion Trails & Axial Rotation.
+// Features Venus, Earth (+Moon), Mars, and 1 Procedural Belt Asteroids with Motion Trails & Axial Rotation.
+
 
 program Solar_System_Asteroid_Belt_Simulation_v4;
 
@@ -206,7 +207,8 @@ begin
   Px := Vx + Round(5 * Cos(VenusSpinRad)); Py := Vy + Round(5 * Sin(VenusSpinRad));
   ImgCanvas.Canvas.Brush.Color := RGB(255, 230, 160);
   ImgCanvas.Canvas.Ellipse(Px - 2, Py - 2, Px + 2, Py + 2);
-  ImgCanvas.Canvas.Font.Color := RGB(240, 210, 130); ImgCanvas.Canvas.Font.Style2 := [];
+  ImgCanvas.Canvas.Font.Color := RGB(240, 210, 130); 
+  //ImgCanvas.Canvas.Font.Style2 := [];
   ImgCanvas.Canvas.TextOut(Vx - 16, Vy + VENUS_R + 2, 'Venus');
 
   // 9. Earth with 23.5 deg Axial Tilt Line & Rotating Continents
@@ -250,7 +252,7 @@ begin
   ImgCanvas.Canvas.Font.Color := RGB(240, 245, 255);
   ImgCanvas.Canvas.TextOut(15, 12, Format('Simulated Time: Day %d | Active Trail Points: %d', [DayCounter, TrailCount]));
 
-  ImgCanvas.Canvas.Font.Style2 := [];
+  //ImgCanvas.Canvas.Font.Style2 := [];
   ImgCanvas.Canvas.Font.Color := RGB(240, 210, 130);
   ImgCanvas.Canvas.TextOut(15, 30, Format('Venus (0.62 AU): (X: %d, Y: %d) | Spin: %.0f Deg', [Vx, Vy, VenusSpinRad * 180.0 / Pi]));
 
@@ -350,7 +352,7 @@ begin
   Application.Initialize;
   Form1 := TForm.Create(Application);
   Form1.Caption := 'maXbox Simulation v4: Solar System with Main Asteroid Belt';
-  Form1.SetBounds(80, 60, 860, 740);
+  Form1.SetBounds(80, 60, 860, 765);
   Form1.Position := poScreenCenter;
   Form1.Color := RGB(20, 25, 40);
 
@@ -364,7 +366,7 @@ begin
   ImgCanvas.SetBounds(20, 38, CANVAS_W, CANVAS_H);
 
   Timer1 := TTimer.Create(Form1);
-  Timer1.Interval := 40;
+  Timer1.Interval := 50;
   Timer1.OnTimer := @OnTimerStep;
 
   BtnStartPause := TButton.Create(Form1); BtnStartPause.Parent := Form1;
@@ -388,7 +390,7 @@ begin
   BtnSave.OnClick := @SaveFrameImage;
 
   LblSpeed := TLabel.Create(Form1); LblSpeed.Parent := Form1;
-  LblSpeed.SetBounds(540, 665, 80, 16);
+  LblSpeed.SetBounds(540, 655, 80, 16);
   LblSpeed.Caption := 'Speed:'; LblSpeed.Font.Color := clWhite;
 
   TrkSpeed := TTrackBar.Create(Form1); TrkSpeed.Parent := Form1;
@@ -405,6 +407,10 @@ begin
   Form1.Free;
 end;
 
-begin
+begin //@main
+ writeln(#$d83d#$de42#$d83d#$de42#$d83d#$de42);    
+  processmessagesOFF;   
+   maxform1.setconsole;
+  SetdebugOFF;
   BuildGUI;
 end.
