@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inner Solar System & Asteroid Belt Interactive Simulation</title>
+    <style>
+        :root {
+            --bg-color: #0a0f1d;
+            --card-bg: #141c2e;
+            --border-color: #2a364f;
+            --text-main: #f0f4fc;
+            --text-muted: #8e9bb4;
+            --accent-blue: #38bdf8;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+            padding: 24px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            margin: 0 0 6px 0;
+            font-size: 1.4rem;
+            color: #bae6fd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        canvas {
+            background: #050811;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .controls {
+            margin-top: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        button {
+            background: #2a364f;
+            color: var(--text-main);
+            border: 1px solid #3b4c6b;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background: #3b4c6b;
+            border-color: var(--accent-blue);
+        }
+
+        button.primary {
+            background: #0284c7;
+            border-color: #38bdf8;
+            color: #ffffff;
+        }
+
+        button.primary:hover {
+            background: #0369a1;
+        }
+
+        .slider-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        input[type="range"] {
+            accent-color: var(--accent-blue);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>
+        <span>🪐 Solar System Orbital Simulation maXboxJS</span>
+        <span style="font-size:0.8rem; color:var(--accent-amber);">v4 (Venus, Earth, Mars & Belt)</span>
+    </h1>
+    <div class="subtitle">Keplerian orbits, planetary axial rotation (day/night spin), persistent motion trails & asteroid belt</div>
+
+    <canvas id="orbitCanvas" width="750" height="550"></canvas>
+
+    <div class="controls">
+        <div class="btn-group">
+            <button class="primary" id="btnPlayPause">Start Simulation</button>
+            <button id="btnReset">Reset Orbits</button>
+            <button id="btnClearTrails">Clear Trails</button>
+        </div>
+
+        <div class="slider-group">
+            <label for="speedSlider">Speed:</label>
+            <input type="range" id="speedSlider" min="1" max="50" value="10">
+            <span id="speedVal" style="color:var(--accent-blue); width: 35px;">1.0x</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('orbitCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const CANVAS_W = canvas.width;
+    const CANVAS_H = canvas.height;
+    const CX = CANVAS_W / 2;
+    const CY = CANVAS_H / 2 - 10;
+    const SUN_R = 24;
+
+    // Orbital Semi-major (A) and Semi-minor (B) axes in pixels
+    const VENUS_A = 105, VENUS_B = 80,  VENUS_R = 9;
+    const EARTH_A = 170, EARTH_B = 130, EARTH_R = 11, MOON_ORBIT_R = 20, MOON_R = 3.5;
+    const MARS_A  = 235, MARS_B  = 180, MARS_R  = 8;
+
+    // Orbital & Axial Spin Angles
+    let venusAngle = 0, earthAngle = 0, moonAngle = 0, marsAngle = 0;
+    let venusSpin = 0, earthSpin = 0, marsSpin = 0;
+    let dayCounter = 1;
+    let isRunning = false;
+    let animId = null;
+
+    // Trail Ring Buffers (max 50 points per planet)
+    const MAX_TRAIL = 50;
+    let venusTrail = [], earthTrail = [], moonTrail = [], marsTrail = [];
+
+    // Generate Procedural Asteroid Belt (120 asteroids between 2.1 AU and 3.3 AU)
+    const asteroids = [];
+    for (let i = 0; i < 125; i++) {
+        const distRatio = 1.35 + Math.random() * 0.65; // Orbit radius multiplier
+        asteroids.push({
+            a: MARS_A * distRatio,
+            b: MARS_B * distRatio,
+            angle: Math.random() * Math.PI * 2,
+            speed: (0.006 + Math.random() * 0.004),
+            size: 1 + Math.random() * 1.5,
+            color: Math.random() > 0.3 ? '#8e9bb4' : '#64748b'
+        });
+    }
+
+    // Static Background Stars
+    const stars = [];
+    for (let i = 0; i < 60; i++) {
+        stars.push({ x: Math.random() * CANVAS_W, y: Math.random() * CANVAS_H, opacity: 0.3 + Math.random() * 0.7 });
+    }
+
+    function drawScene() {
+        // Clear background
+        ctx.fillStyle = '#050811';
+        ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+
+        // Draw Background Stars
+        stars.forEach(s => {
+            ctx.fillStyle = `rgba(255, 255, 255, ${s.opacity})`;
+            ctx.fillRect(s.x, s.y, 1.5, 1.5);
+        });
+
+        // 1. Draw Orbit Paths (Dotted Ellipses)
+        ctx.setLineDash([3, 4]);
+        ctx.lineWidth = 1;
+
+        // Venus Orbit
+        ctx.strokeStyle = '#9a7b38';
+        ctx.beginPath(); ctx.ellipse(CX, CY, VENUS_A, VENUS_B, 0, 0, Math.PI * 2); ctx.stroke();
+
+        // Earth Orbit
+        ctx.strokeStyle = '#386cb0';
+        ctx.beginPath(); ctx.ellipse(CX, CY, EARTH_A, EARTH_B, 0, 0, Math.PI * 2); ctx.stroke();
+
+        // Mars Orbit
+        ctx.strokeStyle = '#b04a38';
+        ctx.beginPath(); ctx.ellipse(CX, CY, MARS_A, MARS_B, 0, 0, Math.PI * 2); ctx.stroke();
+
+        ctx.setLineDash([]); // Reset to solid line
+
+        // 2. Draw Asteroid Belt Ring
+        asteroids.forEach(ast => {
+            const ax = CX + ast.a * Math.cos(ast.angle);
+            const ay = CY + ast.b * Math.sin(ast.angle);
+            ctx.fillStyle = ast.color;
+            ctx.beginPath(); ctx.arc(ax, ay, ast.size, 0, Math.PI * 2); ctx.fill();
+        });
+
+        // Calculate Current Positions
+        const vx = CX + VENUS_A * Math.cos(venusAngle);
+        const vy = CY + VENUS_B * Math.sin(venusAngle);
+
+        const ex = CX + EARTH_A * Math.cos(earthAngle);
+        const ey = CY + EARTH_B * Math.sin(earthAngle);
+
+        const mx = ex + MOON_ORBIT_R * Math.cos(moonAngle);
+        const my = ey + MOON_ORBIT_R * Math.sin(moonAngle);
+
+        const rx = CX + MARS_A * Math.cos(marsAngle);
+        const ry = CY + MARS_B * Math.sin(marsAngle);
+
+        // Update Motion Trails
+        if (isRunning) {
+            venusTrail.push({x: vx, y: vy}); if (venusTrail.length > MAX_TRAIL) venusTrail.shift();
+            earthTrail.push({x: ex, y: ey}); if (earthTrail.length > MAX_TRAIL) earthTrail.shift();
+            moonTrail.push({x: mx, y: my});   if (moonTrail.length > MAX_TRAIL) moonTrail.shift();
+            marsTrail.push({x: rx, y: ry});   if (marsTrail.length > MAX_TRAIL) marsTrail.shift();
+        }
+
+        // Draw Motion Trails
+        drawTrail(venusTrail, '#f59e0b');
+        drawTrail(earthTrail, '#38bdf8');
+        drawTrail(moonTrail, '#cbd5e1');
+        drawTrail(marsTrail, '#ef4444');
+
+        // Moon Orbit Ring around Earth
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(ex, ey, MOON_ORBIT_R, 0, Math.PI * 2); ctx.stroke();
+
+        // 3. Sun with Glowing Corona
+        const sunGlow = ctx.createRadialGradient(CX, CY, 5, CX, CY, SUN_R + 10);
+        sunGlow.addColorStop(0, '#fef08a');
+        sunGlow.addColorStop(0.5, '#f59e0b');
+        sunGlow.addColorStop(1, 'transparent');
+        ctx.fillStyle = sunGlow;
+        ctx.beginPath(); ctx.arc(CX, CY, SUN_R + 10, 0, Math.PI * 2); ctx.fill();
+
+        ctx.fillStyle = '#fbbf24';
+        ctx.beginPath(); ctx.arc(CX, CY, SUN_R, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#78350f';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.fillText('SUN', CX - 11, CY + 4);
+
+        // 4. Venus (Golden Sphere + Retrograde Spin Feature)
+        ctx.fillStyle = '#fbbf24';
+        ctx.beginPath(); ctx.arc(vx, vy, VENUS_R, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#d97706'; ctx.stroke();
+
+        const vSpotX = vx + 4 * Math.cos(-venusSpin);
+        const vSpotY = vy + 4 * Math.sin(-venusSpin);
+        ctx.fillStyle = '#b45309';
+        ctx.beginPath(); ctx.arc(vSpotX, vSpotY, 2, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#fef3c7'; ctx.font = '11px sans-serif'; ctx.fillText('Venus', vx - 16, vy + VENUS_R + 13);
+
+        // 5. Earth (Ocean Blue + Continent Spin + 23.5° Tilt Axis)
+        ctx.fillStyle = '#0284c7';
+        ctx.beginPath(); ctx.arc(ex, ey, EARTH_R, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#38bdf8'; ctx.stroke();
+
+        // Continent Marker
+        const eSpotX = ex + 5 * Math.cos(earthSpin);
+        const eSpotY = ey + 5 * Math.sin(earthSpin);
+        ctx.fillStyle = '#22c55e';
+        ctx.beginPath(); ctx.arc(eSpotX, eSpotY, 3, 0, Math.PI * 2); ctx.fill();
+
+        // 23.5° Axis Line
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.beginPath(); ctx.moveTo(ex - 5, ey - 14); ctx.lineTo(ex + 5, ey + 14); ctx.stroke();
+
+        ctx.fillStyle = '#bae6fd'; ctx.font = '11px sans-serif'; ctx.fillText('Earth', ex - 14, ey + EARTH_R + 13);
+
+        // Moon
+        ctx.fillStyle = '#e2e8f0';
+        ctx.beginPath(); ctx.arc(mx, my, MOON_R, 0, Math.PI * 2); ctx.fill();
+
+        // 6. Mars (Red Planet + Polar Ice Cap)
+        ctx.fillStyle = '#dc2626';
+        ctx.beginPath(); ctx.arc(rx, ry, MARS_R, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#fca5a5'; ctx.stroke();
+
+        // Polar Cap
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath(); ctx.arc(rx, ry - MARS_R + 2, 2.5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#fca5a5'; ctx.font = '11px sans-serif'; ctx.fillText('Mars', rx - 12, ry + MARS_R + 13);
+
+        // 7. Telemetry Overlay
+        ctx.fillStyle = '#f8fafc'; ctx.font = 'bold 12px sans-serif';
+        ctx.fillText(`Simulated Time: Day ${dayCounter}`, 15, 22);
+
+        ctx.font = '11px monospace';
+        ctx.fillStyle = '#f59e0b'; ctx.fillText(`Venus (0.62 AU): (${Math.round(vx)}, ${Math.round(vy)}) | 1.62x`, 15, 40);
+        ctx.fillStyle = '#38bdf8'; ctx.fillText(`Earth (1.00 AU): (${Math.round(ex)}, ${Math.round(ey)}) | 1.00x`, 15, 56);
+        ctx.fillStyle = '#ef4444'; ctx.fillText(`Mars  (1.52 AU): (${Math.round(rx)}, ${Math.round(ry)}) | 0.53x`, 15, 72);
+        ctx.fillStyle = '#94a3b8'; ctx.fillText(`Asteroid Belt: 125 procedural bodies (2.1 - 3.3 AU)`, 15, 88);
+    }
+
+    function drawTrail(trailPoints, color) {
+        if (trailPoints.length < 2) return;
+        ctx.beginPath();
+        for (let i = 0; i < trailPoints.length - 1; i++) {
+            ctx.strokeStyle = color;
+            ctx.globalAlpha = (i / trailPoints.length) * 0.6;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(trailPoints[i].x, trailPoints[i].y);
+            ctx.lineTo(trailPoints[i + 1].x, trailPoints[i + 1].y);
+            ctx.stroke();
+        }
+        ctx.globalAlpha = 1.0;
+    }
+
+    function updatePhysics() {
+        const speed = parseFloat(document.getElementById('speedSlider').value) / 10.0;
+
+        venusAngle += 0.0486 * speed;
+        earthAngle += 0.0300 * speed;
+        marsAngle  += 0.0159 * speed;
+        moonAngle  += 0.3500 * speed;
+
+        venusSpin += 0.02 * speed;
+        earthSpin += 0.12 * speed;
+        marsSpin  += 0.11 * speed;
+
+        asteroids.forEach(ast => { ast.angle += ast.speed * speed; });
+
+        dayCounter++;
+        drawScene();
+
+        if (isRunning) {
+            animId = requestAnimationFrame(updatePhysics);
+        }
+    }
+
+    // Event Controls
+    const btnPlayPause = document.getElementById('btnPlayPause');
+    btnPlayPause.addEventListener('click', () => {
+        isRunning = !isRunning;
+        if (isRunning) {
+            btnPlayPause.innerText = 'Pause Simulation';
+            updatePhysics();
+        } else {
+            btnPlayPause.innerText = 'Start Simulation';
+            cancelAnimationFrame(animId);
+        }
+    });
+
+    document.getElementById('btnReset').addEventListener('click', () => {
+        isRunning = false;
+        cancelAnimationFrame(animId);
+        btnPlayPause.innerText = 'Start Simulation';
+        venusAngle = earthAngle = moonAngle = marsAngle = 0;
+        venusSpin = earthSpin = marsSpin = 0;
+        dayCounter = 1;
+        venusTrail = []; earthTrail = []; moonTrail = []; marsTrail = [];
+        drawScene();
+    });
+
+    document.getElementById('btnClearTrails').addEventListener('click', () => {
+        venusTrail = []; earthTrail = []; moonTrail = []; marsTrail = [];
+        drawScene();
+    });
+
+    const speedSlider = document.getElementById('speedSlider');
+    speedSlider.addEventListener('input', (e) => {
+        document.getElementById('speedVal').innerText = (parseFloat(e.target.value) / 10.0).toFixed(1) + 'x';
+    });
+
+    // Initial Static Render
+    drawScene();
+</script>
+
+</body>
+</html>

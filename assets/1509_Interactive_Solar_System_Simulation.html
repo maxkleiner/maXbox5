@@ -1,0 +1,2300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="tool">
+  <meta name="design-style" content="nocturne">
+  <title>Inner Solar System — Keplerian Observatory maXboxJS</title>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..700;1,400..600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+
+      /* Nocturne: Prussian midnight steps */
+      --background: #0a101d;
+      --surface-container-low: #0e1626;
+      --surface-container: #111b2e;
+      --surface-container-high: #17243c;
+
+      /* Text */
+      --on-surface: #f2ece1;
+      --on-surface-variant: #9ba8bf;
+
+      /* Borders */
+      --outline: #384d73;
+      --outline-variant: #21304d;
+
+      /* Accents */
+      --primary: #dfaa5b;
+      --on-primary: #0a101d;
+      --primary-container: #2b261c;
+      --on-primary-container: #f5dcb0;
+      --secondary: #687a99;
+      --tertiary: #7cc4e8;
+      --error: #f27474;
+      --on-error: #1a0606;
+
+      /* Data series & celestial palette */
+      --data-1: #dfaa5b;
+      --data-2: #7cc4e8;
+      --data-3: #52d19c;
+      --data-4: #e07a5f;
+      --data-context: #4a5d80;
+
+      /* Celestial body rendering tokens */
+      --sun-core: #fff3d1;
+      --sun-mid: #f7b955;
+      --sun-corona: rgba(247, 185, 85, 0.22);
+      --venus-day: #e5c687;
+      --venus-band: #c49b57;
+      --venus-night: #1d1a14;
+      --earth-day: #4da6e8;
+      --earth-land: #52b788;
+      --earth-night: #0d1b2e;
+      --moon-day: #d6dde8;
+      --moon-crater: #98a4b8;
+      --moon-night: #141a26;
+      --mars-day: #e07a5f;
+      --mars-mare: #9e4733;
+      --mars-night: #1f110e;
+      --belt-rock: #6f809e;
+      --belt-rock-bright: #95a8c9;
+      --grid-ring: rgba(56, 77, 115, 0.35);
+      --grid-axis: rgba(56, 77, 115, 0.22);
+      --star-color: rgba(242, 236, 225, 0.45);
+      --night-veil: rgba(6, 10, 18, 0.78);
+
+      /* Fonts */
+      --font-headline: 'EB Garamond', serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+      --font-label: 'JetBrains Mono', monospace;
+
+      /* Shape */
+      --rounded: 0.25rem;
+      --rounded-lg: 0.375rem;
+      --rounded-full: 9999px;
+
+      /* Style effects */
+      --hairline: 1px solid var(--outline-variant);
+      --hairline-strong: 1px solid var(--outline);
+      --panel-highlight: inset 0 1px 0 rgba(242, 236, 225, 0.05);
+      --brass-glow: radial-gradient(circle at 88% 12%, rgba(223, 170, 91, 0.08), transparent 45%);
+      --heading-tracking: -0.015em;
+      --label-tracking: 0.06em;
+      --sky-tint: color-mix(in srgb, var(--tertiary) 12%, transparent);
+      --sky-border: 1px solid color-mix(in srgb, var(--tertiary) 35%, transparent);
+      --brass-tint: color-mix(in srgb, var(--primary) 14%, transparent);
+      --brass-border: 1px solid color-mix(in srgb, var(--primary) 40%, transparent);
+      --mint-tint: color-mix(in srgb, var(--data-3) 14%, transparent);
+      --coral-tint: color-mix(in srgb, var(--data-4) 14%, transparent);
+
+      /* Shared semantic & focus tokens */
+      --positive: #52d19c;
+      --warning: #dfaa5b;
+      --focus: #dfaa5b;
+
+      /* Focused Tool type scale */
+      --display-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.35rem);
+      --headline-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+      --subhead-size: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+      --body-size: clamp(0.9375rem, 0.9rem + 0.15vw, 1rem);
+      --label-size: 0.75rem;
+
+      /* Spacing scale (4pt base) */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+      --space-3xl: 6rem;
+
+      /* Motion */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --dur-micro: 120ms;
+      --dur-short: 220ms;
+      --dur-long: 420ms;
+    }
+
+    /* Base reset */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      overflow-x: clip;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    header { position: static !important; }
+
+    button, input, select, textarea {
+      font-family: inherit;
+      color: inherit;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .page-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-lg);
+      padding: var(--space-lg);
+      max-width: 1380px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .page-grid * { min-width: 0; }
+
+    /* Hero Header */
+    .hero-header {
+      background-color: var(--background);
+      background-image: var(--brass-glow);
+      border-bottom: var(--hairline);
+      padding-bottom: var(--space-lg);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: var(--space-md);
+    }
+
+    .hero-copy {
+      max-width: 65ch;
+    }
+
+    .title {
+      font-family: var(--font-headline);
+      font-weight: 500;
+      font-size: var(--display-size);
+      letter-spacing: var(--heading-tracking);
+      line-height: 1.08;
+      color: var(--on-surface);
+      margin: 0;
+    }
+
+    .title em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--primary);
+    }
+
+    .deck-brass {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      letter-spacing: var(--label-tracking);
+      text-transform: uppercase;
+      color: var(--primary);
+      margin: var(--space-xs) 0 0 0;
+    }
+
+    .hero-lede {
+      color: var(--on-surface-variant);
+      font-size: var(--body-size);
+      margin: var(--space-sm) 0 0 0;
+      max-width: 62ch;
+    }
+
+    .epoch-cluster {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .badge {
+      background: var(--sky-tint);
+      color: var(--tertiary);
+      border: var(--sky-border);
+      border-radius: var(--rounded);
+      padding: var(--space-xs) var(--space-sm);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      letter-spacing: var(--label-tracking);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .badge-brass {
+      background: var(--brass-tint);
+      color: var(--primary);
+      border: var(--brass-border);
+    }
+
+    /* Main Workspace Grid */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(340px, 0.95fr);
+      gap: var(--space-lg);
+      align-items: start;
+    }
+
+    .sim-column {
+      display: grid;
+      gap: var(--space-md);
+    }
+
+    .telemetry-column {
+      display: grid;
+      gap: var(--space-md);
+    }
+
+    /* Nocturne Panels */
+    .panel {
+      background: var(--surface-container);
+      border: var(--hairline);
+      box-shadow: var(--panel-highlight);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-md);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: var(--space-sm);
+      padding-bottom: var(--space-sm);
+      border-bottom: var(--hairline);
+      margin-bottom: var(--space-md);
+    }
+
+    .panel-title {
+      font-family: var(--font-headline);
+      font-weight: 500;
+      font-size: var(--headline-size);
+      letter-spacing: var(--heading-tracking);
+      line-height: 1.15;
+      color: var(--on-surface);
+      margin: 0;
+    }
+
+    .coord-label {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      letter-spacing: var(--label-tracking);
+      text-transform: uppercase;
+      color: var(--tertiary);
+    }
+
+    .muted-label {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      letter-spacing: var(--label-tracking);
+      text-transform: uppercase;
+      color: var(--on-surface-variant);
+    }
+
+    /* Control Deck */
+    .controls-deck {
+      display: grid;
+      gap: var(--space-md);
+    }
+
+    .controls-top-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: end;
+      gap: var(--space-md);
+    }
+
+    .transport-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: end;
+      gap: var(--space-sm);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--rounded);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 500;
+      letter-spacing: var(--label-tracking);
+      text-transform: uppercase;
+      cursor: pointer;
+      border: var(--hairline-strong);
+      background: transparent;
+      color: var(--on-surface);
+      transition: background-color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out), opacity var(--dur-micro) var(--ease-out);
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      background-color: var(--surface-container-high);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--on-primary-container);
+    }
+
+    .btn-compact {
+      min-height: 44px;
+      min-width: 44px;
+      padding: var(--space-xs) var(--space-sm);
+    }
+
+    .btn-active {
+      background: var(--brass-tint);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* Speed Control Group */
+    .speed-control-block {
+      display: grid;
+      gap: var(--space-xs);
+      flex: 1 1 280px;
+    }
+
+    .control-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      letter-spacing: var(--label-tracking);
+      text-transform: uppercase;
+      color: var(--on-surface-variant);
+    }
+
+    .speed-inputs-row {
+      display: flex;
+      align-items: end;
+      gap: var(--space-sm);
+    }
+
+    .speed-slider-wrap {
+      flex: 1 1 auto;
+      display: flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0 var(--space-sm);
+      background: var(--background);
+      border: var(--hairline-strong);
+      border-radius: var(--rounded);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--primary);
+      cursor: pointer;
+      height: 6px;
+      background: transparent;
+    }
+
+    .speed-number-input {
+      width: 78px;
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-sm);
+      background: var(--background);
+      border: var(--hairline-strong);
+      border-radius: var(--rounded);
+      font-family: var(--font-label);
+      font-size: var(--body-size);
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+      color: var(--primary);
+    }
+
+    .speed-presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+    }
+
+    .preset-chip {
+      min-height: 36px;
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--rounded);
+      background: var(--surface-container-low);
+      border: var(--hairline);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+    }
+
+    .preset-chip:hover {
+      background: var(--surface-container-high);
+      color: var(--on-surface);
+    }
+
+    .preset-chip[aria-pressed="true"] {
+      background: var(--brass-tint);
+      border: var(--brass-border);
+      color: var(--primary);
+    }
+
+    /* Layer toggles */
+    .toggles-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      padding-top: var(--space-sm);
+      border-top: var(--hairline);
+    }
+
+    .toggle-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-md);
+      background: var(--surface-container-low);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      letter-spacing: var(--label-tracking);
+      text-transform: uppercase;
+      color: var(--on-surface-variant);
+      cursor: pointer;
+      user-select: none;
+      transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+    }
+
+    .toggle-pill:hover {
+      background: var(--surface-container-high);
+      color: var(--on-surface);
+    }
+
+    .toggle-pill input[type="checkbox"] {
+      accent-color: var(--primary);
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .toggle-pill.is-checked {
+      background: var(--sky-tint);
+      border: var(--sky-border);
+      color: var(--on-surface);
+    }
+
+    /* Recessed Observation Well */
+    .observation-well {
+      position: relative;
+      background: var(--background);
+      border: var(--hairline);
+      border-radius: var(--rounded-lg);
+      overflow: hidden;
+      min-height: 520px;
+      height: clamp(520px, 64vh, 690px);
+    }
+
+    #solar-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    #solar-canvas:active {
+      cursor: grabbing;
+    }
+
+    .canvas-hud-top {
+      position: absolute;
+      top: var(--space-md);
+      left: var(--space-md);
+      right: var(--space-md);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      pointer-events: none;
+      gap: var(--space-sm);
+    }
+
+    .hud-tag {
+      background: var(--surface-container-low);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      padding: var(--space-xs) var(--space-sm);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+      font-variant-numeric: tabular-nums;
+      opacity: 0.92;
+    }
+
+    .canvas-hud-bottom {
+      position: absolute;
+      bottom: var(--space-md);
+      left: var(--space-md);
+      right: var(--space-md);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      pointer-events: none;
+      gap: var(--space-sm);
+    }
+
+    .zoom-controls {
+      display: flex;
+      gap: var(--space-xs);
+      pointer-events: auto;
+    }
+
+    .zoom-btn {
+      min-width: 44px;
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-sm);
+      background: var(--surface-container);
+      border: var(--hairline-strong);
+      border-radius: var(--rounded);
+      color: var(--on-surface);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out);
+    }
+
+    .zoom-btn:hover {
+      background: var(--surface-container-high);
+    }
+
+    /* Telemetry Rail Components */
+    .inspector-card {
+      container-type: inline-size;
+    }
+
+    .body-selector-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+      margin-bottom: var(--space-md);
+    }
+
+    .body-tab {
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--rounded);
+      border: var(--hairline);
+      background: var(--surface-container-low);
+      color: var(--on-surface-variant);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      letter-spacing: var(--label-tracking);
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+    }
+
+    .body-tab:hover {
+      background: var(--surface-container-high);
+      color: var(--on-surface);
+    }
+
+    .body-tab[aria-selected="true"] {
+      background: var(--brass-tint);
+      border: var(--brass-border);
+      color: var(--primary);
+    }
+
+    .swatch-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: var(--rounded-full);
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .inspector-grid {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      gap: var(--space-md);
+      align-items: center;
+    }
+
+    @container (max-width: 399px) {
+      .inspector-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .spin-well {
+      background: var(--background);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      width: 150px;
+      height: 150px;
+      min-height: 150px;
+      position: relative;
+      margin: 0 auto;
+    }
+
+    #spin-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .inspector-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-sm);
+    }
+
+    .metric-cell {
+      background: var(--surface-container-low);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      padding: var(--space-sm);
+    }
+
+    .metric-cell-label {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+      text-transform: uppercase;
+      letter-spacing: var(--label-tracking);
+    }
+
+    .metric-cell-val {
+      font-family: var(--font-label);
+      font-size: var(--subhead-size);
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      color: var(--on-surface);
+      margin-top: var(--space-xs);
+    }
+
+    .vis-viva-box {
+      margin-top: var(--space-md);
+      padding: var(--space-sm) var(--space-md);
+      background: var(--background);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+      font-variant-numeric: tabular-nums;
+      display: grid;
+      gap: var(--space-xs);
+    }
+
+    .vis-viva-eq {
+      color: var(--tertiary);
+    }
+
+    /* Telemetry Table */
+    .table-scroll {
+      overflow-x: auto;
+    }
+
+    .telemetry-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .telemetry-table th {
+      text-align: right;
+      padding: var(--space-sm) var(--space-xs);
+      color: var(--on-surface-variant);
+      text-transform: uppercase;
+      letter-spacing: var(--label-tracking);
+      font-weight: 500;
+      border-bottom: var(--hairline-strong);
+      white-space: nowrap;
+    }
+
+    .telemetry-table th:first-child,
+    .telemetry-table td:first-child {
+      text-align: left;
+    }
+
+    .telemetry-table td {
+      text-align: right;
+      padding: var(--space-sm) var(--space-xs);
+      border-bottom: var(--hairline);
+      color: var(--on-surface);
+      white-space: nowrap;
+    }
+
+    .telemetry-row {
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out);
+    }
+
+    .telemetry-row:hover {
+      background-color: var(--surface-container-high);
+    }
+
+    .telemetry-row.is-selected {
+      background-color: var(--brass-tint);
+    }
+
+    .body-name-cell {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      font-weight: 500;
+    }
+
+    .spin-tag {
+      display: inline-block;
+      padding: 2px var(--space-xs);
+      border-radius: var(--rounded);
+      font-size: var(--label-size);
+    }
+
+    .spin-prograde {
+      background: var(--mint-tint);
+      color: var(--positive);
+    }
+
+    .spin-retrograde {
+      background: var(--coral-tint);
+      color: var(--data-4);
+    }
+
+    /* Belt & Notes Panel */
+    .notes-list {
+      margin: 0;
+      padding-left: var(--space-md);
+      color: var(--on-surface-variant);
+      display: grid;
+      gap: var(--space-xs);
+      font-size: var(--body-size);
+    }
+
+    .notes-list strong {
+      color: var(--on-surface);
+      font-weight: 600;
+    }
+
+    .status-note {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--on-surface-variant);
+      margin-top: var(--space-sm);
+    }
+
+    /* Responsive layout shifts */
+    @media (max-width: 1024px) {
+      .workspace-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page-grid {
+        padding: var(--space-sm);
+        gap: var(--space-md);
+      }
+      .observation-well {
+        min-height: 400px;
+        height: 420px;
+      }
+      .inspector-metrics {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-grid">
+    <header class="hero-header">
+      <div class="hero-copy">
+        <h1 class="title">Inner Solar System — <em>Keplerian</em> Observatory maXboxJS</h1>
+        <p class="deck-brass">Heliocentric Ecliptic Simulation · Venus, Earth &amp; Moon, Mars &amp; Main Asteroid Belt</p>
+        <p class="hero-lede">
+          Interactive two-body Keplerian propagator with planetary day/night axial spin, persistent orbital motion trails, and live Vis-Viva velocity telemetry.
+        </p>
+      </div>
+      <div class="epoch-cluster" aria-live="polite">
+        <span class="badge badge-brass" id="sim-status-badge">RUNNING · 1.0×</span>
+        <span class="badge" id="epoch-readout">T + 0.0 D · 0.000 YR</span>
+        <span class="badge" id="date-readout">2026-11-17</span>
+      </div>
+    </header>
+
+    <main class="workspace-grid">
+      <!-- LEFT COLUMN: Controls + Simulation Canvas -->
+      <section class="sim-column" aria-label="Simulation viewport and controls">
+        <div class="panel controls-deck">
+          <div class="controls-top-row">
+            <div class="transport-group">
+              <button type="button" class="btn btn-primary" id="btn-toggle-run" onclick="toggleSimulation()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" id="icon-run-state">
+                  <rect x="6" y="4" width="4" height="16"></rect>
+                  <rect x="14" y="4" width="4" height="16"></rect>
+                </svg>
+                <span id="label-run-state">Pause</span>
+              </button>
+              <button type="button" class="btn" id="btn-reset" onclick="resetSimulation()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path>
+                  <path d="M3 3v5h5"></path>
+                </svg>
+                <span>Reset</span>
+              </button>
+              <button type="button" class="btn" id="btn-clear-trails" onclick="clearTrails()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M3 6h18"></path>
+                  <path d="M8 6V4h8v2"></path>
+                  <path d="M19 6l-1 14H6L5 6"></path>
+                </svg>
+                <span>Clear Trails</span>
+              </button>
+            </div>
+
+            <div class="speed-control-block">
+              <label class="control-label" for="speed-slider">
+                <span>Simulation Speed (0.1× – 5.0×)</span>
+                <span id="speed-rate-readout">30.0 days/s</span>
+              </label>
+              <div class="speed-inputs-row">
+                <div class="speed-slider-wrap">
+                  <input type="range" id="speed-slider" min="0.1" max="5.0" step="0.1" value="1.0" oninput="syncSpeedFromSlider(this.value)">
+                </div>
+                <input type="number" id="speed-number" class="speed-number-input" min="0.1" max="5.0" step="0.1" value="1.0" aria-label="Simulation speed multiplier" oninput="syncSpeedFromNumber(this.value)">
+              </div>
+              <div class="speed-presets" role="group" aria-label="Speed presets">
+                <button type="button" class="preset-chip" data-speed="0.1" onclick="setSpeedPreset(0.1)">0.1×</button>
+                <button type="button" class="preset-chip" data-speed="0.5" onclick="setSpeedPreset(0.5)">0.5×</button>
+                <button type="button" class="preset-chip" data-speed="1.0" aria-pressed="true" onclick="setSpeedPreset(1.0)">1.0×</button>
+                <button type="button" class="preset-chip" data-speed="2.5" onclick="setSpeedPreset(2.5)">2.5×</button>
+                <button type="button" class="preset-chip" data-speed="5.0" onclick="setSpeedPreset(5.0)">5.0×</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="toggles-row">
+            <label class="toggle-pill is-checked" id="wrap-toggle-trails">
+              <input type="checkbox" id="toggle-trails" checked onchange="toggleTrailsPersistence(this.checked)">
+              <span>Persistent Trails</span>
+            </label>
+            <label class="toggle-pill is-checked" id="wrap-toggle-guides">
+              <input type="checkbox" id="toggle-guides" checked onchange="toggleGuides(this.checked)">
+              <span>Keplerian Ellipses</span>
+            </label>
+            <label class="toggle-pill is-checked" id="wrap-toggle-belt">
+              <input type="checkbox" id="toggle-belt" checked onchange="toggleBelt(this.checked)">
+              <span>Main Asteroid Belt</span>
+            </label>
+            <label class="toggle-pill is-checked" id="wrap-toggle-labels">
+              <input type="checkbox" id="toggle-labels" checked onchange="toggleLabels(this.checked)">
+              <span>Body Labels</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="observation-well" id="canvas-well">
+          <canvas id="solar-canvas" aria-label="Interactive Inner Solar System orbital simulation"></canvas>
+          <div class="canvas-hud-top">
+            <span class="hud-tag" id="hud-scale-tag">ECLIPTIC NORTH · 1 AU = 149.6M KM · SCHEMATIC BODY RADII</span>
+            <span class="hud-tag" id="hud-zoom-tag">ZOOM 1.00×</span>
+          </div>
+          <div class="canvas-hud-bottom">
+            <span class="hud-tag">DRAG TO PAN · SCROLL TO ZOOM · CLICK BODY TO INSPECT</span>
+            <div class="zoom-controls">
+              <button type="button" class="zoom-btn" onclick="adjustZoom(1.2)" aria-label="Zoom in">+</button>
+              <button type="button" class="zoom-btn" onclick="adjustZoom(0.8333)" aria-label="Zoom out">−</button>
+              <button type="button" class="zoom-btn" onclick="resetCamera()" aria-label="Reset camera view">Fit</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: Spin Inspector + Live Telemetry -->
+      <aside class="telemetry-column" aria-label="Real-time telemetry and planetary spin inspector">
+        <section class="panel inspector-card">
+          <div class="panel-header">
+            <h2 class="panel-title">Axial Spin &amp; Keplerian Inspector</h2>
+            <span class="coord-label" id="inspector-class-tag">TERRESTRIAL</span>
+          </div>
+
+          <div class="body-selector-strip" role="tablist" aria-label="Select celestial body">
+            <button type="button" class="body-tab" role="tab" id="tab-venus" aria-selected="false" onclick="selectBody('venus')">
+              <span class="swatch-dot" style="background-color: var(--venus-day);"></span>Venus
+            </button>
+            <button type="button" class="body-tab" role="tab" id="tab-earth" aria-selected="true" onclick="selectBody('earth')">
+              <span class="swatch-dot" style="background-color: var(--earth-day);"></span>Earth
+            </button>
+            <button type="button" class="body-tab" role="tab" id="tab-moon" aria-selected="false" onclick="selectBody('moon')">
+              <span class="swatch-dot" style="background-color: var(--moon-day);"></span>Moon
+            </button>
+            <button type="button" class="body-tab" role="tab" id="tab-mars" aria-selected="false" onclick="selectBody('mars')">
+              <span class="swatch-dot" style="background-color: var(--mars-day);"></span>Mars
+            </button>
+            <button type="button" class="body-tab" role="tab" id="tab-sun" aria-selected="false" onclick="selectBody('sun')">
+              <span class="swatch-dot" style="background-color: var(--sun-mid);"></span>Sun
+            </button>
+          </div>
+
+          <div class="inspector-grid">
+            <div class="spin-well">
+              <canvas id="spin-canvas" width="150" height="150" aria-label="Magnified planetary day and night axial rotation view"></canvas>
+            </div>
+            <div class="inspector-metrics">
+              <div class="metric-cell">
+                <div class="metric-cell-label">Heliocentric (X, Y)</div>
+                <div class="metric-cell-val" id="insp-xy">+0.000, +0.000 AU</div>
+              </div>
+              <div class="metric-cell">
+                <div class="metric-cell-label">Orbital Speed</div>
+                <div class="metric-cell-val" id="insp-speed">29.78 km/s</div>
+              </div>
+              <div class="metric-cell">
+                <div class="metric-cell-label">Solar Distance r</div>
+                <div class="metric-cell-val" id="insp-r">1.000 AU</div>
+              </div>
+              <div class="metric-cell">
+                <div class="metric-cell-label">Axial Spin</div>
+                <div class="metric-cell-val" id="insp-spin">+23.93 h</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="vis-viva-box">
+            <div class="vis-viva-eq" id="insp-vis-viva-eq">v = √[μ☉ · (2/r − 1/a)]</div>
+            <div id="insp-vis-viva-sub">a = 1.0000 AU · e = 0.0167 · ν = 0.0° · Period = 365.26 d</div>
+          </div>
+          <p class="status-note" id="insp-spin-note">
+            Sunlit hemisphere tracks the true Sun vector; visual spin cadence is scaled for 60 Hz legibility while telemetry tracks true sidereal rotation.
+          </p>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h2 class="panel-title">Live Ephemeris Telemetry</h2>
+            <span class="coord-label">ECLIPTIC J2000</span>
+          </div>
+          <div class="table-scroll">
+            <table class="telemetry-table">
+              <thead>
+                <tr>
+                  <th>Body</th>
+                  <th>X (AU)</th>
+                  <th>Y (AU)</th>
+                  <th>r (AU)</th>
+                  <th>v (km/s)</th>
+                  <th>Spin</th>
+                </tr>
+              </thead>
+              <tbody id="telemetry-tbody">
+                <tr class="telemetry-row" id="row-venus" onclick="selectBody('venus')">
+                  <td><span class="body-name-cell"><span class="swatch-dot" style="background-color: var(--venus-day);"></span>Venus</span></td>
+                  <td id="tel-venus-x">+0.000</td>
+                  <td id="tel-venus-y">+0.000</td>
+                  <td id="tel-venus-r">0.723</td>
+                  <td id="tel-venus-v">35.02</td>
+                  <td><span class="spin-tag spin-retrograde" id="tel-venus-spin">RET 0°</span></td>
+                </tr>
+                <tr class="telemetry-row is-selected" id="row-earth" onclick="selectBody('earth')">
+                  <td><span class="body-name-cell"><span class="swatch-dot" style="background-color: var(--earth-day);"></span>Earth</span></td>
+                  <td id="tel-earth-x">+0.000</td>
+                  <td id="tel-earth-y">+0.000</td>
+                  <td id="tel-earth-r">1.000</td>
+                  <td id="tel-earth-v">29.78</td>
+                  <td><span class="spin-tag spin-prograde" id="tel-earth-spin">PRO 0°</span></td>
+                </tr>
+                <tr class="telemetry-row" id="row-moon" onclick="selectBody('moon')">
+                  <td><span class="body-name-cell"><span class="swatch-dot" style="background-color: var(--moon-day);"></span>Moon</span></td>
+                  <td id="tel-moon-x">+0.000</td>
+                  <td id="tel-moon-y">+0.000</td>
+                  <td id="tel-moon-r">1.000</td>
+                  <td id="tel-moon-v">1.02*</td>
+                  <td><span class="spin-tag spin-prograde" id="tel-moon-spin">LOCK 0°</span></td>
+                </tr>
+                <tr class="telemetry-row" id="row-mars" onclick="selectBody('mars')">
+                  <td><span class="body-name-cell"><span class="swatch-dot" style="background-color: var(--mars-day);"></span>Mars</span></td>
+                  <td id="tel-mars-x">+0.000</td>
+                  <td id="tel-mars-y">+0.000</td>
+                  <td id="tel-mars-r">1.524</td>
+                  <td id="tel-mars-v">24.13</td>
+                  <td><span class="spin-tag spin-prograde" id="tel-mars-spin">PRO 0°</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="status-note">*Moon velocity shows geocentric orbital speed around Earth (~1.02 km/s); coordinates X, Y are heliocentric AU.</p>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h2 class="panel-title">Main Asteroid Belt &amp; Model</h2>
+            <span class="muted-label">2.15 – 3.25 AU</span>
+          </div>
+          <ul class="notes-list">
+            <li><strong>Main Belt Ensemble:</strong> 480 simulated bodies orbiting between 2.15 and 3.25 AU (Keplerian speeds 16.5–20.3 km/s), with sculpted density gaps near the 3:1 (2.50 AU) and 5:2 (2.82 AU) Kirkwood resonances.</li>
+            <li><strong>Keplerian Solver:</strong> Mean anomaly <em>M</em> is converted to eccentric anomaly <em>E</em> via 5-step Newton-Raphson iteration on <em>M = E − e sin E</em>, yielding exact elliptical positions and Vis-Viva velocities.</li>
+            <li><strong>Axial Spin Contrast:</strong> Earth (23.93 h) and Mars (24.62 h) spin prograde; Venus (−243.0 d) rotates retrograde (clockwise from ecliptic north), while the Moon remains tidally locked to Earth.</li>
+          </ul>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <api-shim></api-shim>
+  <script>
+    (function () {
+      // Astronomical constants
+      const AU_KM = 149597870.7;
+      const MU_SUN = 1.3271244e11; // km^3 / s^2
+      const MU_EARTH = 398600.4418; // km^3 / s^2
+      const BASE_DAYS_PER_SEC = 30.0; // at 1.0x speed: 30 Earth days per second
+      const START_DATE_MS = Date.UTC(2026, 10, 17, 0, 0, 0);
+
+      // Read Nocturne palette tokens from CSS :root so canvas stays synchronized
+      const styles = getComputedStyle(document.documentElement);
+      const token = (name) => styles.getPropertyValue(name).trim();
+      const PALETTE = {
+        bg: token('--background'),
+        surfaceLow: token('--surface-container-low'),
+        surface: token('--surface-container'),
+        onSurface: token('--on-surface'),
+        onSurfaceVariant: token('--on-surface-variant'),
+        primary: token('--primary'),
+        tertiary: token('--tertiary'),
+        positive: token('--positive'),
+        sunCore: token('--sun-core'),
+        sunMid: token('--sun-mid'),
+        sunCorona: token('--sun-corona'),
+        venusDay: token('--venus-day'),
+        venusBand: token('--venus-band'),
+        venusNight: token('--venus-night'),
+        earthDay: token('--earth-day'),
+        earthLand: token('--earth-land'),
+        earthNight: token('--earth-night'),
+        moonDay: token('--moon-day'),
+        moonCrater: token('--moon-crater'),
+        moonNight: token('--moon-night'),
+        marsDay: token('--mars-day'),
+        marsMare: token('--mars-mare'),
+        marsNight: token('--mars-night'),
+        beltRock: token('--belt-rock'),
+        beltRockBright: token('--belt-rock-bright'),
+        gridRing: token('--grid-ring'),
+        gridAxis: token('--grid-axis'),
+        starColor: token('--star-color'),
+        nightVeil: token('--night-veil'),
+        outline: token('--outline'),
+        outlineVariant: token('--outline-variant')
+      };
+
+      // Planetary and lunar orbital elements (J2000-anchored)
+      const BODIES = {
+        sun: {
+          id: 'sun',
+          name: 'Sun',
+          classification: 'G2V MAIN-SEQUENCE STAR',
+          a: 0,
+          e: 0,
+          periodDays: 0,
+          varpiDeg: 0,
+          meanAnomaly0Deg: 0,
+          rotPeriodDays: 25.38,
+          tiltDeg: 7.25,
+          radiusPx: 18,
+          color: PALETTE.sunMid,
+          trailColor: PALETTE.sunMid,
+          retrograde: false
+        },
+        venus: {
+          id: 'venus',
+          name: 'Venus',
+          classification: 'TERRESTRIAL · RETROGRADE',
+          a: 0.723332,
+          e: 0.006772,
+          periodDays: 224.701,
+          varpiDeg: 131.56,
+          meanAnomaly0Deg: 50.42,
+          rotPeriodDays: -243.025,
+          tiltDeg: 177.36,
+          radiusPx: 8.5,
+          color: PALETTE.venusDay,
+          trailColor: PALETTE.venusDay,
+          retrograde: true
+        },
+        earth: {
+          id: 'earth',
+          name: 'Earth',
+          classification: 'TERRESTRIAL · PROGRADE',
+          a: 1.000001,
+          e: 0.0167086,
+          periodDays: 365.256,
+          varpiDeg: 102.94,
+          meanAnomaly0Deg: 312.5,
+          rotPeriodDays: 0.99727,
+          tiltDeg: 23.44,
+          radiusPx: 9.2,
+          color: PALETTE.earthDay,
+          trailColor: PALETTE.tertiary,
+          retrograde: false
+        },
+        moon: {
+          id: 'moon',
+          name: 'Moon',
+          classification: 'NATURAL SATELLITE · TIDAL LOCK',
+          a: 0.0025696, // 384,400 km in AU
+          visualOrbitAu: 0.115, // schematic separation so Moon is clearly visible around Earth
+          e: 0.0549,
+          periodDays: 27.3217,
+          varpiDeg: 83.35,
+          meanAnomaly0Deg: 135.0,
+          rotPeriodDays: 27.3217,
+          tiltDeg: 6.68,
+          radiusPx: 4.4,
+          color: PALETTE.moonDay,
+          trailColor: PALETTE.moonCrater,
+          retrograde: false
+        },
+        mars: {
+          id: 'mars',
+          name: 'Mars',
+          classification: 'TERRESTRIAL · ECCENTRIC',
+          a: 1.523679,
+          e: 0.093405,
+          periodDays: 686.98,
+          varpiDeg: 336.04,
+          meanAnomaly0Deg: 19.38,
+          rotPeriodDays: 1.02596,
+          tiltDeg: 25.19,
+          radiusPx: 7.4,
+          color: PALETTE.marsDay,
+          trailColor: PALETTE.marsDay,
+          retrograde: false
+        }
+      };
+
+      // Simulation mutable state
+      const state = {
+        isRunning: true,
+        speed: 1.0,
+        simDays: 0,
+        trailsEnabled: true,
+        showGuides: true,
+        showBelt: true,
+        showLabels: true,
+        selectedBody: 'earth',
+        cameraZoom: 1.0,
+        panX: 0,
+        panY: 0,
+        lastFrameTime: null,
+        lastTrailDay: -999
+      };
+
+      // Persistent orbital motion trails
+      const MAX_TRAIL_POINTS = 950;
+      const trails = {
+        venus: [],
+        earth: [],
+        moon: [],
+        mars: []
+      };
+
+      // Precomputed starfield & procedural Main Asteroid Belt
+      const stars = [];
+      const asteroids = [];
+
+      function seededRandom(seed) {
+        let s = seed % 2147483647;
+        if (s <= 0) s += 2147483646;
+        return function () {
+          s = (s * 16807) % 2147483647;
+          return (s - 1) / 2147483646;
+        };
+      }
+
+      function initBackgroundAndBelt() {
+        const rand = seededRandom(42019);
+        stars.length = 0;
+        for (let i = 0; i < 160; i++) {
+          stars.push({
+            nx: rand(),
+            ny: rand(),
+            r: 0.6 + rand() * 1.1,
+            alpha: 0.2 + rand() * 0.55
+          });
+        }
+
+        asteroids.length = 0;
+        let count = 0;
+        while (count < 480) {
+          const a = 2.15 + rand() * 1.10; // 2.15 AU to 3.25 AU
+          // Carve subtle Kirkwood gaps at 2.50 AU (3:1) and 2.82 AU (5:2)
+          if (Math.abs(a - 2.50) < 0.032 && rand() < 0.85) continue;
+          if (Math.abs(a - 2.82) < 0.028 && rand() < 0.80) continue;
+          const e = 0.02 + rand() * 0.14;
+          const varpi = rand() * Math.PI * 2;
+          const m0 = rand() * Math.PI * 2;
+          const periodDays = Math.pow(a, 1.5) * 365.256;
+          const size = 0.9 + rand() * 1.6;
+          const bright = rand() > 0.72;
+          asteroids.push({ a, e, varpi, m0, periodDays, size, bright });
+          count++;
+        }
+      }
+
+      // Keplerian two-body solver
+      function solveEccentricAnomaly(M, e) {
+        let E = M;
+        for (let i = 0; i < 6; i++) {
+          const f = E - e * Math.sin(E) - M;
+          const fp = 1 - e * Math.cos(E);
+          E = E - f / fp;
+        }
+        return E;
+      }
+
+      function computeKeplerState(body, simDays) {
+        if (body.a === 0) {
+          const rotPhaseDeg = ((simDays / body.rotPeriodDays) * 360) % 360;
+          return {
+            x: 0,
+            y: 0,
+            r: 0,
+            v: 0,
+            nuDeg: 0,
+            rotPhaseDeg: (rotPhaseDeg + 360) % 360
+          };
+        }
+
+        const n = (2 * Math.PI) / body.periodDays;
+        const m0 = (body.meanAnomaly0Deg * Math.PI) / 180;
+        const varpi = (body.varpiDeg * Math.PI) / 180;
+        const M = (m0 + n * simDays) % (2 * Math.PI);
+        const E = solveEccentricAnomaly(M, body.e);
+
+        const sinE = Math.sin(E);
+        const cosE = Math.cos(E);
+        const nu = 2 * Math.atan2(
+          Math.sqrt(1 + body.e) * Math.sin(E / 2),
+          Math.sqrt(1 - body.e) * Math.cos(E / 2)
+        );
+        const r = body.a * (1 - body.e * cosE);
+        const theta = nu + varpi;
+        const x = r * Math.cos(theta);
+        const y = r * Math.sin(theta);
+
+        // Vis-Viva equation: v = sqrt(mu * (2/r_km - 1/a_km))
+        const rKm = r * AU_KM;
+        const aKm = body.a * AU_KM;
+        const mu = body.id === 'moon' ? MU_EARTH : MU_SUN;
+        const v = Math.sqrt(mu * (2 / rKm - 1 / aKm));
+
+        const nuDeg = ((nu * 180) / Math.PI + 360) % 360;
+        const rawRot = (simDays / body.rotPeriodDays) * 360;
+        const rotPhaseDeg = ((rawRot % 360) + 360) % 360;
+
+        return { x, y, r, v, nuDeg, rotPhaseDeg, theta };
+      }
+
+      function computeAllBodies(simDays) {
+        const sun = computeKeplerState(BODIES.sun, simDays);
+        const venus = computeKeplerState(BODIES.venus, simDays);
+        const earth = computeKeplerState(BODIES.earth, simDays);
+        const moonGeo = computeKeplerState(BODIES.moon, simDays);
+        const mars = computeKeplerState(BODIES.mars, simDays);
+
+        // True heliocentric Moon coordinates for ephemeris telemetry
+        const moonHelioX = earth.x + moonGeo.x;
+        const moonHelioY = earth.y + moonGeo.y;
+        const moonHelioR = Math.hypot(moonHelioX, moonHelioY);
+
+        // Schematic visual coordinates for Moon around Earth on canvas
+        const scaleRatio = BODIES.moon.visualOrbitAu / BODIES.moon.a;
+        const moonVisX = earth.x + moonGeo.x * scaleRatio;
+        const moonVisY = earth.y + moonGeo.y * scaleRatio;
+
+        return {
+          sun,
+          venus,
+          earth,
+          moon: {
+            x: moonHelioX,
+            y: moonHelioY,
+            visX: moonVisX,
+            visY: moonVisY,
+            r: moonHelioR,
+            geoR: moonGeo.r,
+            v: moonGeo.v,
+            nuDeg: moonGeo.nuDeg,
+            rotPhaseDeg: moonGeo.rotPhaseDeg,
+            theta: moonGeo.theta
+          },
+          mars
+        };
+      }
+
+      // Visual axial rotation angle scaled for crisp 60Hz observation
+      function getVisualSpinAngle(body, simDays, earthState) {
+        if (body.id === 'moon') {
+          // Tidally locked: same face always toward Earth
+          return Math.atan2(earthState.y - (earthState.y + Math.sin(0)), 1) +
+            ((simDays / body.periodDays) * 2 * Math.PI);
+        }
+        if (body.id === 'venus') {
+          // Retrograde (clockwise in ecliptic north view): gently boosted visual cadence so clockwise spin is perceptible
+          return -(simDays / 24.0) * 0.85;
+        }
+        if (body.id === 'sun') {
+          return (simDays / 25.38) * 1.8;
+        }
+        // Earth & Mars prograde spin (counter-clockwise in standard math coords, visually inverted Y on canvas -> -angle)
+        const relRate = 0.99727 / Math.abs(body.rotPeriodDays);
+        return (simDays / 12.0) * Math.PI * relRate;
+      }
+
+      // Canvas setup & coordinate transforms
+      const solarCanvas = document.getElementById('solar-canvas');
+      const spinCanvas = document.getElementById('spin-canvas');
+      const solarCtx = solarCanvas ? solarCanvas.getContext('2d') : null;
+      const spinCtx = spinCanvas ? spinCanvas.getContext('2d') : null;
+
+      let canvasWidth = 600;
+      let canvasHeight = 520;
+      const screenPositions = {};
+
+      function resizeMainCanvas() {
+        if (!solarCanvas) return;
+        const rect = solarCanvas.parentElement.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvasWidth = Math.max(300, Math.floor(rect.width));
+        canvasHeight = Math.max(380, Math.floor(rect.height));
+        solarCanvas.width = Math.floor(canvasWidth * dpr);
+        solarCanvas.height = Math.floor(canvasHeight * dpr);
+        if (solarCtx) {
+          solarCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+      }
+
+      function auToScreen(xAu, yAu) {
+        const baseScale = Math.min(canvasWidth, canvasHeight) / 7.2; // fits +/- 3.6 AU comfortably
+        const pxPerAu = baseScale * state.cameraZoom;
+        const cx = canvasWidth / 2 + state.panX;
+        const cy = canvasHeight / 2 + state.panY;
+        return {
+          sx: cx + xAu * pxPerAu,
+          sy: cy - yAu * pxPerAu, // +Y is ecliptic north (upward)
+          pxPerAu
+        };
+      }
+
+      // Draw a planet with Sun-facing day/night hemisphere and rotating axial spin markers
+      function drawPlanetWithSpin(ctx, sx, sy, radius, sunAngleRad, spinAngleRad, styleCfg, isSelected) {
+        ctx.save();
+        ctx.translate(sx, sy);
+
+        if (isSelected) {
+          ctx.beginPath();
+          ctx.arc(0, 0, radius + 6, 0, Math.PI * 2);
+          ctx.strokeStyle = PALETTE.primary;
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([3, 3]);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+
+        // Clip to planetary disc
+        ctx.beginPath();
+        ctx.arc(0, 0, radius, 0, Math.PI * 2);
+        ctx.clip();
+
+        // Day base fill
+        ctx.fillStyle = styleCfg.day;
+        ctx.fillRect(-radius, -radius, radius * 2, radius * 2);
+
+        // Rotating surface features (axial spin)
+        ctx.save();
+        ctx.rotate(-spinAngleRad); // counter-clockwise = prograde when spinAngleRad > 0
+        ctx.fillStyle = styleCfg.feature;
+        if (styleCfg.kind === 'earth') {
+          ctx.beginPath();
+          ctx.ellipse(-radius * 0.25, -radius * 0.15, radius * 0.42, radius * 0.26, 0.4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.ellipse(radius * 0.35, radius * 0.22, radius * 0.3, radius * 0.22, -0.3, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (styleCfg.kind === 'venus') {
+          ctx.beginPath();
+          ctx.ellipse(0, -radius * 0.28, radius * 0.85, radius * 0.16, 0.15, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.ellipse(0, radius * 0.30, radius * 0.78, radius * 0.15, -0.1, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (styleCfg.kind === 'mars') {
+          ctx.beginPath();
+          ctx.ellipse(radius * 0.2, -radius * 0.1, radius * 0.45, radius * 0.28, 0.5, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (styleCfg.kind === 'moon') {
+          ctx.beginPath();
+          ctx.arc(-radius * 0.28, -radius * 0.2, radius * 0.22, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(radius * 0.3, radius * 0.22, radius * 0.16, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Prime meridian spin line so day/night rotation is unmistakable
+        ctx.strokeStyle = PALETTE.onSurface;
+        ctx.globalAlpha = 0.55;
+        ctx.lineWidth = Math.max(1, radius * 0.08);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(radius, 0);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+        ctx.restore();
+
+        // Day/night terminator shadow (night hemisphere faces away from Sun)
+        ctx.save();
+        ctx.rotate(sunAngleRad);
+        ctx.fillStyle = PALETTE.nightVeil;
+        ctx.beginPath();
+        ctx.arc(0, 0, radius + 1, Math.PI * 0.5, Math.PI * 1.5, false);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+
+        ctx.restore();
+
+        // Subtle crisp rim
+        ctx.beginPath();
+        ctx.arc(sx, sy, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = isSelected ? PALETTE.primary : PALETTE.outline;
+        ctx.lineWidth = isSelected ? 1.5 : 0.8;
+        ctx.stroke();
+      }
+
+      function renderMainCanvas(positions) {
+        if (!solarCtx) return;
+        const ctx = solarCtx;
+
+        // Clear background
+        ctx.fillStyle = PALETTE.bg;
+        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+        // Starfield
+        for (let i = 0; i < stars.length; i++) {
+          const s = stars[i];
+          ctx.fillStyle = PALETTE.starColor;
+          ctx.globalAlpha = s.alpha;
+          ctx.fillRect(s.nx * canvasWidth, s.ny * canvasHeight, s.r, s.r);
+        }
+        ctx.globalAlpha = 1;
+
+        const origin = auToScreen(0, 0);
+        const pxPerAu = origin.pxPerAu;
+
+        // Polar AU distance rings & 30-degree ecliptic longitude axes
+        const ringsAu = [0.5, 1.0, 1.5, 2.0, 2.7, 3.3];
+        ctx.lineWidth = 1;
+        for (let i = 0; i < ringsAu.length; i++) {
+          const rPx = ringsAu[i] * pxPerAu;
+          ctx.beginPath();
+          ctx.arc(origin.sx, origin.sy, rPx, 0, Math.PI * 2);
+          ctx.strokeStyle = PALETTE.gridRing;
+          ctx.stroke();
+
+          if (state.showLabels && rPx > 28) {
+            ctx.fillStyle = PALETTE.onSurfaceVariant;
+            ctx.font = `10px ${token('--font-label')}`;
+            ctx.fillText(`${ringsAu[i].toFixed(1)} AU`, origin.sx + rPx + 4, origin.sy - 4);
+          }
+        }
+
+        // Radial longitude axes
+        ctx.strokeStyle = PALETTE.gridAxis;
+        for (let deg = 0; deg < 360; deg += 30) {
+          const rad = (deg * Math.PI) / 180;
+          ctx.beginPath();
+          ctx.moveTo(origin.sx, origin.sy);
+          ctx.lineTo(origin.sx + Math.cos(rad) * 3.5 * pxPerAu, origin.sy - Math.sin(rad) * 3.5 * pxPerAu);
+          ctx.stroke();
+        }
+
+        // Keplerian elliptical orbit paths
+        if (state.showGuides) {
+          const planetKeys = ['venus', 'earth', 'mars'];
+          for (let p = 0; p < planetKeys.length; p++) {
+            const b = BODIES[planetKeys[p]];
+            ctx.beginPath();
+            const steps = 128;
+            for (let k = 0; k <= steps; k++) {
+              const nu = (k / steps) * Math.PI * 2;
+              const r = (b.a * (1 - b.e * b.e)) / (1 + b.e * Math.cos(nu));
+              const th = nu + (b.varpiDeg * Math.PI) / 180;
+              const pt = auToScreen(r * Math.cos(th), r * Math.sin(th));
+              if (k === 0) ctx.moveTo(pt.sx, pt.sy);
+              else ctx.lineTo(pt.sx, pt.sy);
+            }
+            ctx.strokeStyle = b.id === state.selectedBody ? PALETTE.primary : PALETTE.outline;
+            ctx.globalAlpha = b.id === state.selectedBody ? 0.65 : 0.32;
+            ctx.lineWidth = b.id === state.selectedBody ? 1.4 : 1;
+            ctx.setLineDash([4, 4]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.globalAlpha = 1;
+          }
+        }
+
+        // Main Asteroid Belt Ring (2.15 - 3.25 AU)
+        if (state.showBelt) {
+          for (let i = 0; i < asteroids.length; i++) {
+            const ast = asteroids[i];
+            const n = (2 * Math.PI) / ast.periodDays;
+            const M = (ast.m0 + n * state.simDays) % (2 * Math.PI);
+            // First-order eccentric approximation sufficient for 480 belt rocks
+            const E = M + ast.e * Math.sin(M);
+            const r = ast.a * (1 - ast.e * Math.cos(E));
+            const nu = 2 * Math.atan2(
+              Math.sqrt(1 + ast.e) * Math.sin(E / 2),
+              Math.sqrt(1 - ast.e) * Math.cos(E / 2)
+            );
+            const th = nu + ast.varpi;
+            const pt = auToScreen(r * Math.cos(th), r * Math.sin(th));
+            if (pt.sx < -10 || pt.sx > canvasWidth + 10 || pt.sy < -10 || pt.sy > canvasHeight + 10) continue;
+            ctx.fillStyle = ast.bright ? PALETTE.beltRockBright : PALETTE.beltRock;
+            ctx.globalAlpha = ast.bright ? 0.78 : 0.48;
+            ctx.fillRect(pt.sx - ast.size * 0.5, pt.sy - ast.size * 0.5, ast.size, ast.size);
+          }
+          ctx.globalAlpha = 1;
+
+          if (state.showLabels) {
+            const beltLabelPt = auToScreen(-2.68, 0.2);
+            ctx.fillStyle = PALETTE.onSurfaceVariant;
+            ctx.font = `11px ${token('--font-label')}`;
+            ctx.fillText('MAIN ASTEROID BELT', beltLabelPt.sx - 64, beltLabelPt.sy);
+          }
+        }
+
+        // Persistent Orbital Motion Trails
+        const trailKeys = ['venus', 'earth', 'moon', 'mars'];
+        for (let k = 0; k < trailKeys.length; k++) {
+          const key = trailKeys[k];
+          const pts = trails[key];
+          if (pts.length < 2) continue;
+          const color = BODIES[key].trailColor;
+          ctx.lineWidth = key === 'moon' ? 1.1 : 1.8;
+          for (let i = 1; i < pts.length; i++) {
+            const p0 = auToScreen(pts[i - 1].x, pts[i - 1].y);
+            const p1 = auToScreen(pts[i].x, pts[i].y);
+            const alpha = 0.12 + 0.78 * (i / pts.length);
+            ctx.beginPath();
+            ctx.moveTo(p0.sx, p0.sy);
+            ctx.lineTo(p1.sx, p1.sy);
+            ctx.strokeStyle = color;
+            ctx.globalAlpha = state.trailsEnabled ? alpha : alpha * 0.35;
+            ctx.stroke();
+          }
+          ctx.globalAlpha = 1;
+        }
+
+        // Draw Sun at origin
+        const sunGrad = ctx.createRadialGradient(origin.sx, origin.sy, 4, origin.sx, origin.sy, 48);
+        sunGrad.addColorStop(0, PALETTE.sunCore);
+        sunGrad.addColorStop(0.35, PALETTE.sunMid);
+        sunGrad.addColorStop(1, 'rgba(247, 185, 85, 0)');
+        ctx.fillStyle = sunGrad;
+        ctx.beginPath();
+        ctx.arc(origin.sx, origin.sy, 48, 0, Math.PI * 2);
+        ctx.fill();
+
+        const sunR = BODIES.sun.radiusPx;
+        ctx.beginPath();
+        ctx.arc(origin.sx, origin.sy, sunR, 0, Math.PI * 2);
+        ctx.fillStyle = PALETTE.sunCore;
+        ctx.fill();
+        if (state.selectedBody === 'sun') {
+          ctx.beginPath();
+          ctx.arc(origin.sx, origin.sy, sunR + 6, 0, Math.PI * 2);
+          ctx.strokeStyle = PALETTE.primary;
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([3, 3]);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+        // Solar axial rotation marker
+        const sunSpin = getVisualSpinAngle(BODIES.sun, state.simDays, positions.earth);
+        ctx.save();
+        ctx.translate(origin.sx, origin.sy);
+        ctx.rotate(-sunSpin);
+        ctx.strokeStyle = PALETTE.sunMid;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(sunR - 2, 0);
+        ctx.stroke();
+        ctx.restore();
+
+        screenPositions.sun = { sx: origin.sx, sy: origin.sy, r: sunR + 8 };
+
+        if (state.showLabels) {
+          ctx.fillStyle = PALETTE.primary;
+          ctx.font = `600 11px ${token('--font-label')}`;
+          ctx.fillText('SUN', origin.sx + sunR + 6, origin.sy - 6);
+        }
+
+        // Draw Venus, Earth, Mars
+        const planetStyles = {
+          venus: { kind: 'venus', day: PALETTE.venusDay, feature: PALETTE.venusBand },
+          earth: { kind: 'earth', day: PALETTE.earthDay, feature: PALETTE.earthLand },
+          mars: { kind: 'mars', day: PALETTE.marsDay, feature: PALETTE.marsMare }
+        };
+
+        const renderPlanets = ['venus', 'earth', 'mars'];
+        for (let i = 0; i < renderPlanets.length; i++) {
+          const id = renderPlanets[i];
+          const body = BODIES[id];
+          const pos = positions[id];
+          const pt = auToScreen(pos.x, pos.y);
+          // Vector from planet toward Sun in screen coords: (origin.sx - pt.sx, origin.sy - pt.sy)
+          const sunAngle = Math.atan2(origin.sy - pt.sy, origin.sx - pt.sx);
+          const spinAngle = getVisualSpinAngle(body, state.simDays, positions.earth);
+
+          drawPlanetWithSpin(
+            ctx,
+            pt.sx,
+            pt.sy,
+            body.radiusPx,
+            sunAngle,
+            spinAngle,
+            planetStyles[id],
+            state.selectedBody === id
+          );
+
+          screenPositions[id] = { sx: pt.sx, sy: pt.sy, r: body.radiusPx + 10 };
+
+          // Draw Earth's Moon orbit ring when rendering Earth
+          if (id === 'earth') {
+            const moonRingPx = BODIES.moon.visualOrbitAu * pxPerAu;
+            ctx.beginPath();
+            ctx.arc(pt.sx, pt.sy, moonRingPx, 0, Math.PI * 2);
+            ctx.strokeStyle = PALETTE.outline;
+            ctx.globalAlpha = 0.45;
+            ctx.lineWidth = 1;
+            ctx.setLineDash([2, 3]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.globalAlpha = 1;
+          }
+
+          if (state.showLabels) {
+            ctx.fillStyle = PALETTE.onSurface;
+            ctx.font = `500 11px ${token('--font-label')}`;
+            ctx.fillText(
+              `${body.name.toUpperCase()} (${pos.v.toFixed(1)} km/s)`,
+              pt.sx + body.radiusPx + 7,
+              pt.sy - body.radiusPx + 2
+            );
+          }
+        }
+
+        // Draw Moon around Earth
+        const moonPt = auToScreen(positions.moon.visX, positions.moon.visY);
+        const moonSunAngle = Math.atan2(origin.sy - moonPt.sy, origin.sx - moonPt.sx);
+        const earthPt = screenPositions.earth;
+        // Tidally locked spin: face toward Earth
+        const moonLockAngle = Math.atan2(-(earthPt.sy - moonPt.sy), earthPt.sx - moonPt.sx);
+        drawPlanetWithSpin(
+          ctx,
+          moonPt.sx,
+          moonPt.sy,
+          BODIES.moon.radiusPx,
+          moonSunAngle,
+          moonLockAngle,
+          { kind: 'moon', day: PALETTE.moonDay, feature: PALETTE.moonCrater },
+          state.selectedBody === 'moon'
+        );
+        screenPositions.moon = { sx: moonPt.sx, sy: moonPt.sy, r: BODIES.moon.radiusPx + 10 };
+
+        if (state.showLabels) {
+          ctx.fillStyle = PALETTE.onSurfaceVariant;
+          ctx.font = `10px ${token('--font-label')}`;
+          ctx.fillText('MOON', moonPt.sx + 7, moonPt.sy + 11);
+        }
+      }
+
+      // Render magnified axial spin inspector canvas
+      function renderSpinInspector(positions) {
+        if (!spinCtx || !spinCanvas) return;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const targetSize = 150;
+        if (spinCanvas.width !== targetSize * dpr) {
+          spinCanvas.width = targetSize * dpr;
+          spinCanvas.height = targetSize * dpr;
+        }
+        spinCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        spinCtx.fillStyle = PALETTE.bg;
+        spinCtx.fillRect(0, 0, targetSize, targetSize);
+
+        const cx = targetSize / 2;
+        const cy = targetSize / 2;
+        const R = 44;
+        const id = state.selectedBody;
+        const body = BODIES[id];
+
+        // Subtle polar rings
+        spinCtx.strokeStyle = PALETTE.gridRing;
+        spinCtx.lineWidth = 1;
+        spinCtx.beginPath();
+        spinCtx.arc(cx, cy, R + 12, 0, Math.PI * 2);
+        spinCtx.stroke();
+
+        if (id === 'sun') {
+          const grad = spinCtx.createRadialGradient(cx, cy, 8, cx, cy, R + 18);
+          grad.addColorStop(0, PALETTE.sunCore);
+          grad.addColorStop(0.65, PALETTE.sunMid);
+          grad.addColorStop(1, 'rgba(247, 185, 85, 0)');
+          spinCtx.fillStyle = grad;
+          spinCtx.beginPath();
+          spinCtx.arc(cx, cy, R + 18, 0, Math.PI * 2);
+          spinCtx.fill();
+
+          const sunSpin = getVisualSpinAngle(body, state.simDays, positions.earth);
+          spinCtx.save();
+          spinCtx.translate(cx, cy);
+          spinCtx.rotate(-sunSpin);
+          spinCtx.strokeStyle = PALETTE.onSurface;
+          spinCtx.lineWidth = 2;
+          spinCtx.beginPath();
+          spinCtx.moveTo(0, 0);
+          spinCtx.lineTo(R - 4, 0);
+          spinCtx.stroke();
+          spinCtx.restore();
+        } else {
+          const pos = id === 'moon'
+            ? { x: positions.moon.visX, y: positions.moon.visY }
+            : positions[id];
+          // In screen coords, Sun is at (0,0) and body is at (pos.x, -pos.y)
+          const sunAngle = Math.atan2(pos.y, -pos.x);
+          let spinAngle;
+          if (id === 'moon') {
+            spinAngle = Math.atan2(-(positions.earth.y - pos.y), positions.earth.x - pos.x);
+          } else {
+            spinAngle = getVisualSpinAngle(body, state.simDays, positions.earth);
+          }
+
+          const styleMap = {
+            venus: { kind: 'venus', day: PALETTE.venusDay, feature: PALETTE.venusBand },
+            earth: { kind: 'earth', day: PALETTE.earthDay, feature: PALETTE.earthLand },
+            moon: { kind: 'moon', day: PALETTE.moonDay, feature: PALETTE.moonCrater },
+            mars: { kind: 'mars', day: PALETTE.marsDay, feature: PALETTE.marsMare }
+          };
+
+          drawPlanetWithSpin(spinCtx, cx, cy, R, sunAngle, spinAngle, styleMap[id], false);
+
+          // Draw subtle Sun-direction ray arrow outside ring
+          const rayX = cx + Math.cos(sunAngle) * (R + 22);
+          const rayY = cy + Math.sin(sunAngle) * (R + 22);
+          spinCtx.fillStyle = PALETTE.primary;
+          spinCtx.beginPath();
+          spinCtx.arc(rayX, rayY, 3.5, 0, Math.PI * 2);
+          spinCtx.fill();
+        }
+
+        // Direction label inside corner
+        spinCtx.fillStyle = body.retrograde ? PALETTE.marsDay : PALETTE.positive;
+        spinCtx.font = `600 10px ${token('--font-label')}`;
+        const dirText = id === 'moon' ? 'TIDAL LOCK' : (body.retrograde ? 'CW · RETRO' : 'CCW · PRO');
+        spinCtx.fillText(dirText, 8, 16);
+      }
+
+      // Update DOM telemetry readouts
+      function fmtSigned(val, decimals) {
+        const s = val.toFixed(decimals);
+        return val >= 0 ? `+${s}` : s;
+      }
+
+      function updateTelemetryDOM(positions) {
+        const epochEl = document.getElementById('epoch-readout');
+        if (epochEl) {
+          epochEl.textContent = `T + ${state.simDays.toFixed(1)} D · ${(state.simDays / 365.256).toFixed(3)} YR`;
+        }
+
+        const dateEl = document.getElementById('date-readout');
+        if (dateEl) {
+          const dt = new Date(START_DATE_MS + state.simDays * 86400000);
+          dateEl.textContent = dt.toISOString().slice(0, 10);
+        }
+
+        const statusBadge = document.getElementById('sim-status-badge');
+        if (statusBadge) {
+          statusBadge.textContent = `${state.isRunning ? 'RUNNING' : 'PAUSED'} · ${state.speed.toFixed(1)}×`;
+        }
+
+        // Table rows
+        const rows = ['venus', 'earth', 'moon', 'mars'];
+        for (let i = 0; i < rows.length; i++) {
+          const id = rows[i];
+          const p = positions[id];
+          const elX = document.getElementById(`tel-${id}-x`);
+          const elY = document.getElementById(`tel-${id}-y`);
+          const elR = document.getElementById(`tel-${id}-r`);
+          const elV = document.getElementById(`tel-${id}-v`);
+          const elSpin = document.getElementById(`tel-${id}-spin`);
+          if (elX) elX.textContent = fmtSigned(p.x, 3);
+          if (elY) elY.textContent = fmtSigned(p.y, 3);
+          if (elR) elR.textContent = p.r.toFixed(3);
+          if (elV) elV.textContent = id === 'moon' ? `${p.v.toFixed(2)}*` : p.v.toFixed(2);
+          if (elSpin) {
+            const prefix = id === 'moon' ? 'LOCK' : (BODIES[id].retrograde ? 'RET' : 'PRO');
+            elSpin.textContent = `${prefix} ${Math.round(p.rotPhaseDeg)}°`;
+          }
+        }
+
+        // Inspector panel
+        const selId = state.selectedBody;
+        const selBody = BODIES[selId];
+        const selPos = positions[selId];
+
+        const classTag = document.getElementById('inspector-class-tag');
+        if (classTag) classTag.textContent = selBody.classification;
+
+        const inspXY = document.getElementById('insp-xy');
+        const inspSpeed = document.getElementById('insp-speed');
+        const inspR = document.getElementById('insp-r');
+        const inspSpin = document.getElementById('insp-spin');
+        const inspEq = document.getElementById('insp-vis-viva-eq');
+        const inspSub = document.getElementById('insp-vis-viva-sub');
+
+        if (selId === 'sun') {
+          if (inspXY) inspXY.textContent = '+0.000, +0.000 AU';
+          if (inspSpeed) inspSpeed.textContent = '0.00 km/s (Origin)';
+          if (inspR) inspR.textContent = '0.000 AU';
+          if (inspSpin) inspSpin.textContent = '+25.38 d (Sidereal)';
+          if (inspEq) inspEq.textContent = 'Heliocentric Frame Origin (0, 0)';
+          if (inspSub) inspSub.textContent = 'μ☉ = 1.3271 × 10¹¹ km³/s² · Tilt = 7.25° · Rot = 25.38 d';
+        } else {
+          if (inspXY) inspXY.textContent = `${fmtSigned(selPos.x, 3)}, ${fmtSigned(selPos.y, 3)} AU`;
+          if (inspSpeed) {
+            inspSpeed.textContent = selId === 'moon'
+              ? `${selPos.v.toFixed(3)} km/s (Geo)`
+              : `${selPos.v.toFixed(2)} km/s`;
+          }
+          if (inspR) {
+            inspR.textContent = selId === 'moon'
+              ? `${Math.round(selPos.geoR * AU_KM).toLocaleString()} km`
+              : `${selPos.r.toFixed(4)} AU`;
+          }
+          if (inspSpin) {
+            if (Math.abs(selBody.rotPeriodDays) < 2) {
+              const hrs = selBody.rotPeriodDays * 24;
+              inspSpin.textContent = `${fmtSigned(hrs, 2)} h (${Math.round(selPos.rotPhaseDeg)}°)`;
+            } else {
+              inspSpin.textContent = `${fmtSigned(selBody.rotPeriodDays, 2)} d (${Math.round(selPos.rotPhaseDeg)}°)`;
+            }
+          }
+          if (inspEq) {
+            if (selId === 'moon') {
+              inspEq.textContent = `v = √[μ⊕ · (2/${(selPos.geoR * AU_KM).toFixed(0)} − 1/${(selBody.a * AU_KM).toFixed(0)})] = ${selPos.v.toFixed(3)} km/s`;
+            } else {
+              inspEq.textContent = `v = √[μ☉ · (2/${selPos.r.toFixed(4)} − 1/${selBody.a.toFixed(4)})] = ${selPos.v.toFixed(2)} km/s`;
+            }
+          }
+          if (inspSub) {
+            inspSub.textContent = `a = ${selBody.a.toFixed(4)} AU · e = ${selBody.e.toFixed(4)} · ν = ${selPos.nuDeg.toFixed(1)}° · Period = ${selBody.periodDays.toFixed(2)} d`;
+          }
+        }
+      }
+
+      // Record trail samples cleanly when simulation advances
+      function recordTrails(positions) {
+        if (!state.trailsEnabled) return;
+        if (Math.abs(state.simDays - state.lastTrailDay) < 0.8) return;
+        state.lastTrailDay = state.simDays;
+
+        const trailSpecs = [
+          { key: 'venus', x: positions.venus.x, y: positions.venus.y },
+          { key: 'earth', x: positions.earth.x, y: positions.earth.y },
+          { key: 'moon', x: positions.moon.visX, y: positions.moon.visY },
+          { key: 'mars', x: positions.mars.x, y: positions.mars.y }
+        ];
+
+        for (let i = 0; i < trailSpecs.length; i++) {
+          const item = trailSpecs[i];
+          const arr = trails[item.key];
+          arr.push({ x: item.x, y: item.y });
+          if (arr.length > MAX_TRAIL_POINTS) {
+            arr.shift();
+          }
+        }
+      }
+
+      // Single requestAnimationFrame owner
+      let animId = 0;
+      function frameLoop(now) {
+        if (state.lastFrameTime === null) {
+          state.lastFrameTime = now;
+        }
+        const dtSec = Math.min((now - state.lastFrameTime) / 1000, 0.1);
+        state.lastFrameTime = now;
+
+        if (state.isRunning) {
+          state.simDays += dtSec * BASE_DAYS_PER_SEC * state.speed;
+        }
+
+        const positions = computeAllBodies(state.simDays);
+        if (state.isRunning) {
+          recordTrails(positions);
+        }
+
+        renderMainCanvas(positions);
+        renderSpinInspector(positions);
+        updateTelemetryDOM(positions);
+
+        animId = requestAnimationFrame(frameLoop);
+      }
+
+      // State persistence helper
+      async function persistSettings() {
+        if (window.notebookAppApi && typeof window.notebookAppApi.setAppState === 'function') {
+          try {
+            await window.notebookAppApi.setAppState({
+              speed: state.speed,
+              trailsEnabled: state.trailsEnabled,
+              showGuides: state.showGuides,
+              showBelt: state.showBelt,
+              showLabels: state.showLabels,
+              selectedBody: state.selectedBody,
+              simDays: Number(state.simDays.toFixed(2)),
+              isRunning: state.isRunning
+            });
+          } catch (e) {
+            // Keep simulation uninterrupted if host persistence rejects
+          }
+        }
+      }
+
+      function applySpeedUI(val) {
+        const clamped = Math.max(0.1, Math.min(5.0, Math.round(val * 10) / 10));
+        state.speed = clamped;
+        const slider = document.getElementById('speed-slider');
+        const num = document.getElementById('speed-number');
+        const rateEl = document.getElementById('speed-rate-readout');
+        if (slider && Number(slider.value) !== clamped) slider.value = clamped.toFixed(1);
+        if (num && document.activeElement !== num) num.value = clamped.toFixed(1);
+        if (rateEl) rateEl.textContent = `${(BASE_DAYS_PER_SEC * clamped).toFixed(1)} days/s`;
+
+        const chips = document.querySelectorAll('.preset-chip');
+        chips.forEach((chip) => {
+          const match = Math.abs(Number(chip.dataset.speed) - clamped) < 0.05;
+          chip.setAttribute('aria-pressed', match ? 'true' : 'false');
+        });
+      }
+
+      function updateRunButtonUI() {
+        const label = document.getElementById('label-run-state');
+        const icon = document.getElementById('icon-run-state');
+        if (label) {
+          label.textContent = state.isRunning ? 'Pause' : 'Start';
+        }
+        if (icon) {
+          icon.innerHTML = state.isRunning
+            ? '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>'
+            : '<polygon points="6,4 20,12 6,20"></polygon>';
+        }
+      }
+
+      function updateToggleWrappers() {
+        const pairs = [
+          ['toggle-trails', 'wrap-toggle-trails', state.trailsEnabled],
+          ['toggle-guides', 'wrap-toggle-guides', state.showGuides],
+          ['toggle-belt', 'wrap-toggle-belt', state.showBelt],
+          ['toggle-labels', 'wrap-toggle-labels', state.showLabels]
+        ];
+        for (let i = 0; i < pairs.length; i++) {
+          const cb = document.getElementById(pairs[i][0]);
+          const wrap = document.getElementById(pairs[i][1]);
+          const val = pairs[i][2];
+          if (cb) cb.checked = val;
+          if (wrap) wrap.classList.toggle('is-checked', val);
+        }
+      }
+
+      function updateZoomHUD() {
+        const el = document.getElementById('hud-zoom-tag');
+        if (el) el.textContent = `ZOOM ${state.cameraZoom.toFixed(2)}×`;
+      }
+
+      // Hoisted global handlers for inline DOM events
+      window.toggleSimulation = function toggleSimulation() {
+        state.isRunning = !state.isRunning;
+        updateRunButtonUI();
+        persistSettings();
+      };
+
+      window.resetSimulation = function resetSimulation() {
+        state.simDays = 0;
+        state.lastTrailDay = -999;
+        trails.venus.length = 0;
+        trails.earth.length = 0;
+        trails.moon.length = 0;
+        trails.mars.length = 0;
+        state.cameraZoom = 1.0;
+        state.panX = 0;
+        state.panY = 0;
+        updateZoomHUD();
+        const positions = computeAllBodies(0);
+        recordTrails(positions);
+        renderMainCanvas(positions);
+        renderSpinInspector(positions);
+        updateTelemetryDOM(positions);
+        persistSettings();
+      };
+
+      window.clearTrails = function clearTrails() {
+        trails.venus.length = 0;
+        trails.earth.length = 0;
+        trails.moon.length = 0;
+        trails.mars.length = 0;
+        state.lastTrailDay = -999;
+        const positions = computeAllBodies(state.simDays);
+        if (state.trailsEnabled) recordTrails(positions);
+        renderMainCanvas(positions);
+      };
+
+      window.syncSpeedFromSlider = function syncSpeedFromSlider(val) {
+        const parsed = parseFloat(val);
+        if (Number.isNaN(parsed)) return;
+        const num = document.getElementById('speed-number');
+        const clamped = Math.max(0.1, Math.min(5.0, Math.round(parsed * 10) / 10));
+        if (num) num.value = clamped.toFixed(1);
+        applySpeedUI(clamped);
+        persistSettings();
+      };
+
+      window.syncSpeedFromNumber = function syncSpeedFromNumber(val) {
+        const parsed = parseFloat(val);
+        if (Number.isNaN(parsed)) return;
+        const slider = document.getElementById('speed-slider');
+        const clamped = Math.max(0.1, Math.min(5.0, Math.round(parsed * 10) / 10));
+        if (slider) slider.value = clamped.toFixed(1);
+        applySpeedUI(clamped);
+        persistSettings();
+      };
+
+      window.setSpeedPreset = function setSpeedPreset(val) {
+        const slider = document.getElementById('speed-slider');
+        const num = document.getElementById('speed-number');
+        if (slider) slider.value = val.toFixed(1);
+        if (num) num.value = val.toFixed(1);
+        applySpeedUI(val);
+        persistSettings();
+      };
+
+      window.toggleTrailsPersistence = function toggleTrailsPersistence(checked) {
+        state.trailsEnabled = Boolean(checked);
+        updateToggleWrappers();
+        persistSettings();
+      };
+
+      window.toggleGuides = function toggleGuides(checked) {
+        state.showGuides = Boolean(checked);
+        updateToggleWrappers();
+        persistSettings();
+      };
+
+      window.toggleBelt = function toggleBelt(checked) {
+        state.showBelt = Boolean(checked);
+        updateToggleWrappers();
+        persistSettings();
+      };
+
+      window.toggleLabels = function toggleLabels(checked) {
+        state.showLabels = Boolean(checked);
+        updateToggleWrappers();
+        persistSettings();
+      };
+
+      window.selectBody = function selectBody(bodyId) {
+        if (!BODIES[bodyId]) return;
+        state.selectedBody = bodyId;
+
+        const tabs = ['venus', 'earth', 'moon', 'mars', 'sun'];
+        for (let i = 0; i < tabs.length; i++) {
+          const tab = document.getElementById(`tab-${tabs[i]}`);
+          if (tab) tab.setAttribute('aria-selected', tabs[i] === bodyId ? 'true' : 'false');
+          const row = document.getElementById(`row-${tabs[i]}`);
+          if (row) row.classList.toggle('is-selected', tabs[i] === bodyId);
+        }
+
+        const positions = computeAllBodies(state.simDays);
+        renderSpinInspector(positions);
+        updateTelemetryDOM(positions);
+        persistSettings();
+      };
+
+      window.adjustZoom = function adjustZoom(factor) {
+        state.cameraZoom = Math.max(0.45, Math.min(8.0, state.cameraZoom * factor));
+        updateZoomHUD();
+      };
+
+      window.resetCamera = function resetCamera() {
+        state.cameraZoom = 1.0;
+        state.panX = 0;
+        state.panY = 0;
+        updateZoomHUD();
+      };
+
+      // Interactive canvas pan, wheel zoom, and click-to-select body
+      let dragging = false;
+      let dragMoved = false;
+      let dragStartX = 0;
+      let dragStartY = 0;
+      let startPanX = 0;
+      let startPanY = 0;
+
+      if (solarCanvas) {
+        solarCanvas.addEventListener('pointerdown', (e) => {
+          dragging = true;
+          dragMoved = false;
+          dragStartX = e.clientX;
+          dragStartY = e.clientY;
+          startPanX = state.panX;
+          startPanY = state.panY;
+          solarCanvas.setPointerCapture(e.pointerId);
+        });
+
+        solarCanvas.addEventListener('pointermove', (e) => {
+          if (!dragging) return;
+          const dx = e.clientX - dragStartX;
+          const dy = e.clientY - dragStartY;
+          if (Math.hypot(dx, dy) > 4) {
+            dragMoved = true;
+            state.panX = startPanX + dx;
+            state.panY = startPanY + dy;
+          }
+        });
+
+        solarCanvas.addEventListener('pointerup', (e) => {
+          if (!dragging) return;
+          dragging = false;
+          if (!dragMoved) {
+            const rect = solarCanvas.getBoundingClientRect();
+            const px = e.clientX - rect.left;
+            const py = e.clientY - rect.top;
+            const checkOrder = ['moon', 'venus', 'earth', 'mars', 'sun'];
+            for (let i = 0; i < checkOrder.length; i++) {
+              const id = checkOrder[i];
+              const hit = screenPositions[id];
+              if (hit && Math.hypot(px - hit.sx, py - hit.sy) <= hit.r) {
+                window.selectBody(id);
+                break;
+              }
+            }
+          }
+        });
+
+        solarCanvas.addEventListener('wheel', (e) => {
+          e.preventDefault();
+          const factor = e.deltaY < 0 ? 1.12 : 0.89;
+          window.adjustZoom(factor);
+        }, { passive: false });
+      }
+
+      // Keyboard shortcut: Spacebar toggles Start/Pause when not typing in an input
+      document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' && document.activeElement && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'BUTTON') {
+          e.preventDefault();
+          window.toggleSimulation();
+        }
+      });
+
+      window.addEventListener('resize', resizeMainCanvas);
+
+      // Initialize simulation & restore persisted app state
+      async function initApp() {
+        initBackgroundAndBelt();
+        resizeMainCanvas();
+
+        if (window.notebookAppApi && typeof window.notebookAppApi.getAppState === 'function') {
+          try {
+            const saved = await window.notebookAppApi.getAppState();
+            if (saved && typeof saved === 'object') {
+              if (typeof saved.speed === 'number') state.speed = saved.speed;
+              if (typeof saved.trailsEnabled === 'boolean') state.trailsEnabled = saved.trailsEnabled;
+              if (typeof saved.showGuides === 'boolean') state.showGuides = saved.showGuides;
+              if (typeof saved.showBelt === 'boolean') state.showBelt = saved.showBelt;
+              if (typeof saved.showLabels === 'boolean') state.showLabels = saved.showLabels;
+              if (typeof saved.selectedBody === 'string' && BODIES[saved.selectedBody]) {
+                state.selectedBody = saved.selectedBody;
+              }
+              if (typeof saved.simDays === 'number' && !Number.isNaN(saved.simDays)) {
+                state.simDays = saved.simDays;
+              }
+              if (typeof saved.isRunning === 'boolean') {
+                state.isRunning = saved.isRunning;
+              }
+            }
+          } catch (e) {
+            // Proceed cleanly with defaults
+          }
+        }
+
+        applySpeedUI(state.speed);
+        updateRunButtonUI();
+        updateToggleWrappers();
+        updateZoomHUD();
+        window.selectBody(state.selectedBody);
+
+        const initialPos = computeAllBodies(state.simDays);
+        recordTrails(initialPos);
+        renderMainCanvas(initialPos);
+        renderSpinInspector(initialPos);
+        updateTelemetryDOM(initialPos);
+
+        if (window.notebookAppApi && typeof window.notebookAppApi.notifyAppReady === 'function') {
+          window.notebookAppApi.notifyAppReady();
+        }
+
+        cancelAnimationFrame(animId);
+        animId = requestAnimationFrame(frameLoop);
+      }
+
+      initApp();
+    })();
+  </script>
+</body>
+</html>
